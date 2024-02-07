@@ -21,8 +21,10 @@ list(
                map(import_data) |> 
                list_rbind(), packages = c("lubridate", "stringr")),
   tar_target(data_wo_empty_cols, 
-             remove_empty(data_imported, which = c("rows", "cols")), packages = "janitor")
-  # tar_target(data_w_num_cols,
-  #            data_wo_empty_cols |> mutate(across(everything(), parse_number)))
-  
+             remove_empty(data_imported, which = c("rows", "cols")), 
+             packages = "janitor"),
+  tar_target(data_dttm_cols_repaired,
+             repair_dttm_cols(data_wo_empty_cols),
+             packages = c("lubridate", "dplyr"))  
+
 )
