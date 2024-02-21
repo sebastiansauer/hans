@@ -8,8 +8,13 @@
 .quarto
 
 
+# data:
 *.rda
+*/*.csv
 _targets/
+
+# debugging:
+test*.R
 
 
 
