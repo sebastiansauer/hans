@@ -1,0 +1,235 @@
+---
+title: "Analyse der Matoma-HaNS-Daten"
+subtitle: "Wintersemester 2023/2024"
+
+toc: true
+number-sections: true
+
+format: 
+  html:
+    theme: lumen
+    embed-resources: true
+    toc: true
+    toc-location: right
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-summary: "Show the code"
+    code-tools: true
+    
+execute: 
+  warning: false
+  cache: true
+---
+
+
+# Setup
+
+## R-Pakete starten
+
+
+
+```{r}
+library(targets)
+library(tidyverse)
+library(ggokabeito)
+library(easystats)
+library(gt)
+library(ggfittext)
+```
+
+## Roh-Daten laden
+
+```{r}
+#| eval: false
+#tar_load(data_all_chr)
+```
+
+JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind.
+
+# Roh-Datensatz inspizieren
+
+Der Roh-Datensatz verfügt über
+
+- *3722* Zeilen
+- *7233* Spalten (Dubletten und Spalten mit Bildern bereits entfernt)
+  
+
+Jede Zeile entspricht einem "Visit".
+
+# Datensatz nur User
+
+Entfernt man Developler, Admins und Lecturere aus dem Roh-Datensatz so bleiben weniger Zeilen übrig:
+
+- *2546* Zeilen
+
+
+# Anzahl der Aktionen pro User
+
+```{r load-count-action}
+tar_load(count_action)
+```
+
+
+## Statistiken
+
+```{r}
+count_action |> 
+  describe_distribution(n_max) |> 
+  gt() |> 
+  fmt_number(columns = where(is.numeric),
+             decimals = 2)
+```
+
+
+## Verteilung
+
+```{r plot-count-action}
+count_action_avg = mean(count_action$n_max)
+count_action_sd = sd(count_action$n_max)
+
+count_action |> 
+  ggplot() +
+  geom_histogram(aes(x = n_max)) +
+  labs(x = "Anzahl von Aktionen pro Visit",
+       y = "n",
+       caption = "Der vertikale Strich zeigt den Mittelwert; der horizontale die SD") +
+  theme_minimal() +
+  geom_vline(xintercept = count_action_avg,
+             color = palette_okabe_ito()[1]) +
+  geom_segment(x = count_action_avg-count_action_sd,
+               y = 0,
+               xend = count_action_avg + count_action_sd,
+               yend = 0,
+               color = palette_okabe_ito()[2],
+               size = 2) +
+  annotate("label", x = count_action_avg, y = 1500, label = "MW") +
+  annotate("label", x = count_action_avg + count_action_sd, y = 0, label = "SD")
+  #geom_label(aes(x = count_action_avg), y = 1, label = "Mean")
+```
+
+
+
+- Mittelwert der Aktionen pro Visit: `r count_action_avg`.
+- SD der Aktionen pro Visit: `r count_action_sd`.
+
+
+# Zeit pro Visit
+
+Die Visit-Zeit wurde auf 600 Min. begrenzt.
+
+```{r load-time-spent}
+tar_load(time_spent)
+```
+
+```{r}
+time_spent <- 
+  time_spent |> 
+  mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
+  filter(t_min < 600)
+```
+
+## Verweildauer-Statistiken in Sekunden
+
+```{r comp-diff-time-stats}
+time_spent |> 
+  summarise(
+    mean_time_diff = mean(time_diff),
+    sd_time_diff = sd(time_diff),
+    min_time_diff = min(time_diff),
+    max_time_diff = max(time_diff)
+  ) |> 
+  gt() |> 
+  fmt_number(columns = everything(),
+             decimals = 2)
+```
+
+
+## Verweildauer-Statistiken in Minuten
+
+```{r}
+time_spent |> 
+  summarise(
+    mean_t_min = mean(t_min),
+    sd_t_min = sd(t_min),
+    min_t_min = min(t_min),
+    max_t_min = max(t_min)
+  ) |> 
+  gt() |> 
+  fmt_number(columns = everything(),
+             decimals = 2)
+```
+
+## Visualisierung der Verweildauer
+
+
+```{r plot-time-spent1}
+time_spent |> 
+  ggplot(aes(x = t_min)) +
+  geom_histogram() +
+  scale_x_time() +
+  theme_minimal() +
+  labs(y = "n",
+       x = "Verweildauer in HaNS pro Visit in Minuten")
+```
+
+
+
+```{r plot-time-spent2}
+time_spent |> 
+  ggplot(aes(x = t_min)) +
+  geom_histogram(binwidth = 5) +
+  theme_minimal() +
+  labs(y = "n",
+       x = "Verweildauer in Minuten",
+       title = "Verweildauzer in HaNS pro Visit")
+```
+
+
+
+```{r plot-time-spent3}
+time_spent2 <- 
+time_spent |> 
+  filter(t_min > 1, t_min < 120) 
+
+time_spent2 |> 
+  ggplot(aes(x = t_min)) +
+  geom_histogram(binwidth = 10) +
+  theme_minimal() +
+  labs(y = "n",
+       x = "Verweildauer in HaNS pro Visit in Minuten",
+       title = "Verweildauer begrenzt auf 1-120 Minuten")
+```
+
+
+
+# Was machen die User?
+
+```{r}
+tar_load(count_action_type)
+```
+
+
+## Statistiken
+
+```{r}
+count_action_type |> 
+  count(category, sort = TRUE) |> 
+  gt()
+```
+
+## Verteilung
+
+```{r}
+count_action_type |> 
+  count(category, sort = TRUE) |> 
+  ggplot(aes(y = reorder(category, n), x = n)) +
+  geom_col() +
+  geom_bar_text() +
+  labs(
+    x = "User-Aktion"
+  ) +
+  theme_minimal()
+```
+
+
