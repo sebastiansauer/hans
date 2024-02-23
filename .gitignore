@@ -12,6 +12,8 @@
 *.rda
 */*.csv
 _targets/
+obj/
+
 
 # debugging:
 test*.R
