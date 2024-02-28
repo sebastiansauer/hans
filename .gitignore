@@ -6,6 +6,9 @@
 .httr-oauth
 .DS_Store
 .quarto
+report_files/
+report_cache/
+
 
 
 # data:
@@ -13,6 +16,9 @@
 */*.csv
 _targets/
 obj/
+*.csv
+
+
 
 
 # debugging:
