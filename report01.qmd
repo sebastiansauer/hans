@@ -1,0 +1,330 @@
+---
+title: "Analyse der Matoma-HaNS-Daten"
+subtitle: "Wintersemester 2023/2024"
+
+toc: true
+number-sections: true
+
+format: 
+  html:
+    theme: lumen
+    embed-resources: true
+    toc: true
+    toc-location: right
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-summary: "Show the code"
+    code-tools: true
+    
+execute: 
+  warning: false
+  cache: false
+---
+
+
+# Setup
+
+## R-Pakete starten
+
+
+
+```{r load-libs}
+library(targets)
+library(tidyverse)
+library(ggokabeito)
+library(easystats)
+library(gt)
+library(ggfittext)
+library(scales)
+```
+
+## Roh-Daten laden
+
+```{r}
+#| eval: false
+#tar_load(data_all_chr)
+```
+
+JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind.
+
+# Roh-Datensatz inspizieren
+
+
+```{r load-data-all-f}
+tar_load(data_all_fct)
+```
+
+
+Der Roh-Datensatz verfügt über
+
+- `r nrow(data_all_fct)` Zeilen
+- `r ncol(data_all_fct)` Spalten (Dubletten und Spalten mit Bildern bereits entfernt)
+  
+
+Jede Zeile entspricht einem "Visit".
+
+# Datensatz nur User
+
+Entfernt man Developler, Admins und Lecturers aus dem Roh-Datensatz so bleiben weniger Zeilen übrig:
+
+
+
+```{r load-data-users-only}
+tar_load(data_users_only)
+```
+
+
+- `r nrow(data_users_only)` Zeilen
+- `r ncol(data_users_only)` Spalten 
+  
+
+# Anzahl der Aktionen pro User
+
+```{r load-count-action}
+tar_load(count_action)
+```
+
+
+## Statistiken
+
+### Mit den 499er-Daten
+
+```{r}
+count_action |> 
+  describe_distribution(n_max) |> 
+  gt() |> 
+  fmt_number(columns = where(is.numeric),
+             decimals = 2)
+```
+
+
+### Ohne die 499er-Daten
+
+
+```{r}
+count_action2 <- 
+count_action |> 
+  filter(n_max != 499) 
+
+count_action2 |> 
+  describe_distribution(n_max) |> 
+  gt() |> 
+  fmt_number(columns = where(is.numeric),
+             decimals = 2)
+```
+
+## Verteilung
+
+### Mit den 499er-Daten
+
+```{r plot-count-action}
+count_action_avg = mean(count_action$n_max)
+count_action_sd = sd(count_action$n_max)
+
+count_action |> 
+  ggplot() +
+  geom_histogram(aes(x = n_max)) +
+  labs(x = "Anzahl von Aktionen pro Visit",
+       y = "n",
+       caption = "Der vertikale Strich zeigt den Mittelwert; der horizontale die SD") +
+  theme_minimal() +
+  geom_vline(xintercept = count_action_avg,
+             color = palette_okabe_ito()[1]) +
+  geom_segment(x = count_action_avg-count_action_sd,
+               y = 0,
+               xend = count_action_avg + count_action_sd,
+               yend = 0,
+               color = palette_okabe_ito()[2],
+               size = 2) +
+  annotate("label", x = count_action_avg, y = 1500, label = "MW") +
+  annotate("label", x = count_action_avg + count_action_sd, y = 0, label = "SD")
+  #geom_label(aes(x = count_action_avg), y = 1, label = "Mean")
+```
+
+
+
+- Mittelwert der Aktionen pro Visit: `r round(count_action_avg, 2)`.
+- SD der Aktionen pro Visit: `r round(count_action_sd, 2)`.
+
+
+### Ohne 499er-Daten
+
+```{r plot-count-action-2}
+count_action_avg2 = mean(count_action2$n_max)
+count_action_sd2 = sd(count_action2$n_max)
+
+count_action2 |> 
+  ggplot() +
+  geom_histogram(aes(x = n_max)) +
+  labs(x = "Anzahl von Aktionen pro Visit",
+       y = "n",
+       title = "Verteilung der User-Aktionen pro Visit",
+       caption = "Der vertikale Strich zeigt den Mittelwert; der horizontale die SD") +
+  theme_minimal() +
+  geom_vline(xintercept = count_action_avg2,
+             color = palette_okabe_ito()[1]) +
+  geom_segment(x = count_action_avg-count_action_sd2,
+               y = 0,
+               xend = count_action_avg2 + count_action_sd2,
+               yend = 0,
+               color = palette_okabe_ito()[2],
+               size = 2) +
+  annotate("label", x = count_action_avg2, y = 1500, label = "MW", vjust = "top") +
+  annotate("label", x = count_action_avg2 + count_action_sd2, y = 0, label = "SD", vjust = "bottom")
+  #geom_label(aes(x = count_action_avg), y = 1, label = "Mean")
+```
+
+
+
+- Mittelwert der Aktionen pro Visit: `r round(count_action_avg2, 2)`.
+- SD der Aktionen pro Visit: `r round(count_action_sd2, 2)`.
+
+
+# Zeit pro Visit
+
+Die Visit-Zeit wurde auf 600 Min. begrenzt.
+
+```{r load-time-spent}
+tar_load(time_spent)
+```
+
+```{r}
+time_spent <- 
+  time_spent |> 
+  mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
+  filter(t_min < 600)
+```
+
+## Verweildauer-Statistiken in Sekunden
+
+```{r comp-diff-time-stats}
+time_spent |> 
+  summarise(
+    mean_time_diff = round(mean(time_diff), 2),
+    sd_time_diff = sd(time_diff),
+    min_time_diff = min(time_diff),
+    max_time_diff = max(time_diff)
+  ) |> 
+  gt() |> 
+  fmt_number(columns = everything(),
+             decimals = 2)
+```
+
+
+## Verweildauer-Statistiken in Minuten
+
+```{r}
+time_spent |> 
+  summarise(
+    mean_t_min = mean(t_min),
+    sd_t_min = sd(t_min),
+    min_t_min = min(t_min),
+    max_t_min = max(t_min)
+  ) |> 
+  gt() |> 
+  fmt_number(columns = everything(),
+             decimals = 2)
+```
+
+## Visualisierung der Verweildauer
+
+### bins=20
+
+```{r plot-time-spent1}
+time_spent |> 
+  ggplot(aes(x = t_min)) +
+  geom_histogram() +
+  scale_x_time() +
+  theme_minimal() +
+  labs(y = "n",
+       x = "Verweildauer in HaNS pro Visit in Minuten")
+```
+
+
+
+### bins=100
+
+```{r plot-time-spent2}
+time_spent |> 
+  ggplot(aes(x = t_min)) +
+  geom_histogram(binwidth = 5) +
+  theme_minimal() +
+  labs(y = "n",
+       x = "Verweildauer in Minuten",
+       title = "Verweildauer in HaNS pro Visit",
+       caption = "binwidth = 5 Min.")
+```
+
+### Zeitdauer begrenzt auf 1-120 Min.
+
+```{r plot-time-spent3}
+time_spent2 <- 
+time_spent |> 
+  filter(t_min > 1, t_min < 120) 
+
+time_spent2 |> 
+  ggplot(aes(x = t_min)) +
+  geom_histogram(binwidth = 10) +
+  theme_minimal() +
+  labs(y = "n",
+       x = "Verweildauer in HaNS pro Visit in Minuten",
+       title = "Verweildauer begrenzt auf 1-120 Minuten",
+       caption = "bindwidth = 10 Min.")
+```
+
+
+
+# Was machen die User?
+
+```{r tar-load-count-action-type}
+tar_load(count_action_type)
+```
+
+
+## Statistiken
+
+```{r}
+count_action_type |> 
+  count(category, sort = TRUE) |> 
+  gt()
+```
+
+## Verteilung
+
+### Rohwerte
+
+```{r vis-count-action-type}
+count_action_type |> 
+  count(category, sort = TRUE) |> 
+  ggplot(aes(y = reorder(category, n), x = n)) +
+  geom_col() +
+  geom_bar_text() +
+  labs(
+    x = "User-Aktion",
+    y = "Aktion",
+    title = "Anzahl der User-Aktionen nach Kategorie"
+  ) +
+  theme_minimal() +
+  scale_x_continuous(labels = scales::comma)
+```
+
+
+### Log-Skalierung
+
+```{r vis-count-action-type}
+#| fig-width: 9
+count_action_type |> 
+  count(category, sort = TRUE) |> 
+  ggplot(aes(y = reorder(category, n), x = n)) +
+  geom_col() +
+  geom_bar_text() +
+  labs(
+    x = "Anazhl der User-Aktionen",
+    y = "Aktion",
+    title = "Anzahl der User-Aktionen nach Kategorie",
+    caption = "Log10-Skala"
+  ) +
+  theme_minimal() +
+  scale_x_log10()
+```

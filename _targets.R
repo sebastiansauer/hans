@@ -28,7 +28,7 @@ list(
   tar_target(data_imported, 
              data_files_no_json |> 
                map(import_data) |> 
-               list_rbind(), packages = c("lubridate", "stringr")),
+               list_rbind(), packages = c("lubridate", "stringr", "data.table")),
   
   # remove empty cols:
   tar_target(data_wo_empty_cols, 
@@ -75,28 +75,16 @@ list(
   
   # tinify data set for quicker debugging:
   tar_target(data_little_long,
-             data_little |> 
-               get_vars(vars = c("idvisit", grep("actiondetails_", names(data_little), value = TRUE))) |> 
-               pivot(ids = "idvisit",
-                     how = "longer",
-                     check.dups = TRUE, 
-                     factor = FALSE),
+             data_little |> longify_data(),
              packages = "collapse"),
  
   tar_target(data_user1_long,
              longify_data(data_user1),
              packages = "collapse"),
   
-  
   # pivot longer to get a handle on the number of cols per login:
   tar_target(data_long,
-             data_all_chr |> 
-               get_vars(vars = c("idvisit", grep("actiondetails_", names(data_all_chr),
-                                                 value = TRUE))) |> 
-               pivot(ids = "idvisit",
-                     how = "longer",
-                     check.dups = TRUE, 
-                     factor = FALSE),
+             data_all_chr |> longify_data(),
              packages = "collapse"),
 
   # slimify and separate:
@@ -106,21 +94,25 @@ list(
   tar_target(data_user1_long_slim,
               slimify_nona_data(data_user1_long), 
              packages = c("dplyr", "tidyr", "collapse")),
+  tar_target(data_slim_head,
+             data_slim[1:1e5,]),
 
   # count rows per visit:
   tar_target(count_action,
              data_slim |>
                group_by(idvisit) |>
-               summarise(n_max = n())),
+               summarise(n_max = max(nr))),
   
+  # count time spent per visit:
   tar_target(time_spent,
              data_slim |> diff_time(),
              packages = "lubridate"),
   
+  # count action categories per visit:
   tar_target(count_action_type,
              count_user_action_type(data_slim), packages = "stringr"),
   
   # render report:
-  tar_quarto(report, "report.qmd")
+  tar_quarto(report01, "report01.qmd")
 
 )

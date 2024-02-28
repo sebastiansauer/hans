@@ -14,8 +14,8 @@ import_data <- function(file, verbose = TRUE){
   print(paste0("Now processing: ", file))
   
   d_raw <- switch(file_suffix(file),
-        "csv" = readr::read_csv(file),
-        "tsv" = readr::read_tsv(file),
+        "csv" = fread(file, sep = ","),
+        "tsv" = fread(file, sep = "\t"),
         "json" = jsonlite::fromJSON(file),
         stop("invalid file suffix"))
   
