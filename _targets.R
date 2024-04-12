@@ -5,24 +5,28 @@ library(tarchetypes)
 # packages available for all targets:
 tar_option_set(packages = c("dplyr", "purrr", "readr", "tidyr"))
 
+
 # source funs:
 funs_files <- list.files(path = "funs", pattern = "\\.R", full.names = TRUE)
 lapply(X = funs_files, FUN = source)
 
 # targets, ie., steps to be computed:
 list(
-  # read data path:
-  tar_target(data_path_raw, read_yaml("config.yaml")$data_23ws, 
+  # read data path as saved in config.yaml:
+  tar_target(paths, read_yaml("config.yaml"), packages = "yaml"),
+  tar_target(data_path_raw, paths$data_23ws, 
              packages = "yaml"),
   tar_target(data_files_list, list.files(path = data_path_raw,
                                          full.names = TRUE,
                                          recursive = TRUE), format = "file"),
   
   # exclude duplicate data files:
-  tar_target(data_files_dupes_excluded, exclude_dupes(data_files_list)),
+  tar_target(data_files_dupes_excluded, 
+             exclude_dupes(data_files_list)),
   
   # exclude json files:
-  tar_target(data_files_no_json, exclude_filetype(data_files_dupes_excluded, "json")),
+  tar_target(data_files_no_json, 
+             exclude_filetype(data_files_dupes_excluded, "json")),
   
   # import data files and bind in one df:
   tar_target(data_imported, 
@@ -62,12 +66,14 @@ list(
   # exclude non-participants:
   tar_target(data_users_only,
              data_all_chr |> 
-               filter(!str_detect(actiondetails_0_url, "=admin|=developer|=lecturer")) |> 
-               filter(!str_detect(actiondetails_1_subtitle, "=admin|=developer|=lecturer"))),
+               filter(!str_detect(actiondetails_0_url, 
+                                  "=admin|=developer|=lecturer")) |> 
+               filter(!str_detect(actiondetails_1_subtitle, 
+                                  "=admin|=developer|=lecturer"))),
   
   # prepare little data set for quick checking:
   tar_target(data_little,
-             data_users_only[1:50, 1:50] |> write_csv("obj/data_little.csv")),
+             data_users_only[1:50, 1:50]),
   
   tar_target(data_user1,
              data_all_chr |> 
@@ -103,16 +109,37 @@ list(
                group_by(idvisit) |>
                summarise(n_max = max(nr))),
   
-  # count time spent per visit:
+  # compute time spent per visit:
   tar_target(time_spent,
              data_slim |> diff_time(),
+             packages = "lubridate"),
+  tar_target(time_minmax,
+             data_slim |> time_min_max(),
              packages = "lubridate"),
   
   # count action categories per visit:
   tar_target(count_action_type,
              count_user_action_type(data_slim), packages = "stringr"),
   
+  # count time of visit per weekday:
+  tar_target(time_visit_wday,
+             data_slim |> when_visited(), 
+             packages = c("collapse", "lubridate")),
+  
   # render report:
-  tar_quarto(report01, "report01.qmd")
-
+  tar_quarto(report01, "report01.qmd"),
+  
+  # export processed data to disk as RDS file:
+  tar_target(data_to_be_exported, list(time_spent = time_spent, 
+                                       data_slim = data_slim, 
+                                       count_action = count_action,
+                                       data_little = data_little,
+                                       data_all_chr = data_all_chr,
+                                       data_user1 = data_user1,
+                                       data_user1_long = data_user1_long,
+                                       data_little_long = data_little_long,
+                                       data_slim_head = data_slim_head)),
+  tar_target(export_data, save_data_as_rds(data_to_be_exported),
+             packages = c("purrr", "yaml"))
+            
 )
