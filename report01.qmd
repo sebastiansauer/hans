@@ -19,7 +19,7 @@ format:
     
 execute: 
   warning: false
-  cache: false
+  cache: true
 ---
 
 
@@ -39,16 +39,12 @@ library(ggfittext)
 library(scales)
 ```
 
-## Roh-Daten laden
+## Roh-Daten laden und inspizieren
 
-```{r}
-#| eval: false
-#tar_load(data_all_chr)
-```
 
 JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind.
 
-# Roh-Datensatz inspizieren
+
 
 
 ```{r load-data-all-f}
@@ -56,17 +52,21 @@ tar_load(data_all_fct)
 ```
 
 
+### Dimension
+
 Der Roh-Datensatz verfügt über
 
 - `r nrow(data_all_fct)` Zeilen
 - `r ncol(data_all_fct)` Spalten (Dubletten und Spalten mit Bildern bereits entfernt)
-  
+
+
+
 
 Jede Zeile entspricht einem "Visit".
 
-# Datensatz nur User
+## Datensatz nur User
 
-Entfernt man Developler, Admins und Lecturers aus dem Roh-Datensatz so bleiben weniger Zeilen übrig:
+Entfernt man Developer, Admins und Lecturers aus dem Roh-Datensatz so bleiben weniger Zeilen übrig:
 
 
 
@@ -77,14 +77,32 @@ tar_load(data_users_only)
 
 - `r nrow(data_users_only)` Zeilen
 - `r ncol(data_users_only)` Spalten 
+
+
   
 
-# Anzahl der Aktionen pro User
+## Datensatz mit Anzahl der Aktionen pro User
 
 ```{r load-count-action}
 tar_load(count_action)
 ```
 
+
+## Zeitraum (Beginn, Ende) der Daten
+
+```{r}
+tar_load(time_minmax)
+```
+
+
+```{r}
+time_minmax |> 
+  summarise(time_min = min(time_min),
+            time_max = max(time_max)) |> 
+  gt()
+```
+
+Diese Statistik wurde auf Basis des Datenobjekts `data_slim` berechnet.
 
 ## Statistiken
 
@@ -181,7 +199,7 @@ count_action2 |>
 - SD der Aktionen pro Visit: `r round(count_action_sd2, 2)`.
 
 
-# Zeit pro Visit
+# Zeit pro Visit 
 
 Die Visit-Zeit wurde auf 600 Min. begrenzt.
 
@@ -312,7 +330,7 @@ count_action_type |>
 
 ### Log-Skalierung
 
-```{r vis-count-action-type}
+```{r vis-count-action-type-log}
 #| fig-width: 9
 count_action_type |> 
   count(category, sort = TRUE) |> 
@@ -328,3 +346,139 @@ count_action_type |>
   theme_minimal() +
   scale_x_log10()
 ```
+
+
+
+# An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?
+
+## Setup
+
+```{r}
+tar_load(time_visit_wday)
+```
+
+
+```{r}
+# Define a vector with the names of the days of the week
+# Note: Adjust the start of the week (Sunday or Monday) as per your requirement
+days_of_week <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+# Replace numbers with day names
+time_visit_wday$dow2 <- factor(days_of_week[time_visit_wday$dow],
+                               levels = days_of_week)
+```
+
+
+
+## HaNS-Login nach Uhrzeit
+
+```{r vis-hans-login-hour}
+time_visit_wday |> 
+  as_tibble() |> 
+  count(hour) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "HaNS-Nutzer sind keine Frühaufsteher",
+    x = "Uhrzeit",
+    y = "Anteil"
+  )
+ # coord_polar()
+```
+
+
+
+
+```{r vis-hans-login-hour-polar}
+time_visit_wday |> 
+  as_tibble() |> 
+  count(hour) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  coord_polar()
+```
+
+
+
+## Verteilung der HaNS-Besuche nach Wochentagen
+
+
+
+```{r vis-hans-login-wday-bar}
+time_visit_wday |> 
+  as_tibble() |> 
+  count(dow2) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = dow2, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "Verteilung der HaNS-Logins nach Wochentagen",
+       x = "Wochentag",
+       y = "Anteil")
+ # coord_polar()
+```
+
+
+
+
+```{r vis-hans-login-wday-polar}
+time_visit_wday |> 
+  as_tibble() |> 
+  count(dow2) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = dow2, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "Verteilung der HaNS-Logins nach Wochentagen",
+       x = "Wochentag",
+       y = "Anteil")  +
+  coord_polar()
+```
+
+
+### HaNS-Login nach Wochentagen Uhrzeit
+
+
+
+
+```{r vis-hans-login-wday-hour}
+time_visit_wday |> 
+  as_tibble() |> 
+  count(dow2, hour) |> 
+  group_by(dow2) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  facet_wrap(~ dow2) +
+  theme_minimal() +
+  labs(title = "Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten",
+       x = "Wochentag",
+       y = "Anteil")
+ # coord_polar()
+```
+
+
+
+```{r vis-hans-login-wday-hour-polar}
+#| fig-width: 9
+#| fig-asp: 1.5
+time_visit_wday |> 
+  as_tibble() |> 
+  count(dow2, hour) |> 
+  group_by(dow2) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  facet_wrap(~ dow2) +
+  theme_minimal() +
+  labs(title = "Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten",
+       x = "Wochentag",
+       y = "Anteil") +
+  coord_polar()
+```
+
+
