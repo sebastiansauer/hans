@@ -6,8 +6,13 @@
 .httr-oauth
 .DS_Store
 .quarto
+
+
+# cache:
 report_files/
 report_cache/
+*_cache/
+*_files/
 
 
 
