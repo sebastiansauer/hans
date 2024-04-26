@@ -39,6 +39,11 @@ library(ggfittext)
 library(scales)
 ```
 
+```{r}
+theme_set(theme_minimal())
+```
+
+
 ## Roh-Daten laden und inspizieren
 
 
@@ -481,4 +486,53 @@ time_visit_wday |>
   coord_polar()
 ```
 
+## Anzahl der Visits nach Datum (Tagen) und Uhrzeit (bin2d)
 
+```{r}
+time2 <- 
+time_visit_wday |> 
+  ungroup() |> 
+  mutate(date = as.Date(date_time))
+
+time2 |> 
+  ggplot(aes(x = date, y = hour)) +
+  geom_bin2d(binwidth = c(1, 1)) + # (1 day, 1 hour)
+  scale_x_date(date_breaks = "1 month") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(caption = "Segmentierung X-Achse: pro Tag")
+ 
+```
+
+
+## Anzahl der Visits nach Datum (Wochen) und Uhrzeit (bin2d)
+
+
+```{r}
+time2 |> 
+  ggplot(aes(x = date, y = hour)) +
+  geom_bin2d(binwidth = c(7, 1)) +  # 1 week, 1 hour
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c()  +
+  labs(x = "Week number in 2023/2024",
+       caption = "Each x-bin maps to one week")
+```
+
+## Anzahl der Visits nach Datum (Wochen) und Wochentag (bin2d)
+
+
+
+
+
+```{r}
+time2 |> 
+  ggplot(aes(x = date, y = dow)) +
+  geom_bin2d(binwidth = c(7, 1)) +  # 1 week, 1 hour
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c()  +
+  labs(x = "Week number in 2023/2024",
+       caption = "Each x-bin maps to one week") +
+  scale_y_continuous(breaks = 1:7)
+```

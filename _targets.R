@@ -81,10 +81,10 @@ list(
   
   # tinify data set for quicker debugging:
   tar_target(data_little_long,
-             data_little |> longify_data(),
+             data_little |> longify_data(),  # transform into long format
              packages = "collapse"),
  
-  tar_target(data_user1_long,
+  tar_target(data_user1_long,  # transform into long format
              longify_data(data_user1),
              packages = "collapse"),
   
@@ -92,10 +92,13 @@ list(
   tar_target(data_long,
              data_all_chr |> longify_data(),
              packages = "collapse"),
+  
+  tar_target(data_long_nona,
+             data_long |> drop_na()),  # drop rows with missing data
 
   # slimify and separate:
   tar_target(data_slim,
-             slimify_nona_data(data_long), 
+             slimify_nona_data(data_long_nona), 
              packages = c("dplyr", "tidyr", "collapse")),
   tar_target(data_user1_long_slim,
               slimify_nona_data(data_user1_long), 
