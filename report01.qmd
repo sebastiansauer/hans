@@ -500,7 +500,7 @@ time2 |>
   scale_x_date(date_breaks = "1 month") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
-  labs(caption = "Segmentierung X-Achse: pro Tag")
+  labs(caption = "Each x-bin maps to one week")
  
 ```
 
@@ -533,6 +533,7 @@ time2 |>
   theme(legend.position = "bottom") +
   scale_fill_viridis_c()  +
   labs(x = "Week number in 2023/2024",
-       caption = "Each x-bin maps to one week") +
+       caption = "Each x-bin maps to one week",
+       y = "Day of Week") +
   scale_y_continuous(breaks = 1:7)
 ```
