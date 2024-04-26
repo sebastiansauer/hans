@@ -2,7 +2,7 @@ slimify_nona_data <- function(data_long) {
   
   out <- 
     data_long |> 
-    drop_na() |> # better placed  more upstream in pipe, so save computation time downstream
+    #drop_na() |> # better placed  more upstream in pipe, so save computation time downstream
     # prepare to count the number of things a user does:
     select(variable, value, idvisit) |> 
     separate(variable, sep = "_", into = c("constant", "nr", "type")) |> 
