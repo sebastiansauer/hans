@@ -1,6 +1,8 @@
-data: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw"
-data_23ws: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw/23-ws"
-data_test: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw/test"
-data_out: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-processed/23-ws"
+data: "data/data-raw"
+data_23ws: "data/data-raw/23-ws"
+data_test: "data/data-raw/test"
+data_out_23ws: "data/data-processed/23-ws"
+data_out: "data/data-processed"
+profile: "23ws_24ss"
 
 

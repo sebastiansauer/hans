@@ -7,18 +7,25 @@ tar_option_set(packages = c("dplyr", "purrr", "readr", "tidyr"))
 
 
 # source funs:
-funs_files <- list.files(path = "funs", pattern = "\\.R", full.names = TRUE)
+funs_files <- list.files(
+  path = "funs", pattern = "\\.R", full.names = TRUE)
 lapply(X = funs_files, FUN = source)
+
 
 # targets, ie., steps to be computed:
 list(
   # read data path as saved in config.yaml:
-  tar_target(paths, read_yaml("config.yaml"), packages = "yaml"),
-  tar_target(data_path_raw, paths$data_23ws, 
+  tar_target(config_file, "config.yaml", 
+             format = "file"),  # watch config file
+  tar_target(paths, read_yaml(config_file), 
              packages = "yaml"),
-  tar_target(data_files_list, list.files(path = data_path_raw,
-                                         full.names = TRUE,
-                                         recursive = TRUE), format = "file"),
+  tar_target(data_path_raw, paths$data, 
+             packages = "yaml"),
+  tar_target(data_files_list, 
+             list.files(path = data_path_raw,
+                        full.names = TRUE,
+                        recursive = TRUE), 
+             format = "file"),  # watch data source files
   
   # exclude duplicate data files:
   tar_target(data_files_dupes_excluded, 
@@ -32,7 +39,8 @@ list(
   tar_target(data_imported, 
              data_files_no_json |> 
                map(import_data) |> 
-               list_rbind(), packages = c("lubridate", "stringr", "data.table")),
+               list_rbind(), 
+             packages = c("lubridate", "stringr", "data.table")),
   
   # remove empty cols:
   tar_target(data_wo_empty_cols, 
@@ -106,43 +114,60 @@ list(
   tar_target(data_slim_head,
              data_slim[1:1e5,]),
 
-  # count rows per visit:
+  # count rows per visit (n):
   tar_target(count_action,
              data_slim |>
                group_by(idvisit) |>
-               summarise(n_max = max(nr))),
+               # "nr" is the id of the action of this visit:
+               summarise(n_max = max(nr))), 
   
-  # compute time spent per visit:
+  # compute time variables per visit:
   tar_target(time_spent,
              data_slim |> diff_time(),
              packages = "lubridate"),
   tar_target(time_minmax,
              data_slim |> time_min_max(),
              packages = "lubridate"),
+  tar_target(time_duration,
+             data_all_chr %>% 
+               select(idvisit, visitduration) %>% 
+               mutate(visitduration_sec = as.numeric(visitduration)) %>% 
+               select(-visitduration)),
+  # count time of visit per weekday:
+  tar_target(time_visit_wday,
+             data_slim |> when_visited(), 
+             packages = c("collapse", "lubridate")),
+  tar_target(time_since_last_visit,
+             data_all_fct |> 
+               select(idvisit, dayssincelastvisit)
+             ),
+  
   
   # count action categories per visit:
   tar_target(count_action_type,
              count_user_action_type(data_slim), packages = "stringr"),
   
-  # count time of visit per weekday:
-  tar_target(time_visit_wday,
-             data_slim |> when_visited(), 
-             packages = c("collapse", "lubridate")),
+
   
   # render report:
   tar_quarto(report01, "report01.qmd"),
   
   # export processed data to disk as RDS file:
-  tar_target(data_to_be_exported, list(time_spent = time_spent, 
-                                       data_slim = data_slim, 
-                                       count_action = count_action,
-                                       data_little = data_little,
-                                       data_all_chr = data_all_chr,
-                                       data_user1 = data_user1,
-                                       data_user1_long = data_user1_long,
-                                       data_little_long = data_little_long,
-                                       data_slim_head = data_slim_head)),
-  tar_target(export_data, save_data_as_rds(data_to_be_exported),
+  tar_target(data_to_be_exported, 
+             list(
+               time_spent = time_spent, 
+               data_slim = data_slim, 
+               count_action = count_action,
+               data_little = data_little,
+               data_all_chr = data_all_chr,
+               data_all_fct = data_all_fct,
+               data_user1 = data_user1,
+               data_user1_long = data_user1_long,
+               data_little_long = data_little_long,
+               data_slim_head = data_slim_head)),
+  tar_target(export_data, 
+             save_data_as_rds(
+               data_to_be_exported, config_file),
              packages = c("purrr", "yaml"))
             
 )
