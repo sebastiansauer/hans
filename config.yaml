@@ -4,5 +4,6 @@ data_test: "data/data-raw/test"
 data_out_23ws: "data/data-processed/23-ws"
 data_out: "data/data-processed"
 profile: "23ws_24ss"
+data_raw_pattern: ".csv$"
 
 
