@@ -1,6 +1,9 @@
+this_semester: "24-ss"
 data: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw"
 data_23ws: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw/23-ws"
+data_24ss: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw/24-ss"
 data_test: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-raw/test"
 data_out: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-processed/23-ws"
+data_out_24ss: "/Users/sebastiansaueruser/FAUbox/HAnS-Ansbach/data-processed/24-ss"
 
 

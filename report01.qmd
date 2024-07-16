@@ -1,6 +1,5 @@
 ---
 title: "Analyse der Matoma-HaNS-Daten"
-subtitle: "Wintersemester 2023/2024"
 
 toc: true
 number-sections: true
@@ -94,6 +93,16 @@ tar_load(count_action)
 
 
 ## Zeitraum (Beginn, Ende) der Daten
+
+
+```{r}
+tar_load(paths)
+```
+
+
+Laut `config.yaml` ist das aktuelle Semester `r paths$this_semester`.
+
+
 
 ```{r}
 tar_load(time_minmax)
@@ -537,3 +546,40 @@ time2 |>
        y = "Day of Week") +
   scale_y_continuous(breaks = 1:7)
 ```
+
+
+# KI-Gebrauch
+
+
+## Welcher Anteil der Nutzenden klickt auf ein Wort im Transkript?
+
+
+```{r}
+tar_load(data_slim)
+```
+
+
+```{r}
+data_slim |> 
+  filter(type == "subtitle") |> 
+  filter(!is.na(value) & value != "") |> 
+  count(click_transcript_word = str_detect(value, "click_transcript_word")) |> 
+  mutate(prop = n/sum(n)) |> 
+  gt()
+```
+
+
+## ... Aufteilung nach Monaten
+
+
+```{r}
+tar_load(ai_transcript_clicks_per_month)
+```
+
+
+
+```{r}
+ai_transcript_clicks_per_month |> 
+  gt()
+```
+

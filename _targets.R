@@ -14,7 +14,7 @@ lapply(X = funs_files, FUN = source)
 list(
   # read data path as saved in config.yaml:
   tar_target(paths, read_yaml("config.yaml"), packages = "yaml"),
-  tar_target(data_path_raw, paths$data_23ws, 
+  tar_target(data_path_raw, paths$data_24ss, 
              packages = "yaml"),
   tar_target(data_files_list, list.files(path = data_path_raw,
                                          full.names = TRUE,
@@ -129,8 +129,22 @@ list(
              data_slim |> when_visited(), 
              packages = c("collapse", "lubridate")),
   
+  # count AI transcript clicks per month:
+  tar_target(ai_transcript_clicks_per_month,
+             data_slim |> 
+               filter(type == "subtitle" | type == "timestamp") |> 
+               filter(!is.na(value) & value != "")  |> 
+               ftransform(date_time = parse_date_time(value, "ymd HMS")) |> 
+               add_dates() |> 
+               group_by(year_month) |> 
+               count(click_transcript_word = str_detect(value, "click_transcript_word")),
+             packages = c("lubridate", "collapse", "stringr")),
+  
+  
+  
   # render report:
   tar_quarto(report01, "report01.qmd"),
+  
   
   # export processed data to disk as RDS file:
   tar_target(data_to_be_exported, list(time_spent = time_spent, 
