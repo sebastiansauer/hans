@@ -127,13 +127,14 @@ list(
              data_little |> longify_data(),  # transform into long format
              packages = "collapse"),
  
-  tar_target(data_user1_long,  # transform into long format
-             longify_data(data_user1),
+  tar_target(data_user1_long,  # transform into long format:
+             data_user1 |> longify_data(),
              packages = "collapse"),
 
 tar_target(data_wide_slim,
            data_less_cols |> 
            get_vars(vars = c("idvisit", 
+                             # get only the "actiondetails_XXX" variables:
                              grep("actiondetails_", names(data_less_cols),
                                   value = TRUE))),
            packages = "collapse"),
@@ -143,11 +144,7 @@ tar_target(data_wide_slim,
 # pivot longer ------------------------------------------------------------
 
   tar_target(data_long,
-             data_wide_slim |> 
-               pivot(ids = "idvisit",
-                     how = "longer",
-                     check.dups = TRUE, 
-                     factor = FALSE),
+             data_less_cols |> longify_data(),
              packages = "collapse"),
   
   # pivot longer to get a handle on the number of cols per login:
@@ -156,7 +153,7 @@ tar_target(data_wide_slim,
   #            packages = "collapse"),
   
   tar_target(data_long_nona,
-             data_long |> drop_na()),  # drop rows with missing data
+             data_long |> drop_na() |> filter(value != "")),  # drop rows with missing data
 
   # slimify and separate:
   tar_target(data_slim,
@@ -187,7 +184,7 @@ tar_target(data_wide_slim,
              data_slim |>
                group_by(idvisit) |>
                # "nr" is the id of the action of this visit:
-               summarise(n_max = max(nr))), 
+               summarise(nr_max = max(nr))), 
   
   # compute time variables per visit:
   tar_target(time_spent,
@@ -216,18 +213,40 @@ tar_target(data_wide_slim,
              count_user_action_type(data_slim), packages = "stringr"),
   
   # count AI transcript clicks per month:
-tar_target(ai_transcript_clicks_per_month,
-           data_slim |> 
-             filter(type == "subtitle" | type == "timestamp") |> 
-             filter(!is.na(value) & value != "")  |> 
-             ftransform(date_time = parse_date_time(value, "ymd HMS")) |> 
-             add_dates() |> 
-             group_by(year_month) |> 
-             count(click_transcript_word = str_detect(value, "click_transcript_word")),
-           packages = c("lubridate", "collapse", "stringr")),
+  tar_target(ai_transcript_clicks_per_month,
+             data_slim |> 
+               mutate(clicks_transcript = str_detect(value, "click_transcript_word"))  |> 
+               group_by(idvisit) |> 
+               mutate(clicks_transcript_any = any(clicks_transcript == TRUE)) |> 
+               filter(type == "timestamp") |> 
+               add_dates()  |> 
+               filter(date_time == min(date_time)) |> 
+               ungroup() |> 
+               select(-c(clicks_transcript)),
+             packages = c("lubridate", "collapse", "stringr")),
+
+  # count interactions with LLM per month:
+  tar_target(ai_llm_per_months,
+             data_slim |> 
+               filter(type == "eventcategory" | type == "timestamp") |> 
+               add_dates() |> 
+               group_by(year_month) |> 
+               count(llm_interaction = str_detect(value, "llm")),
+             packages = c("lubridate", "collapse", "stringr")),
 
 
-
+  # count how many visitors interact with the LLM:
+  tar_target(idvisit_has_llm, 
+               data_slim |> 
+               mutate(has_llm = str_detect(value, "llm"))  |> 
+               group_by(idvisit) |> 
+               mutate(uses_llm = any(has_llm == TRUE)) |> 
+               filter(type == "timestamp") |> 
+               add_dates()  |> 
+               filter(date_time == min(date_time)) |> 
+               ungroup() |> 
+               select(-c(has_llm)),
+             packages = c("lubridate", "collapse", "stringr")),
 
 # render report in Quarto -------------------------------------------------
 
