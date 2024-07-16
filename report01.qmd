@@ -139,15 +139,15 @@ tar_load(count_action)
 ## Zeitraum 
 
 
-### Beginn, Ende) der Daten
+### Beginn/Ende der Daten
 
 
 ```{r}
-tar_load(paths)
+tar_load(config)
 ```
 
 
-Laut `config.yaml` ist das aktuelle Semester `r paths$this_semester`.
+Laut `config.yaml` ist das aktuelle Semester `r config$this_semester`.
 
 
 
@@ -285,14 +285,12 @@ count_action2 |>
 
 # Zeit pro Visit 
 
-Die Visit-Zeit wurde auf 600 Min. begrenzt.
+Die Visit-Zeit wurde auf 600 Min. trunkiert/begrenzt.
 
 ```{r load-time-spent}
 tar_load(time_spent)
 tar_load(time_duration)
-```
 
-```{r time-spent}
 time_spent <- 
   time_spent |> 
   mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
@@ -308,6 +306,12 @@ time_spent |>
     sd_time_diff = sd(time_diff),
     min_time_diff = min(time_diff),
     max_time_diff = max(time_diff)
+  ) |> 
+  summarise(
+    mean_time_diff_avg = mean(mean_time_diff),
+    sd_time_diff_avg = mean(sd_time_diff, na.rm = TRUE),
+    min_time_diff_avg = mean(min_time_diff),
+    max_time_diff_avg = mean(max_time_diff)
   ) |> 
   gt() |> 
   fmt_number(columns = everything(),
@@ -335,6 +339,12 @@ time_spent |>
     min_t_min = min(t_min),
     max_t_min = max(t_min)
   ) |> 
+   summarise(
+    mean_t_min_avg = mean(mean_t_min),
+    sd_t_min_avg = mean(sd_t_min, na.rm = TRUE),
+    min_t_min_avg = mean(min_t_min),
+    max_t_min_avg = mean(max_t_min)
+  ) |>
   gt() |> 
   fmt_number(columns = everything(),
              decimals = 2)
@@ -397,7 +407,7 @@ tar_load(count_action_type)
 
 ## Statistiken
 
-```{r}
+```{r category-tab}
 count_action_type |> 
   count(category, sort = TRUE) |> 
   gt()
@@ -615,7 +625,7 @@ time2 |>
 
 
 
-```{r}
+```{r p-visits-day-wday}
 time2 |> 
   ggplot(aes(x = date, y = dow)) +
   geom_bin2d(binwidth = c(7, 1)) +  # 1 week, 1 hour
@@ -640,7 +650,7 @@ tar_load(data_slim)
 ```
 
 
-```{r}
+```{r ai-click-transcript-word}
 data_slim |> 
   filter(type == "subtitle") |> 
   filter(!is.na(value) & value != "") |> 
@@ -659,7 +669,7 @@ tar_load(ai_transcript_clicks_per_month)
 
 
 
-```{r}
+```{r  ai-click-transcript-word-months}
 ai_transcript_clicks_per_month |> 
   gt()
 ```
