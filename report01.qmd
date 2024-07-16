@@ -18,7 +18,7 @@ format:
     
 execute: 
   warning: false
-  cache: true
+  cache: false
 ---
 
 
@@ -36,6 +36,7 @@ library(easystats)
 library(gt)
 library(ggfittext)
 library(scales)
+library(visdat)
 ```
 
 ```{r}
@@ -43,7 +44,7 @@ theme_set(theme_minimal())
 ```
 
 
-## Roh-Daten laden und inspizieren
+## Roh-Daten laden und inspizieren (data_all_fact)
 
 
 JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind.
@@ -63,10 +64,53 @@ Der Roh-Datensatz verfügt über
 - `r nrow(data_all_fct)` Zeilen
 - `r ncol(data_all_fct)` Spalten (Dubletten und Spalten mit Bildern bereits entfernt)
 
-
-
-
 Jede Zeile entspricht einem "Visit".
+
+
+### Erster Blick
+
+
+```{r}
+data_all_fct_head100 <- 
+data_all_fct %>% 
+  select(1:100) %>% 
+  slice_head(n = 100) 
+```
+
+
+```{r vis-dat}
+data_all_fct_head100 %>% 
+  visdat::vis_dat()
+```
+
+
+### Namen (1-100)
+
+```{r}
+data_all_fct_head100 %>% 
+  names()
+```
+
+
+### Werte der erst 100 Spalten
+
+```{r}
+data_all_fct_head100 %>% 
+  glimpse()
+```
+
+
+
+### Datensatz data_slim, Zeilen 1-100
+
+```{r}
+tar_load(data_slim)
+
+data_slim %>% 
+  filter(idvisit == 1) %>% 
+  head(100)
+```
+
 
 ## Datensatz nur User
 
@@ -92,7 +136,10 @@ tar_load(count_action)
 ```
 
 
-## Zeitraum (Beginn, Ende) der Daten
+## Zeitraum 
+
+
+### Beginn, Ende) der Daten
 
 
 ```{r}
@@ -109,7 +156,7 @@ tar_load(time_minmax)
 ```
 
 
-```{r}
+```{r time-min-max}
 time_minmax |> 
   summarise(time_min = min(time_min),
             time_max = max(time_max)) |> 
@@ -117,6 +164,29 @@ time_minmax |>
 ```
 
 Diese Statistik wurde auf Basis des Datenobjekts `data_slim` berechnet.
+
+
+### Days since last visit
+
+```{r days-since-last-visit}
+tar_load(time_since_last_visit)
+
+
+time_since_last_visit <- 
+time_since_last_visit |> 
+  mutate(dayssincelastvisit = as.numeric(dayssincelastvisit)) 
+
+time_since_last_visit |> 
+  datawizard::describe_distribution(dayssincelastvisit) |> 
+  knitr::kable()
+
+time_since_last_visit |>
+  ggplot(aes(x=dayssincelastvisit)) +
+  geom_density()
+```
+
+
+
 
 ## Statistiken
 
@@ -219,9 +289,10 @@ Die Visit-Zeit wurde auf 600 Min. begrenzt.
 
 ```{r load-time-spent}
 tar_load(time_spent)
+tar_load(time_duration)
 ```
 
-```{r}
+```{r time-spent}
 time_spent <- 
   time_spent |> 
   mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
@@ -244,9 +315,19 @@ time_spent |>
 ```
 
 
+```{r time-duration}
+tar_load(time_duration)
+
+time_duration |> 
+  summarise(duration_sec_avg = mean(visitduration_sec, na.rm = TRUE))  |> 
+  mutate(duration_min_avg = duration_sec_avg / 60)
+```
+
+
+
 ## Verweildauer-Statistiken in Minuten
 
-```{r}
+```{r time-spent-tbl}
 time_spent |> 
   summarise(
     mean_t_min = mean(t_min),
