@@ -1,11 +1,4 @@
 
-# 
-# import_data <- function(file){
-#   
-#   if(file_suffix(file) == "csv") out <- readr::read_csv(file)
-#   if(file_suffix(file) == "tsv") out <- readr::read_tsv(file)
-#   if(file_suffix(file) == "json") out <- jsonlite::fromJSON(file)
-# }
 
 
 

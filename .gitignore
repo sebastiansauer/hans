@@ -22,6 +22,8 @@ report_cache/
 _targets/
 obj/
 *.csv
+data*/
+
 
 
 
