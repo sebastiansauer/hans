@@ -1,6 +1,7 @@
 ---
 title: "Analyse der Matoma-HaNS-Daten"
-subtitle: "Wintersemester 2023/2024"
+date: now
+author: Sebastian Sauer
 
 toc: true
 number-sections: true
@@ -108,8 +109,8 @@ data_all_fct_head100 %>%
 tar_load(data_slim)
 
 data_slim %>% 
-  filter(idvisit == 1) %>% 
-  head(100)
+  slice(1:100) |> 
+  gt()
 ```
 
 
@@ -140,7 +141,17 @@ tar_load(count_action)
 ## Zeitraum 
 
 
-### Beginn, Ende) der Daten
+### Beginn/Ende der Daten
+
+
+```{r}
+tar_load(config)
+```
+
+
+Laut `config.yaml` ist das **aktuelle Semester, d.h. `r config$this_semester`**.
+
+
 
 ```{r}
 tar_load(time_minmax)
@@ -181,27 +192,69 @@ time_since_last_visit |>
 
 ## Statistiken
 
-### Mit den 499er-Daten
+Die folgenden Statistiken beruhen auf dem Datensatz `data_slim`:
+
+
+```{r}
+glimpse(data_slim)
+```
+`nr` fasst die Nummer der Aktion innerhalb eines bestimmten Visits.
+
+
+### Mit allen Daten (den 499er-Daten)
+
+
 
 ```{r}
 count_action |> 
-  describe_distribution(n_max) |> 
+  describe_distribution(nr_max) |> 
   gt() |> 
   fmt_number(columns = where(is.numeric),
              decimals = 2)
 ```
 
+`nr_max` gibt den Maximalwert von `nr` zurück, sagt also, wie viele Aktionen maximal von einem Visitor ausgeführt wurden.
 
-### Ohne die 499er-Daten
+Betrachtet man die Anzahl der Aktionen pro Visitor näher, so fällt auf, dass der Maximalwert (499) sehr häufig vorkommt:
+
+```{r}
+count_action |> 
+  count(nr_max) |> 
+  ggplot(aes(x = nr_max, y = n)) +
+  geom_col()
+```
+
+Hier noch in einer anderen Darstellung:
+
+```{r}
+count_action |> 
+  count(nr_max) |> 
+  ggplot(aes(x = nr_max, y = n)) +
+  geom_point()
+```
+
+Der Maximalwert ist einfach auffällig häufig:
+
+
+```{r}
+count_action |> 
+  count(nr_max == 499) |> 
+  gt()
+```
+
+
+Es erscheint plausibel, dass der Maximalwert alle "gekappten" (zensierten, abgeschnittenen) Werte fasst, also viele Werte, die eigentlich größer wären (aber dann zensiert wurden).
+
+### Nur Visitors, für die weniger als 500 Aktionen protokolliert sind
 
 
 ```{r}
 count_action2 <- 
 count_action |> 
-  filter(n_max != 499) 
+  filter(nr_max != 499) 
 
 count_action2 |> 
-  describe_distribution(n_max) |> 
+  describe_distribution(nr_max) |> 
   gt() |> 
   fmt_number(columns = where(is.numeric),
              decimals = 2)
@@ -212,12 +265,12 @@ count_action2 |>
 ### Mit den 499er-Daten
 
 ```{r plot-count-action}
-count_action_avg = mean(count_action$n_max)
-count_action_sd = sd(count_action$n_max)
+count_action_avg = mean(count_action$nr_max)
+count_action_sd = sd(count_action$nr_max)
 
 count_action |> 
   ggplot() +
-  geom_histogram(aes(x = n_max)) +
+  geom_histogram(aes(x = nr_max)) +
   labs(x = "Anzahl von Aktionen pro Visit",
        y = "n",
        caption = "Der vertikale Strich zeigt den Mittelwert; der horizontale die SD") +
@@ -244,12 +297,12 @@ count_action |>
 ### Ohne 499er-Daten
 
 ```{r plot-count-action-2}
-count_action_avg2 = mean(count_action2$n_max)
-count_action_sd2 = sd(count_action2$n_max)
+count_action_avg2 = mean(count_action2$nr_max)
+count_action_sd2 = sd(count_action2$nr_max)
 
 count_action2 |> 
   ggplot() +
-  geom_histogram(aes(x = n_max)) +
+  geom_histogram(aes(x = nr_max)) +
   labs(x = "Anzahl von Aktionen pro Visit",
        y = "n",
        title = "Verteilung der User-Aktionen pro Visit",
@@ -276,14 +329,12 @@ count_action2 |>
 
 # Zeit pro Visit 
 
-Die Visit-Zeit wurde auf 600 Min. begrenzt.
+Die Visit-Zeit wurde auf 600 Min. trunkiert/begrenzt.
 
 ```{r load-time-spent}
 tar_load(time_spent)
 tar_load(time_duration)
-```
 
-```{r time-spent}
 time_spent <- 
   time_spent |> 
   mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
@@ -299,6 +350,12 @@ time_spent |>
     sd_time_diff = sd(time_diff),
     min_time_diff = min(time_diff),
     max_time_diff = max(time_diff)
+  ) |> 
+  summarise(
+    mean_time_diff_avg = mean(mean_time_diff),
+    sd_time_diff_avg = mean(sd_time_diff, na.rm = TRUE),
+    min_time_diff_avg = mean(min_time_diff),
+    max_time_diff_avg = mean(max_time_diff)
   ) |> 
   gt() |> 
   fmt_number(columns = everything(),
@@ -326,6 +383,12 @@ time_spent |>
     min_t_min = min(t_min),
     max_t_min = max(t_min)
   ) |> 
+   summarise(
+    mean_t_min_avg = mean(mean_t_min),
+    sd_t_min_avg = mean(sd_t_min, na.rm = TRUE),
+    min_t_min_avg = mean(min_t_min),
+    max_t_min_avg = mean(max_t_min)
+  ) |>
   gt() |> 
   fmt_number(columns = everything(),
              decimals = 2)
@@ -386,11 +449,25 @@ tar_load(count_action_type)
 ```
 
 
-## Statistiken
+## Häufigkeiten
 
-```{r}
+### Nach Kategorien
+
+```{r category-tab}
 count_action_type |> 
   count(category, sort = TRUE) |> 
+  mutate(prop = round(n/sum(n), 2)) |> 
+  gt()
+```
+
+### `eventcategory`
+
+Was machen die Visitors eigentlich? Und wie oft?
+
+```{r}
+data_slim |> 
+  filter(type == "eventcategory") |> 
+  count(value, sort = TRUE) |> 
   gt()
 ```
 
@@ -606,7 +683,7 @@ time2 |>
 
 
 
-```{r}
+```{r p-visits-day-wday}
 time2 |> 
   ggplot(aes(x = date, y = dow)) +
   geom_bin2d(binwidth = c(7, 1)) +  # 1 week, 1 hour
@@ -618,3 +695,154 @@ time2 |>
        y = "Day of Week") +
   scale_y_continuous(breaks = 1:7)
 ```
+
+
+
+# KI-Gebrauch
+
+
+## Interaktion mit dem LLM
+
+### Art und Anzahl der Interaktionen mit dem LLM
+
+```{r}
+data_slim |> 
+  filter(type == "eventcategory") |> 
+  filter(str_detect(value, "llm")) |> 
+  count(value, sort = TRUE) |> 
+  mutate(prop = n / round(sum(n), 2)) |> 
+  gt()
+```
+
+
+### Anteil Visitors, die mit dem LLM interagieren
+
+```{r}
+data_slim |> 
+  mutate(has_llm = str_detect(value, "llm"))  |> 
+  group_by(idvisit) |> 
+  summarise(llm_used_during_visit = any(has_llm == TRUE)) |> 
+  count(llm_used_during_visit) |> 
+  mutate(prop = round(n /sum(n), 2)) |> 
+  gt()
+```
+
+
+### ... Im Zeitverlauf
+
+
+```{r}
+tar_load(idvisit_has_llm)
+
+idvisit_has_llm |> 
+  count(year_month, uses_llm) |> 
+  ungroup() |> 
+  group_by(year_month) |> 
+  mutate(prop = round(n/sum(n), 2)) |> 
+  gt()
+```
+
+
+```{r}
+idvisit_has_llm |> 
+  count(year_month, uses_llm) |> 
+  ungroup() |> 
+  group_by(year_month) |> 
+  mutate(prop = n/sum(n)) |> 
+  ggplot(aes(x = year_month, y = prop, color = uses_llm, groups = uses_llm)) +
+  geom_point() +
+  geom_line(aes(group = uses_llm)) +
+  labs(title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anteile)")
+```
+
+
+```{r}
+idvisit_has_llm |> 
+  count(year_month, uses_llm) |> 
+  ungroup() |> 
+  group_by(year_month) |> 
+  ggplot(aes(x = year_month, y = n, color = uses_llm, groups = uses_llm)) +
+  geom_point() +
+  geom_line(aes(group = uses_llm)) +
+  labs(title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anzahl)")
+```
+
+## Klick auf ein Wort im Transkript
+
+
+```{r}
+tar_load(data_slim)
+```
+
+
+```{r ai-click-transcript-word}
+data_slim |> 
+  filter(type == "subtitle") |> 
+  filter(!is.na(value) & value != "") |> 
+  count(click_transcript_word = str_detect(value, "click_transcript_word")) |> 
+  mutate(prop = round(n/sum(n), 2)) |> 
+  gt()
+```
+
+
+
+
+
+
+## KI-Aktionen
+
+### Insgesamt (ganzer Zeitraum)
+
+```{r}
+tar_load(data_long)
+```
+
+
+#### Im Detail
+
+```{r ai-actions-count}
+ai_actions_count <- 
+  data_long |> 
+  filter(str_detect(value, "transcript")) |> 
+  count(value) 
+
+ai_actions_count |> 
+  gt()
+```
+
+#### Zusammengefasst nach "click transcript word"
+
+```{r}
+ai_actions_count |> 
+  mutate(value = case_when(
+    str_detect(value, "click_transcript_word.*") ~ "click transcript word",
+    TRUE ~ value
+  )) |> 
+  count(value, sort = TRUE) |> 
+  gt()
+```
+
+
+
+
+
+
+
+### KI-Klicks pro Monat
+
+```{r}
+tar_load(ai_transcript_clicks_per_month)
+```
+
+
+
+```{r  ai-click-transcript-word-months}
+ai_transcript_clicks_per_month |> 
+  count(year_month, clicks_transcript_any) |> 
+  ungroup() |> 
+  group_by(year_month) |> 
+  mutate(prop = round(n/sum(n), 2)) |> 
+  gt()
+```
+
+
