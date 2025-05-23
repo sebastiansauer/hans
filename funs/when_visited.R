@@ -8,7 +8,7 @@ when_visited <- function(data_slim){
     ungroup() |> 
     ftransform(type = as.character(type)) |> 
     ftransform(date_time = parse_date_time(value, "ymd HMS")) |>  # from lubridate
-    ftransform(dow = wday(date_time, week_start = 1),
+    ftransform(dow = lubridate::wday(date_time, week_start = 1),
                hour = hour(date_time)
                ) |> 
     fselect(idvisit, dow, hour, date_time) |> 

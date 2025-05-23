@@ -8,6 +8,7 @@ data_out_24ss: "data/data-processed/24-ss"
 data_out: "data/data-processed"
 profile: "23ws_24ss"
 data_raw_pattern: ".csv$"
+demo: "data/demo"
 
 
 
