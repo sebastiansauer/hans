@@ -32,7 +32,7 @@ list(
   tar_target(config, read_yaml(config_file), 
              packages = "yaml"),
   tar_target(data_files_list, 
-             list.files(path = config$data-raw,  # all SEMSTERs
+             list.files(path = config$data,  # all SEMSTERs
                         full.names = TRUE,
                         pattern = config$data_raw_pattern,
                         recursive = TRUE), 
@@ -163,6 +163,16 @@ tar_target(data_wide_slim,
              packages = c("dplyr", "tidyr", "collapse")),
 
 
+  # filter unneeded rows:
+  tar_target(data_slim_filtered,
+             data_slim |> 
+               filter(!type %in% c("pageloadtime", 
+                                  "pageloadtimemilliseconds",
+                                  "title",
+                                  "type",
+                                  "url"))),
+
+
 
 # Mini slim data for debugging --------------------------------------------
 
@@ -174,8 +184,8 @@ tar_target(data_wide_slim,
              packages = c("dplyr", "tidyr", "collapse")),
   tar_target(data_slim_head,
              data_slim[1:1e5,]),
-
-
+  tar_target(data_slim_filtered_head,
+             data_slim_filtered[1:1e5,]),
 
 
 
@@ -183,17 +193,17 @@ tar_target(data_wide_slim,
 
   # count rows per visit (n):
   tar_target(count_action,
-             data_slim |>
+             data_slim_filtered |>
                group_by(idvisit) |>
                # "nr" is the id of the action of this visit:
                summarise(nr_max = max(nr))), 
   
   # compute time variables per visit:
   tar_target(time_spent,
-             data_slim |> diff_time(),
+             data_slim_filtered |> diff_time(),
              packages = "lubridate"),
   tar_target(time_minmax,
-             data_slim |> time_min_max(),
+             data_slim_filtered |> time_min_max(),
              packages = "lubridate"),
   tar_target(time_duration,
              data_all_chr %>% 
@@ -203,7 +213,7 @@ tar_target(data_wide_slim,
 
   # count time of visit per weekday:
   tar_target(time_visit_wday,
-             data_slim |> when_visited(), 
+             data_slim_filtered |> when_visited(), 
              packages = c("collapse", "lubridate")),
   tar_target(time_since_last_visit,
              data_all_fct |> 
@@ -212,11 +222,11 @@ tar_target(data_wide_slim,
   
   # count action categories per visit:
   tar_target(count_action_type,
-             count_user_action_type(data_slim), packages = "stringr"),
+             count_user_action_type(data_slim_filtered), packages = "stringr"),
   
   # count AI transcript clicks per month:
   tar_target(ai_transcript_clicks_per_month,
-             data_slim |> 
+             data_slim_filtered |> 
                mutate(clicks_transcript = str_detect(value, "click_transcript_word"))  |> 
                group_by(idvisit) |> 
                mutate(clicks_transcript_any = any(clicks_transcript == TRUE)) |> 
@@ -229,7 +239,7 @@ tar_target(data_wide_slim,
 
   # count interactions with LLM per month:
   tar_target(ai_llm_per_months,
-             data_slim |> 
+             data_slim_filtered |> 
                filter(type == "eventcategory" | type == "timestamp") |> 
                add_dates() |> 
                group_by(year_month) |> 
@@ -239,7 +249,7 @@ tar_target(data_wide_slim,
 
   # count how many visitors interact with the LLM:
   tar_target(idvisit_has_llm, 
-               data_slim |> 
+             data_slim_filtered |> 
                mutate(has_llm = str_detect(value, "llm"))  |> 
                group_by(idvisit) |> 
                mutate(uses_llm = any(has_llm == TRUE)) |> 
@@ -248,14 +258,14 @@ tar_target(data_wide_slim,
                filter(date_time == min(date_time)) |> 
                ungroup() |> 
                select(-c(has_llm)),
-             packages = c("lubridate", "collapse", "stringr")),
+             packages = c("lubridate", "collapse", "stringr"))
 
 # render report in Quarto -------------------------------------------------
 
 
   
   # render report:
-  tar_quarto(report01, "report01.qmd")
+  #tar_quarto(report01, "report01.qmd")
 
   # export small XLS files
   
