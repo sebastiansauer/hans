@@ -49,7 +49,8 @@ theme_set(theme_minimal())
 ## Roh-Daten laden und inspizieren (data_all_fact)
 
 
-JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind.
+JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind 
+(alle Daten schon in den CSV-Dateien enthalten).
 
 
 
@@ -147,10 +148,6 @@ tar_load(count_action)
 ```{r}
 tar_load(config)
 ```
-
-
-Laut `config.yaml` ist das **aktuelle Semester, d.h. `r config$this_semester`**.
-
 
 
 ```{r}
