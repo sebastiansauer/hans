@@ -32,7 +32,7 @@ list(
   tar_target(config, read_yaml(config_file), 
              packages = "yaml"),
   tar_target(data_files_list, 
-             list.files(path = config$data_24ss,  # THIS SEMSTER
+             list.files(path = config$data-raw,  # all SEMSTERs
                         full.names = TRUE,
                         pattern = config$data_raw_pattern,
                         recursive = TRUE), 
@@ -60,7 +60,9 @@ list(
   
   # remove empty cols:
   tar_target(data_wo_empty_cols, 
-             remove_empty(data_imported, which = c("rows", "cols")), 
+             data_imported |> 
+               transform_to_true_NAs() |> 
+               remove_empty(which = c("rows", "cols")), 
              packages = "janitor"),
   
   # repair "broken" cols:

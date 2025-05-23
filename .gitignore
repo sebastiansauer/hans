@@ -9,15 +9,12 @@
 
 
 # cache:
-report_files/
-report_cache/
 *_cache/
-*_files/
-
 
 
 # data:
 *.rda
+*.rds
 */*.csv
 _targets/
 obj/
