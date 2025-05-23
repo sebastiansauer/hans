@@ -11,7 +11,8 @@ when_visited <- function(data){
     ftransform(dow = wday(date_time, week_start = 1),
                hour = hour(date_time)) |> 
     fselect(idvisit, dow, hour, date_time) |> 
-    fgroup_by(idvisit, dow, hour) 
+    fgroup_by(idvisit, dow, hour) |> 
+    ungroup()
   
 
   
