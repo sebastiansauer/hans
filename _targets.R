@@ -256,6 +256,8 @@ tar_target(data_wide_slim,
   
   # render report:
   tar_quarto(report01, "report01.qmd")
+
+  # export small XLS files
   
   # export processed data to disk as RDS file:
   # tar_target(data_to_be_exported, 
