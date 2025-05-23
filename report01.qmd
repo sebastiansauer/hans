@@ -20,7 +20,10 @@ format:
     
 execute: 
   warning: false
-  cache: false
+  cache: true
+  
+params:
+   recompute_gt: false
 ---
 
 
@@ -39,6 +42,8 @@ library(gt)
 library(ggfittext)
 library(scales)
 library(visdat)
+library(collapse)
+library(ggpubr)
 ```
 
 ```{r}
@@ -46,11 +51,19 @@ theme_set(theme_minimal())
 ```
 
 
+## Optionen setzen
+
+```{r}
+options(lubridate.week.start = 1)  # Monday as first day
+#options(collapse_mask = "all") # use collapse for all dplyr operations
+options(chromote.headless = "new")  # Chrome headleass needed for gtsave
+```
+
+
+
 ## Roh-Daten laden und inspizieren (data_all_fact)
 
 
-JSON-Daten wurden nicht importiert, da offenbar nur redundante Daten enthalten sind 
-(alle Daten schon in den CSV-Dateien enthalten).
 
 
 
@@ -104,18 +117,18 @@ data_all_fct_head100 %>%
 
 
 
-### Datensatz data_slim, Zeilen 1-100
+### Datensatz data_slim_filtered, Zeilen 1-100
 
-```{r}
-tar_load(data_slim)
+```{r data_slim_filtered}
+tar_load(data_slim_filtered)
 
-data_slim %>% 
+data_slim_filtered %>% 
   slice(1:100) |> 
   gt()
 ```
 
 
-## Datensatz nur User
+# Datensatz nur User
 
 Entfernt man Developer, Admins und Lecturers aus dem Roh-Datensatz so bleiben weniger Zeilen übrig:
 
@@ -132,17 +145,17 @@ tar_load(data_users_only)
 
   
 
-## Datensatz mit Anzahl der Aktionen pro User
+# Datensatz mit Anzahl der Aktionen pro User
 
 ```{r load-count-action}
 tar_load(count_action)
 ```
 
 
-## Zeitraum 
+# Zeitraum
 
 
-### Beginn/Ende der Daten
+## Beginn/Ende der Daten
 
 
 ```{r}
@@ -150,34 +163,37 @@ tar_load(config)
 ```
 
 
-```{r}
+```{r time_minmax-load}
 tar_load(time_minmax)
 ```
 
 
-```{r time-min-max}
+```{r comp-time-min-max}
 time_minmax |> 
-  summarise(time_min = min(time_min),
-            time_max = max(time_max)) |> 
+  summarise(time_min = min(time_min, na.rm = T),
+            time_max = max(time_max, na.rm = T)) |> 
   gt()
 ```
 
-Diese Statistik wurde auf Basis des Datenobjekts `data_slim` berechnet.
+Diese Statistik wurde auf Basis des Datenobjekts `data_slim_filtered` berechnet.
 
 
-### Days since last visit
+## Days since last visit
+
+```{r}
+tar_load(time_visit_wday)
+tar_load(time_since_last_visit)
+```
+
 
 ```{r days-since-last-visit}
-tar_load(time_since_last_visit)
-
-
 time_since_last_visit <- 
 time_since_last_visit |> 
   mutate(dayssincelastvisit = as.numeric(dayssincelastvisit)) 
 
 time_since_last_visit |> 
   datawizard::describe_distribution(dayssincelastvisit) |> 
-  knitr::kable()
+  knitr::kable(digits = 2)
 
 time_since_last_visit |>
   ggplot(aes(x=dayssincelastvisit)) +
@@ -186,29 +202,111 @@ time_since_last_visit |>
 
 
 
+## Visits im Zeitverlauf
+
+Wie viele Visits (von Hans) gab es?
+
+
+### Pro Monat
+
+
+```{r}
+time_visit_wday_summary <- 
+time_visit_wday |> 
+  ungroup() |> 
+  mutate(month_start = floor_date(date_time, "month")) |> 
+  mutate(month_name = month(date_time, label = TRUE, abbr = FALSE),
+         month_num = month(date_time, label = FALSE),
+         year_num = year(date_time)) |> 
+  group_by(year_num, month_num) |> 
+  summarise(n = n())
+```
+
+
+```{r}
+time_visit_wday_summary |> 
+  gt()
+```
+
+```{r}
+time_visit_wday_summary2 <- 
+time_visit_wday |> 
+  ungroup() |> 
+  mutate(month_start = floor_date(date_time, "month")) |> 
+  mutate(month_name = month(date_time, label = TRUE, abbr = FALSE),
+         month_num = month(date_time, label = FALSE),
+         year_num = year(date_time)) |> 
+  group_by(year_num, month_start) |> 
+  summarise(n = n())
+
+
+time_visit_wday_summary2 |> 
+  ggplot(aes(x = month_start, y = n)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() 
+```
+
+
+### Akkumulierte Seitenaufrufe im Zeitverlauf
+
+```{r}
+time_visit_wday_summary2 <- 
+time_visit_wday |> 
+  ungroup() |> 
+  mutate(month_start = floor_date(date_time, "month")) |> 
+  mutate(month_name = month(date_time, label = TRUE, abbr = FALSE),
+         month_num = month(date_time, label = FALSE),
+         year_num = year(date_time)) |> 
+  group_by(year_num, month_start) |> 
+  summarise(n = n()) |> 
+  ungroup() |> 
+  mutate(n_cumsum = cumsum(n))
+
+
+time_visit_wday_summary2 |> 
+  ggplot(aes(x = month_start, y = n_cumsum)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() 
+```
+
 
 ## Statistiken
 
-Die folgenden Statistiken beruhen auf dem Datensatz `data_slim`:
+Die folgenden Statistiken beruhen auf dem Datensatz `data_slim_filtered`:
 
 
 ```{r}
-glimpse(data_slim)
+glimpse(data_slim_filtered)
 ```
+
 `nr` fasst die Nummer der Aktion innerhalb eines bestimmten Visits.
 
 
-### Mit allen Daten (den 499er-Daten)
+## Mit allen Daten (den 499er-Daten)
 
 
 
 ```{r}
+tbl_count_action <- 
 count_action |> 
   describe_distribution(nr_max) |> 
   gt() |> 
   fmt_number(columns = where(is.numeric),
              decimals = 2)
+
+tbl_count_action
 ```
+
+
+```{r}
+#| eval: !expr params$recompute_gt
+gtsave(tbl_count_action, filename = "reports/tbl_count_action.png")
+```
+
+
+![](reports/tbl_count_action.png)
+
+
 
 `nr_max` gibt den Maximalwert von `nr` zurück, sagt also, wie viele Aktionen maximal von einem Visitor ausgeführt wurden.
 
@@ -240,9 +338,10 @@ count_action |>
 ```
 
 
-Es erscheint plausibel, dass der Maximalwert alle "gekappten" (zensierten, abgeschnittenen) Werte fasst, also viele Werte, die eigentlich größer wären (aber dann zensiert wurden).
+Es erscheint plausibel, dass der Maximalwert alle "gekappten" (*zensierten*, abgeschnittenen) Werte fasst, 
+also viele Werte, die eigentlich größer wären (aber dann zensiert wurden).
 
-### Nur Visitors, für die weniger als 500 Aktionen protokolliert sind
+## Nur Visitors, für die weniger als 500 Aktionen protokolliert sind
 
 
 ```{r}
@@ -259,7 +358,7 @@ count_action2 |>
 
 ## Verteilung
 
-### Mit den 499er-Daten
+## Mit den 499er-Daten
 
 ```{r plot-count-action}
 count_action_avg = mean(count_action$nr_max)
@@ -291,7 +390,7 @@ count_action |>
 - SD der Aktionen pro Visit: `r round(count_action_sd, 2)`.
 
 
-### Ohne 499er-Daten
+## Ohne 499er-Daten
 
 ```{r plot-count-action-2}
 count_action_avg2 = mean(count_action2$nr_max)
@@ -324,7 +423,13 @@ count_action2 |>
 - SD der Aktionen pro Visit: `r round(count_action_sd2, 2)`.
 
 
-# Zeit pro Visit 
+
+
+
+
+
+
+# Verweildauer pro Visit 
 
 Die Visit-Zeit wurde auf 600 Min. trunkiert/begrenzt.
 
@@ -373,6 +478,7 @@ time_duration |>
 ## Verweildauer-Statistiken in Minuten
 
 ```{r time-spent-tbl}
+time_spent_summary <- 
 time_spent |> 
   summarise(
     mean_t_min = mean(t_min),
@@ -385,11 +491,29 @@ time_spent |>
     sd_t_min_avg = mean(sd_t_min, na.rm = TRUE),
     min_t_min_avg = mean(min_t_min),
     max_t_min_avg = mean(max_t_min)
-  ) |>
+  )
+
+time_spent_summary |> 
   gt() |> 
   fmt_number(columns = everything(),
              decimals = 2)
 ```
+
+```{r}
+small_padding_theme <- ggpubr::ttheme(
+  tbody.style = tbody_style(size = 8), # Smaller font size can help
+  colnames.style = colnames_style(size = 9, face = "bold"),
+  padding = unit(c(2, 2), "mm") # Reduce horizontal and vertical padding
+)
+```
+
+
+```{r}
+ggpubr::ggtexttable(time_spent_summary,
+                    rows = NULL,
+                    theme = small_padding_theme)
+```
+
 
 ## Visualisierung der Verweildauer
 
@@ -439,6 +563,60 @@ time_spent2 |>
 
 
 
+### Veränderung der Verweildauer im Zeitverlauf
+
+
+```{r}
+time_spent_by_month <-
+  time_spent |> 
+  mutate(date = ymd_hms(value)) |> 
+  mutate(month_start = floor_date(date, "month")) |> 
+  mutate(month_name = month(month_start, label = TRUE, abbr = FALSE),
+         month_num = month(month_start, label = FALSE),
+         year = year(month_start)) |> 
+  group_by(month_num, year) |> 
+  summarise(time_spent_month_avg = mean(t_min, na.rm = TRUE),
+            time_spent_month_sd = sd(t_min, na.rm = TRUE)) |> 
+  arrange(year, month_num)
+
+time_spent_by_month |> 
+  gt() |> 
+  fmt_auto()
+```
+
+
+```{r}
+time_spent_by_month |> 
+  mutate(time_spent_month_avg = round(time_spent_month_avg, 2),
+         time_spent_month_sd = round(time_spent_month_sd, 2)) |> 
+  ggtexttable()
+```
+
+
+```{r}
+time_spent_by_month_name <- 
+time_spent |> 
+  mutate(date = ymd_hms(value)) |> 
+  mutate(month_start = floor_date(date, "month")) |> 
+  mutate(month_name = month(month_start, label = TRUE, abbr = FALSE),
+         month_num = month(month_start, label = FALSE),
+         year = year(month_start)) |> 
+  group_by(month_start, year) |> 
+  summarise(time_spent_month_avg = mean(t_min, na.rm = TRUE),
+            time_spent_month_sd = sd(t_min, na.rm = TRUE))
+
+time_spent_by_month_name |> 
+ggplot(aes(x = month_start, y = time_spent_month_avg)) +
+  geom_line(group = 1, color = "grey60") +
+    geom_point() 
+```
+
+
+
+
+
+
+
 # Was machen die User?
 
 ```{r tar-load-count-action-type}
@@ -451,22 +629,88 @@ tar_load(count_action_type)
 ### Nach Kategorien
 
 ```{r category-tab}
+count_action_type_counted <- 
 count_action_type |> 
+  drop_na() |> 
   count(category, sort = TRUE) |> 
-  mutate(prop = round(n/sum(n), 2)) |> 
+  mutate(prop = round(n/sum(n), 2)) 
+
+count_action_type_counted |> 
   gt()
 ```
+
+
+### Nach Kategorien im Zeitverlauf
+
+```{r}
+count_action_type_per_month <- 
+count_action_type |> 
+  select(nr, idvisit, category) |> 
+  ungroup() |> 
+  left_join(time_visit_wday |> ungroup()) |> 
+  select(-c(dow, hour, nr)) |> 
+  drop_na() |> 
+  mutate(month_start = floor_date(date_time, "month")) |> 
+  count(month_start, category)
+```
+
+```{r}
+count_action_type_per_month |> 
+  gt()
+```
+
+### Nur die Top3-Kategorien
+
+```{r}
+tar_load(time_visit_wday)
+```
+
+
+```{r count_action_type_per_month_top3}
+count_action_type_per_month_top3 <- 
+count_action_type |> 
+  select(nr, idvisit, category) |> 
+  ungroup() |> 
+  filter(category %in% c("video", "click_slideChange", "visit_page")) |> 
+  left_join(time_visit_wday |> ungroup()) |> 
+  select(-c(dow, hour, nr)) |> 
+  drop_na() |> 
+  mutate(month_start = floor_date(date_time, "month")) |> 
+  count(month_start, category)
+```
+
+```{r}
+count_action_type_per_month_top3 |> 
+  gt()
+```
+
+
+```{r count_action_type_per_month_top3-ggplot}
+count_action_type_per_month_top3 |> 
+  ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  geom_line()
+```
+
 
 ### `eventcategory`
 
 Was machen die Visitors eigentlich? Und wie oft?
 
-```{r}
-data_slim |> 
+```{r data_slim_filtered_count}
+data_slim_filtered_count <- 
+data_slim_filtered |> 
   filter(type == "eventcategory") |> 
-  count(value, sort = TRUE) |> 
+  count(value, sort = TRUE) 
+
+data_slim_filtered_count |> 
   gt()
 ```
+
+```{r}
+data_slim_filtered_count |> 
+  ggtexttable()
+```
+
 
 ## Verteilung
 
@@ -703,26 +947,46 @@ time2 |>
 ### Art und Anzahl der Interaktionen mit dem LLM
 
 ```{r}
-data_slim |> 
+data_slim_filtered_ai <- 
+data_slim_filtered |> 
   filter(type == "eventcategory") |> 
   filter(str_detect(value, "llm")) |> 
   count(value, sort = TRUE) |> 
-  mutate(prop = n / round(sum(n), 2)) |> 
-  gt()
+  mutate(prop = n / sum(n))
+
+data_slim_filtered_ai |> 
+  gt() |> 
+  fmt_auto()
 ```
+
+```{r}
+data_slim_filtered_ai |> 
+  mutate(prop = round(prop, 3)) |> 
+  ggtexttable()
+```
+
 
 
 ### Anteil Visitors, die mit dem LLM interagieren
 
 ```{r}
-data_slim |> 
+data_slim_filtered_llm_interact <- 
+data_slim_filtered |> 
   mutate(has_llm = str_detect(value, "llm"))  |> 
   group_by(idvisit) |> 
   summarise(llm_used_during_visit = any(has_llm == TRUE)) |> 
   count(llm_used_during_visit) |> 
-  mutate(prop = round(n /sum(n), 2)) |> 
+  mutate(prop = round(n /sum(n), 2)) 
+
+data_slim_filtered_llm_interact|> 
   gt()
 ```
+
+```{r}
+data_slim_filtered_llm_interact |> 
+  ggtexttable()
+```
+
 
 
 ### ... Im Zeitverlauf
@@ -731,12 +995,20 @@ data_slim |>
 ```{r}
 tar_load(idvisit_has_llm)
 
+idvisit_has_llm_timeline <- 
 idvisit_has_llm |> 
   count(year_month, uses_llm) |> 
   ungroup() |> 
   group_by(year_month) |> 
-  mutate(prop = round(n/sum(n), 2)) |> 
+  mutate(prop = round(n/sum(n), 2)) 
+
+idvisit_has_llm_timeline|> 
   gt()
+```
+
+```{r}
+idvisit_has_llm_timeline |> 
+  ggtexttable()
 ```
 
 
@@ -767,13 +1039,9 @@ idvisit_has_llm |>
 ## Klick auf ein Wort im Transkript
 
 
-```{r}
-tar_load(data_slim)
-```
-
 
 ```{r ai-click-transcript-word}
-data_slim |> 
+data_slim_filtered |> 
   filter(type == "subtitle") |> 
   filter(!is.na(value) & value != "") |> 
   count(click_transcript_word = str_detect(value, "click_transcript_word")) |> 
@@ -798,26 +1066,22 @@ tar_load(data_long)
 #### Im Detail
 
 ```{r ai-actions-count}
+regex_pattern <-  "Category: \"(.*?)(?=', Action)"
+
 ai_actions_count <- 
   data_long |> 
+ # slice(1:1000) |> 
   filter(str_detect(value, "transcript")) |> 
-  count(value) 
+  mutate(category = str_extract(value, regex_pattern)) |> 
+  select(category) |> 
+  mutate(category = str_replace_all(category, "[\"']", "")) |> 
+  count(category, sort = TRUE) 
 
 ai_actions_count |> 
   gt()
 ```
 
-#### Zusammengefasst nach "click transcript word"
 
-```{r}
-ai_actions_count |> 
-  mutate(value = case_when(
-    str_detect(value, "click_transcript_word.*") ~ "click transcript word",
-    TRUE ~ value
-  )) |> 
-  count(value, sort = TRUE) |> 
-  gt()
-```
 
 
 
@@ -833,13 +1097,41 @@ tar_load(ai_transcript_clicks_per_month)
 
 
 
-```{r  ai-click-transcript-word-months}
+```{r ai-click-transcript-word-months}
+ai_transcript_clicks_per_month_count <-
 ai_transcript_clicks_per_month |> 
   count(year_month, clicks_transcript_any) |> 
   ungroup() |> 
   group_by(year_month) |> 
-  mutate(prop = round(n/sum(n), 2)) |> 
+  mutate(prop = round(n/sum(n), 2)) 
+
+ai_transcript_clicks_per_month_count|> 
   gt()
 ```
+
+
+```{r}
+ai_transcript_clicks_per_month_count |> 
+  ggtexttable()
+```
+
+
+```{rai_transcript_clicks_per_month_count-plot}
+ai_transcript_clicks_per_month_count |> 
+  mutate(date = ymd(paste0(year_month,"-01"))) |> 
+  ggplot(aes(x = date, y = n)) +
+  geom_line(group = 1) +
+  geom_point()
+```
+
+
+# Glotzdauer
+
+
+## Glotzdauer allgemein
+
+
+
+## Glotzdauer im Zeitverlauf
 
 

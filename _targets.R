@@ -15,6 +15,7 @@ tar_option_set(
 
 # set options:
 options(lubridate.week.start = 1)
+#options(collapse_mask = "all") # use collapse for all dplyr operations
 
 # source funs:
 funs_files <- list.files(
@@ -88,7 +89,7 @@ list(
   
   # transform all cols to factor: 
   tar_target(data_all_fct,
-             data_all_chr |> mutate(across(everything(), as.factor)),
+             data_no_img_cols |> mutate(across(everything(), as.factor)),
              packages = "collapse"),
   
   # exclude non-participants:
