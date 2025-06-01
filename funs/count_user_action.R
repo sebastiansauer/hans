@@ -21,7 +21,7 @@ count_user_action_type <- function(data){
       str_detect(value, "Abmelden") ~ "logout",
       str_detect(value, "Evaluation") ~ "Evaluation",
       str_detect(value, "Data protection") ~ "Data protection",
-      str_detect(value, "Media item") ~ "Media item"
+      str_detect(value, "Media item") ~ "Media item",
       
       
       TRUE ~ NA
