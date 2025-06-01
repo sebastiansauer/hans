@@ -269,7 +269,7 @@ tar_target(data_wide_slim,
 # Glotzdauer --------------------------------------------------------------
 
 tar_target(
-  data_slim_head_distinct_slice1,
+  data_slim_distinct_slice1,
   data_slim |> 
     distinct(.keep_all = TRUE) |> 
     group_by(nr, type, idvisit) |> 
@@ -277,7 +277,7 @@ tar_target(
     ungroup()),
 
 tar_target(glotzdauer,
-           data_slim_head_distinct_slice1 |> 
+           data_slim_distinct_slice1 |> 
              glotzdauer_playpause(),
            packages = c("collapse", "lubridate", "dplyr", "stringr"))
 
