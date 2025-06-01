@@ -155,6 +155,8 @@ tar_target(data_wide_slim,
   #            data_all_chr |> longify_data(),
   #            packages = "collapse"),
   
+  
+  # drop rows with missing data:
   tar_target(data_long_nona,
              data_long |> drop_na() |> filter(value != "")),  # drop rows with missing data
 
@@ -259,7 +261,28 @@ tar_target(data_wide_slim,
                filter(date_time == min(date_time)) |> 
                ungroup() |> 
                select(-c(has_llm)),
-             packages = c("lubridate", "collapse", "stringr"))
+             packages = c("lubridate", "collapse", "stringr")),
+
+
+
+
+# Glotzdauer --------------------------------------------------------------
+
+tar_target(
+  data_slim_head_distinct_slice1,
+  data_slim |> 
+    distinct(.keep_all = TRUE) |> 
+    group_by(nr, type, idvisit) |> 
+    slice(1) |>
+    ungroup()),
+
+tar_target(glotzdauer,
+           data_slim_head_distinct_slice1 |> 
+             glotzdauer_playpause(),
+           packages = c("collapse", "lubridate", "dplyr", "stringr"))
+
+
+
 
 # render report in Quarto -------------------------------------------------
 
