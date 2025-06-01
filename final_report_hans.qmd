@@ -44,6 +44,7 @@ library(scales)
 library(visdat)
 library(collapse)
 library(ggpubr)
+library(knitr)
 ```
 
 ```{r}
@@ -1116,7 +1117,7 @@ ai_transcript_clicks_per_month_count |>
 ```
 
 
-```{rai_transcript_clicks_per_month_count-plot}
+```{r ai_transcript_clicks_per_month_count-plot}
 ai_transcript_clicks_per_month_count |> 
   mutate(date = ymd(paste0(year_month,"-01"))) |> 
   ggplot(aes(x = date, y = n)) +
@@ -1125,13 +1126,84 @@ ai_transcript_clicks_per_month_count |>
 ```
 
 
-# Glotzdauer
+# Videozeit
+
+Wie viel Zeit verbringen die Nutzer mit dem Betrachten von Videos ("Glotzdauer")?
 
 
 ## Glotzdauer allgemein
 
+Achtung: Die Videozeit ist schwierig auszuwerten.
+Die Nutzer beenden keine Videos, in dem sie auf "Pause" drücken,
+sondern indem sie andere Aktionen durchführen.
+Dies ist aber analytisch schwer abzubilden.
+
+```{r}
+tar_load(glotzdauer)
+```
+
+```{r p-plotzdauer}
+glotzdauer |> 
+  # we will assume that negative glotzdauer is the as positive glotzdauer:
+  mutate(time_diff = abs(time_diff)) |> 
+  # without glotzdauer smaller than 10 minutes:
+  filter(time_diff < 60*10) |> 
+  ggplot(aes(x = time_diff)) +
+  geom_histogram() +
+  scale_x_time() +
+  labs(x = "Time interval [minutes]",
+       caption = "Only time intervals less than 10 minutes")
+```
+
+
+
+```{r glotzdauer-stats}
+
+glotzdauer_prepped <- 
+glotzdauer |> 
+  # we will assume that negative glotzdauer is the as positive glotzdauer:
+  mutate(time_diff_abs_sec = abs(as.numeric(time_diff, units = "secs"))) |> 
+  # without glotzdauer smaller than 10 minutes:
+  filter(time_diff_abs_sec < 60*10) |> 
+  mutate(time_diff_abs_min = time_diff_abs_sec / 60) 
+
+glotzdauer_tbl <- 
+  glotzdauer_prepped |> 
+  select(time_diff_abs_sec, time_diff_abs_min) |> 
+  describe_distribution()
+
+glotzdauer_tbl |> 
+  kable()
+```
+
+```{r}
+glotzdauer_tbl |>
+  mutate(across(where(is.numeric), ~ round(., 2))) |>
+  ggpubr::ggtexttable()
+```
+
 
 
 ## Glotzdauer im Zeitverlauf
+
+```{r}
+glotzdauer_prepped_tbl <-
+glotzdauer_prepped |> 
+  mutate(first_of_month = floor_date(date, unit = "month")) |> 
+  group_by(first_of_month) |> 
+  summarise(time_diff_mean = mean(time_diff, na.rm = TRUE))
+  
+
+glotzdauer_prepped_tbl |> 
+  kable()
+```
+
+```{r}
+glotzdauer_prepped_tbl |> 
+  ggplot(aes(x = first_of_month, y = time_diff_mean)) +
+  geom_line()
+```
+
+
 
 

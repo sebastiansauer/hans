@@ -19,7 +19,8 @@ d_glotzdauer <-
   group_by(idvisit) %>%
   summarise(
     first_play = min(timestamp[eventaction == "play"], na.rm = TRUE),
-    last_pause = min(timestamp[eventaction == "pause"], na.rm = TRUE)
+    last_pause = min(timestamp[eventaction == "pause"], na.rm = TRUE),
+    date = date(min(timestamp))
   ) %>%
   #filter(!is.na(first_play) & !is.na(last_pause)) %>%
   mutate(time_diff = difftime(last_pause, first_play)) %>%
