@@ -29,4 +29,13 @@ data*/
 test*.R
 
 
+# output documents/reports:
+report*/
+final_report_*/
+final_report*.html
+report*.html
+reports/
+
+	
+
 
