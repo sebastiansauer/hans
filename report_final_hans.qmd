@@ -27,6 +27,23 @@ params:
 ---
 
 
+# Hintergrund
+
+
+Dieser Arbeitsbericht schildert das technische Vorgehen im Rahmen der Analyse der Matomo-Daten des BMBF-Projekt "HaNS".
+
+## Vorgehen
+
+Die Matomo-Klickdaten aller Semester der Projektlaufzeit wurden für diese Analyse verarbeitet. Mit Hilfe einer R-Pipeline wurden eine Reihe von Forschungsfragen analysiert.
+
+Der komplette Code ist online dokumentiert unter <https://github.com/sebastiansauer/hans>.
+
+Aus Datenschutzgründen
+
+
+## Forschungsfragen
+
+
 # Setup
 
 ## R-Pakete starten
