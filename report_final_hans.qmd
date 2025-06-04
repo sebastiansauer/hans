@@ -37,11 +37,34 @@ Dieser Arbeitsbericht schildert das technische Vorgehen im Rahmen der Analyse de
 Die Matomo-Klickdaten aller Semester der Projektlaufzeit wurden für diese Analyse verarbeitet. Mit Hilfe einer R-Pipeline wurden eine Reihe von Forschungsfragen analysiert.
 
 Der komplette Code ist online dokumentiert unter <https://github.com/sebastiansauer/hans>.
+Aus Datenschutzgründen sind online keine Daten eingestellt.
 
-Aus Datenschutzgründen
+Die zentrale Analyse-Pipeline-Datei ist <https://github.com/sebastiansauer/hans/blob/main/_targets.R>.
 
 
 ## Forschungsfragen
+
+
+1. Wie viele Nutzer gibt es und in welchem Zeitraum?
+2. In welcher Frequenz wird HaNS aufgesucht? Wie groß sind die zeitlichen Zwischenräume zwischen der Benutzung der Plattform?
+3. Wie oft wird HaNS pro Zeitraum (z.B. Monat) besucht?
+4. Wie verändert sich die Nutzung im Zeitverlauf?
+5. Wie viele Aktionen bringt ein Visit mit sich? Wie ist die statistische Verteilung der Aktionen pro Visit?
+6. Wie lang verweilen die Nutzer pro Visit?
+7. Wie verändert sich die Nutzungsdauer pro Visit im Zeitverlauf?
+8. Welche Aktionen führen die Nutzer auf Hans aus?
+9. Wie verändern sich die Verteilungen der Aktionshäufigkeiten im Zeitverlauf?
+10. An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?
+11. Wie häufig und in welcher Art inteagieren die Nutzer mit dem LLM in HaNS?
+12. Wie groß ist der Anteil der Nutzer, die mit dem LLM interagieren?
+13. Wie verändert sich der Anteil der Nutzer, die mit dem LLM interagieren, im Zeitverlauf?
+14. Wie oft wird auf ein Wort im Transkript des LLM geklickt?
+15. Wie oft wird ein Transkript-Dienst in HaNS in Anspruch genommen?
+16. Wie verändert sich die Nutzung der Transkript-Dienste in HaNS im Zeitverlauf?
+17. Wie lange werden Videos angeschaut?
+18. Wie verändert sich die Betrachtungsdauer im Zeitverlauf?
+
+
 
 
 # Setup
