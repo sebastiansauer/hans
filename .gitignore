@@ -32,7 +32,6 @@ test*.R
 # output documents/reports:
 report*/
 final_report_*/
-report*.html
 reports/
 
 	
