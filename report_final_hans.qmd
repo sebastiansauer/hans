@@ -221,9 +221,6 @@ Entfernt man Developer, Admins und Lecturers aus dem Roh-Datensatz so bleiben we
 
 ```{r load-data-users-only}
 tar_load(data_users_only)
-data_users_only |> 
-  head(30) |> 
-  kable()
 ```
 
 
@@ -601,7 +598,7 @@ time_spent |>
 ```
 
 
-## Verweildauer auf Basis der Variable `visitduration``
+## Verweildauer auf Basis der Variable `visitduration`
 
 Alternativ zur Berechnung der Verweildauer steht eine Variable, `visitduration` zur Verfügung, die (offenbar) die Dauer des Visits misst bzw. messen soll.
 
