@@ -1,0 +1,25 @@
+---
+title: "Matomo Main Data excerpt"
+format: html
+---
+
+# Setup
+
+```{r libs}
+library(knitr)
+library(targets)
+```
+
+
+```{r load data_users_only}
+tar_load(data_users_only)
+```
+
+# Main Data - BIG!
+
+```{r show_data}
+data_users_only |> 
+  head(30) |> 
+  kable()
+```
+
