@@ -10,7 +10,7 @@ library(tarchetypes)
 
 # packages available for all targets:
 tar_option_set(
-  packages = c("dplyr", "purrr", "readr", "tidyr")
+  packages = c("dplyr", "purrr", "readr", "tidyr", "collapse")
   )
 
 # set options:

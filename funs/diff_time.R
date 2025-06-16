@@ -7,3 +7,4 @@ diff_time <- function(data) {
            time_diff = max(time) - min(time)) 
 }
 
+# Note: The data set is still grouped by idvisit!

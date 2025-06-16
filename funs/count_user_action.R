@@ -16,15 +16,12 @@ count_user_action_type <- function(data){
       str_detect(value, "click_topic") ~ "click_topic",
       str_detect(value, "click_slideChange") ~ "click_slideChange",
       str_detect(value, "click_channelcard") ~ "click_channelcard",
-      str_detect(value, "video") ~ "video",  
       str_detect(value, "logout") ~ "logout",
       str_detect(value, "Abmelden") ~ "logout",
       str_detect(value, "Evaluation") ~ "Evaluation",
       str_detect(value, "Data protection") ~ "Data protection",
       str_detect(value, "Media item") ~ "Media item",
-      
-      
-      TRUE ~ NA
+     TRUE ~ NA
     ))
   
 }

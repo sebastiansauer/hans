@@ -17,7 +17,6 @@
 *.rds
 */*.csv
 _targets/
-obj/
 *.csv
 data*/
 
