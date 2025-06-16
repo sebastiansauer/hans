@@ -94,13 +94,52 @@ theme_set(theme_minimal())
 
 ## Optionen setzen
 
-```{r}
+```{r options}
 options(lubridate.week.start = 1)  # Monday as first day
 #options(collapse_mask = "all") # use collapse for all dplyr operations
 options(chromote.headless = "new")  # Chrome headleass needed for gtsave
 ```
 
+Immer `knitr::kable` für das Zeigen von Data frames verwenden:
 
+
+<!-- ```{r setup-kable, include=FALSE} -->
+<!-- knitr::opts_chunk$set( -->
+<!--   print.opts = list(use.kable = TRUE) -->
+<!-- ) -->
+<!-- ``` -->
+
+
+# Datenaufbereitung und Analysepipeline
+
+
+## Targets-Pipeline stellt Überblick aller Analyseschritte dar
+
+Die Analyse wird im Rahmen einer [Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R) beschrieben und ist offen auf Github einsehbar. 
+
+
+## Langformat
+
+Aufgrund des "rechts flatternden" Datenformat (d.h. unterschiedliche Zeilenlängen) wurden die Daten in ein Langformat überführt, zwecks besserer/einfacherer Analyse.
+
+Dazu wurden (neben den ID-Variablen, v.a. `idvisit`) die `actionDetails_`-Variablen verwendet.
+Der Code des Pivotierens in das Langformat ist in der Funktion [longify-data.R](https://github.com/sebastiansauer/hans/blob/main/funs/longify-data.R) einsehbar.
+
+
+Die Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion [slimify-data.R](https://github.com/sebastiansauer/hans/blob/main/funs/slimify_data.R).
+
+```{r data_slim_filtered_head}
+tar_load(data_slim_filtered_head)
+
+data_slim_filtered_head |> 
+  head(30) |> 
+  kable()
+```
+
+
+
+
+# Überblick über die Daten
 
 ## Roh-Daten laden und inspizieren (data_all_fact)
 
@@ -127,7 +166,7 @@ Jede Zeile entspricht einem "Visit".
 ### Erster Blick
 
 
-```{r}
+```{r data_all_fct_head100}
 data_all_fct_head100 <- 
 data_all_fct %>% 
   select(1:100) %>% 
@@ -143,18 +182,23 @@ data_all_fct_head100 %>%
 
 ### Namen (1-100)
 
-```{r}
+
+
+```{r data_all_fct_head100-2}
 data_all_fct_head100 %>% 
   names()
 ```
 
 
+
 ### Werte der erst 100 Spalten
+
 
 ```{r}
 data_all_fct_head100 %>% 
   glimpse()
 ```
+
 
 
 
@@ -177,6 +221,9 @@ Entfernt man Developer, Admins und Lecturers aus dem Roh-Datensatz so bleiben we
 
 ```{r load-data-users-only}
 tar_load(data_users_only)
+data_users_only |> 
+  head(30) |> 
+  kable()
 ```
 
 
@@ -190,6 +237,10 @@ tar_load(data_users_only)
 
 ```{r load-count-action}
 tar_load(count_action)
+
+count_action |> 
+  head(30) |> 
+  kable()
 ```
 
 
@@ -199,13 +250,17 @@ tar_load(count_action)
 ## Beginn/Ende der Daten
 
 
-```{r}
+```{r load-config}
 tar_load(config)
 ```
 
 
 ```{r time_minmax-load}
 tar_load(time_minmax)
+
+time_minmax |> 
+  head(30) |> 
+  kable()
 ```
 
 
@@ -216,14 +271,24 @@ time_minmax |>
   gt()
 ```
 
-Diese Statistik wurde auf Basis des Datenobjekts `data_slim_filtered` berechnet.
+Diese Statistik wurde auf Basis des Datenobjekts `data_slim_filtered` berechnet,
+vgl. [das Target dieses Objekts in der Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L170).
+
+
 
 
 ## Days since last visit
 
-```{r}
+```{r load-time-objs}
 tar_load(time_visit_wday)
 tar_load(time_since_last_visit)
+```
+
+
+```{r}
+time_visit_wday |> 
+  head(30) |> 
+  kable()
 ```
 
 
@@ -251,7 +316,7 @@ Wie viele Visits (von Hans) gab es?
 ### Pro Monat
 
 
-```{r}
+```{r time_visit_wday_summary}
 time_visit_wday_summary <- 
 time_visit_wday |> 
   ungroup() |> 
@@ -269,7 +334,7 @@ time_visit_wday_summary |>
   gt()
 ```
 
-```{r}
+```{r time_visit_wday_summary2}
 time_visit_wday_summary2 <- 
 time_visit_wday |> 
   ungroup() |> 
@@ -327,7 +392,7 @@ glimpse(data_slim_filtered)
 
 
 
-```{r}
+```{r tbl_count_action}
 tbl_count_action <- 
 count_action |> 
   describe_distribution(nr_max) |> 
@@ -353,7 +418,7 @@ gtsave(tbl_count_action, filename = "reports/tbl_count_action.png")
 
 Betrachtet man die Anzahl der Aktionen pro Visitor näher, so fällt auf, dass der Maximalwert (499) sehr häufig vorkommt:
 
-```{r}
+```{r count-action-plot}
 count_action |> 
   count(nr_max) |> 
   ggplot(aes(x = nr_max, y = n)) +
@@ -362,7 +427,7 @@ count_action |>
 
 Hier noch in einer anderen Darstellung:
 
-```{r}
+```{r count-action-plot2}
 count_action |> 
   count(nr_max) |> 
   ggplot(aes(x = nr_max, y = n)) +
@@ -385,7 +450,7 @@ also viele Werte, die eigentlich größer wären (aber dann zensiert wurden).
 ## Nur Visitors, für die weniger als 500 Aktionen protokolliert sind
 
 
-```{r}
+```{r count-action-tbl2}
 count_action2 <- 
 count_action |> 
   filter(nr_max != 499) 
@@ -472,19 +537,49 @@ count_action2 |>
 
 # Verweildauer pro Visit 
 
+## Berechnungsgrundlage der Verweildauer
+
+Die Verweildauer wurde berechnet als Differenz zwischen kleinstem und größtem Datumszeitwert (POSixct) eines Visits, vgl. [Funktion `diff_time](https://github.com/sebastiansauer/hans/blob/main/funs/diff_time.R).
+Diese Variable heißt `time_diff` im Objekt `time_spent`.
+
+Dabei wird das Objekt `data_slim_filtered` herangezogen, vgl. [die Definition es Targets "time_spent" in der Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L205).
+
+```{r data_slim_filtered2}
+tar_load(data_slim_filtered)
+head(data_slim_filtered, 20) |> kable()
+```
+
+
+
+## Vorverarbeitung
+
 Die Visit-Zeit wurde auf 600 Min. trunkiert/begrenzt.
 
-```{r load-time-spent}
+```{r time_spent-duration}
 tar_load(time_spent)
 tar_load(time_duration)
+```
 
+
+```{r}
+time_spent |> 
+  head(30) |> 
+  kable()
+```
+
+
+```{r load-time-spent}
 time_spent <- 
   time_spent |> 
+  # compute time (t) in minutes (min):
   mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
   filter(t_min < 600)
 ```
 
-## Verweildauer-Statistiken in Sekunden
+## Verweildauer-Statistiken in Sekunden 
+
+Die Verweildauer ist dargestellt auf Grundlage oben dargestellter Berechnungsgrundlage.
+
 
 ```{r comp-diff-time-stats}
 time_spent |> 
@@ -506,12 +601,28 @@ time_spent |>
 ```
 
 
-```{r time-duration}
-tar_load(time_duration)
+## Verweildauer auf Basis der Variable `visitduration``
 
+Alternativ zur Berechnung der Verweildauer steht eine Variable, `visitduration` zur Verfügung, die (offenbar) die Dauer des Visits misst bzw. messen soll.
+
+Allerdings resultieren substanziell andere Werte,
+wenn man diese Variable heranzieht zur Berechnung der Verweildauer,
+vgl. [Target `time_duration` in der Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L211).
+
+
+```{r}
+time_duration |> 
+  head(30) |> 
+  kable()
+```
+
+
+
+```{r time-duration}
 time_duration |> 
   summarise(duration_sec_avg = mean(visitduration_sec, na.rm = TRUE))  |> 
-  mutate(duration_min_avg = duration_sec_avg / 60)
+  mutate(duration_min_avg = duration_sec_avg / 60) |> 
+  kable()
 ```
 
 
@@ -626,7 +737,7 @@ time_spent_by_month |>
 ```
 
 
-```{r}
+```{r time_spent_by_month}
 time_spent_by_month |> 
   mutate(time_spent_month_avg = round(time_spent_month_avg, 2),
          time_spent_month_sd = round(time_spent_month_sd, 2)) |> 
@@ -634,7 +745,7 @@ time_spent_by_month |>
 ```
 
 
-```{r}
+```{r time_spent_by_month_name}
 time_spent_by_month_name <- 
 time_spent |> 
   mutate(date = ymd_hms(value)) |> 
@@ -660,14 +771,34 @@ ggplot(aes(x = month_start, y = time_spent_month_avg)) +
 
 # Was machen die User?
 
+
+Was machen die Visitors eigentlich? Und wie oft?
+
+## Häufigkeiten
+
 ```{r tar-load-count-action-type}
 tar_load(count_action_type)
 ```
 
 
-## Häufigkeiten
+Für das Objekt `count_action_type` wurde die Spalte `subtitle` in den Langformat-Daten ausgewertet, s. [Funktionsdefinition von `count_user_action_type`](https://github.com/sebastiansauer/hans/blob/main/funs/count_user_action.R).
 
-### Nach Kategorien
+
+```{r}
+count_action_type |> 
+  head(30)
+```
+
+
+
+Achtung: Es kann sinnvoller sein,
+alternativ zu dieser Analyse
+die Analyse auf Basis von `eventcategory` heranzuziehen.
+Dort werden alle Arten von Events berücksichtigt. 
+Hier, in der vorliegenden, nur ausgewählte Events.
+
+
+### Nach bestimmten Kategorien
 
 ```{r category-tab}
 count_action_type_counted <- 
@@ -702,8 +833,15 @@ count_action_type_per_month |>
 
 ### Nur die Top3-Kategorien
 
-```{r}
+```{r time_visit_wday}
 tar_load(time_visit_wday)
+```
+
+
+```{r}
+time_visit_wday |> 
+  head(30) |> 
+  kable()
 ```
 
 
@@ -720,7 +858,7 @@ count_action_type |>
   count(month_start, category)
 ```
 
-```{r}
+```{r count_action_type_per_month_top3-gt}
 count_action_type_per_month_top3 |> 
   gt()
 ```
@@ -735,7 +873,8 @@ count_action_type_per_month_top3 |>
 
 ### `eventcategory`
 
-Was machen die Visitors eigentlich? Und wie oft?
+Für folgende Analyse wurde eine andere Variable als oben herangezogen, nämlich `eventcategory`. Dadurch resultieren etwas andere Ergebnisse.
+
 
 ```{r data_slim_filtered_count}
 data_slim_filtered_count <- 
@@ -750,6 +889,13 @@ data_slim_filtered_count |>
 ```{r}
 data_slim_filtered_count |> 
   ggtexttable()
+```
+
+Als Excel-Datei abspeichern:
+
+```{r}
+data_slim_filtered_count |> 
+  writexl::write_xlsx(path = "obj/data_slim_filtered_count.xlsx")
 ```
 
 
@@ -797,10 +943,6 @@ count_action_type |>
 # An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?
 
 ## Setup
-
-```{r}
-tar_load(time_visit_wday)
-```
 
 
 ```{r}
@@ -985,7 +1127,11 @@ time2 |>
 
 ## Interaktion mit dem LLM
 
+Berechnungsgrundlage: Für diese Analyse wurden alle Events der Kategorie `llm` gefiltert.
+
 ### Art und Anzahl der Interaktionen mit dem LLM
+
+
 
 ```{r}
 data_slim_filtered_ai <- 
@@ -1032,10 +1178,16 @@ data_slim_filtered_llm_interact |>
 
 ### ... Im Zeitverlauf
 
-
 ```{r}
 tar_load(idvisit_has_llm)
 
+idvisit_has_llm |> 
+  head(30) |> 
+  kable()
+```
+
+
+```{r}
 idvisit_has_llm_timeline <- 
 idvisit_has_llm |> 
   count(year_month, uses_llm) |> 
@@ -1104,10 +1256,24 @@ tar_load(data_long)
 ```
 
 
+```{r}
+data_long |> 
+  head(30)
+```
+
+
 #### Im Detail
+
+
 
 ```{r ai-actions-count}
 regex_pattern <-  "Category: \"(.*?)(?=', Action)"
+
+# Explaining this regex_pattern:
+# Find the literal string 
+# 1. `Category: ` (surrounded by quotation marks)
+# 2. Capture any characters (.*?) that follow, non-greedily, until...
+# 3. ...it encounters the literal sequence,  ` Action`) immediately after the captured string.
 
 ai_actions_count <- 
   data_long |> 
@@ -1132,8 +1298,16 @@ ai_actions_count |>
 
 ### KI-Klicks pro Monat
 
+Im Objekt wird gezählt, wie oft der String `"click_transcript_word"` in den Daten (Langformat) gefunden wird, s. Target `ai_transcript_clicks_per_month` in der Targets-Pipeline.
+
+
+
 ```{r}
 tar_load(ai_transcript_clicks_per_month)
+
+ai_transcript_clicks_per_month |> 
+  head(30) |> 
+  kable()
 ```
 
 
@@ -1182,6 +1356,24 @@ Dies ist aber analytisch schwer abzubilden.
 tar_load(glotzdauer)
 ```
 
+Vgl. die Definition des Targets `glotzdauer` in der [Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L269).
+
+Kurz gesagt wird die Zeit-Differenz zwischen zwei aufeinander folgenden "Play" und "Pause" Aktionen berechnet.
+
+Allerdings hat dieses Vorgehen Schwierigkeiten: Nicht immer folgt auf einem "Play" ein "Pause". 
+Es ist schwer auszuwerten, wann die Betrachtung eines Videos endet.
+Daher ist diese Analyse nur vorsichtig zu interpretieren.
+
+Die Definition [der Funktion glotzdauer.R](https://github.com/sebastiansauer/hans/blob/main/funs/glotzdauer.R) ist online dokumentiert.
+
+```{r}
+glotzdauer |> 
+  head(30) |> 
+  kable()
+```
+
+Für die folgende Darstellung wurden die *absoluten* Zeitwerte verwendet, d.h. ohne Vorzeichen.
+
 ```{r p-plotzdauer}
 glotzdauer |> 
   # we will assume that negative glotzdauer is the as positive glotzdauer:
@@ -1192,7 +1384,7 @@ glotzdauer |>
   geom_histogram() +
   scale_x_time() +
   labs(x = "Time interval [minutes]",
-       caption = "Only time intervals less than 10 minutes")
+       caption = "Only time intervals less than 10 minutes. It is assumed that video time is positive only (no negative time intervals).")
 ```
 
 
