@@ -85,6 +85,7 @@ library(visdat)
 library(collapse)
 library(ggpubr)
 library(knitr)
+library(tinytable)
 ```
 
 ```{r}
@@ -464,15 +465,15 @@ count_action2 |>
 ## Mit den 499er-Daten
 
 ```{r plot-count-action}
-count_action_avg = mean(count_action$nr_max)
-count_action_sd = sd(count_action$nr_max)
+count_action_avg = mean(count_action$nr_max) |> round(0)
+count_action_sd = sd(count_action$nr_max) |> round(0)
 
 count_action |> 
   ggplot() +
   geom_histogram(aes(x = nr_max)) +
   labs(x = "Anzahl von Aktionen pro Visit",
        y = "n",
-       caption = "Der vertikale Strich zeigt den Mittelwert; der horizontale die SD") +
+       caption = "Der vertikale Strich zeigt den Mittelwert; der horizontale MW±SD") +
   theme_minimal() +
   geom_vline(xintercept = count_action_avg,
              color = palette_okabe_ito()[1]) +
@@ -482,8 +483,12 @@ count_action |>
                yend = 0,
                color = palette_okabe_ito()[2],
                size = 2) +
-  annotate("label", x = count_action_avg, y = 1500, label = "MW") +
-  annotate("label", x = count_action_avg + count_action_sd, y = 0, label = "SD")
+  annotate("label", x = count_action_avg, y = 1500, 
+           label = paste0("MW = ", count_action_avg)) +
+  annotate("label", 
+           x = count_action_avg + count_action_sd, 
+           y = 0, 
+           label = paste0("SD = ", count_action_sd))
   #geom_label(aes(x = count_action_avg), y = 1, label = "Mean")
 ```
 
@@ -496,8 +501,8 @@ count_action |>
 ## Ohne 499er-Daten
 
 ```{r plot-count-action-2}
-count_action_avg2 = mean(count_action2$nr_max)
-count_action_sd2 = sd(count_action2$nr_max)
+count_action_avg2 = mean(count_action2$nr_max) |> round(0)
+count_action_sd2 = sd(count_action2$nr_max) |> round(2)
 
 count_action2 |> 
   ggplot() +
@@ -515,8 +520,12 @@ count_action2 |>
                yend = 0,
                color = palette_okabe_ito()[2],
                size = 2) +
-  annotate("label", x = count_action_avg2, y = 1500, label = "MW", vjust = "top") +
-  annotate("label", x = count_action_avg2 + count_action_sd2, y = 0, label = "SD", vjust = "bottom")
+  annotate("label", x = count_action_avg2, y = 1500, 
+           label = paste0("MW = ", count_action_avg2)) +
+  annotate("label", 
+           x = count_action_avg2 + count_action_sd2, 
+           y = 0, 
+           label = paste0("SD = ", count_action_sd2))
   #geom_label(aes(x = count_action_avg), y = 1, label = "Mean")
 ```
 
@@ -585,7 +594,8 @@ time_spent |>
     sd_time_diff = sd(time_diff),
     min_time_diff = min(time_diff),  # shortest duration
     max_time_diff = max(time_diff)  # longest
-  )
+  ) |> 
+  kable()
 ```
 
 
@@ -626,7 +636,8 @@ time_spent |>
     sd_time_diff = sd(time_diff_minutes),
     min_time_diff = min(time_diff_minutes),  # shortest duration
     max_time_diff = max(time_diff_minutes)  # longest
-  )
+  ) |> 
+  kable()
 ```
 
 
@@ -640,6 +651,7 @@ small_padding_theme <- ggpubr::ttheme(
 
 
 ```{r}
+#| eval: false
 ggpubr::ggtexttable(time_spent_summary,
                     rows = NULL,
                     theme = small_padding_theme)
@@ -657,7 +669,8 @@ time_spent |>
   #scale_x_time() +
   theme_minimal() +
   labs(y = "n",
-       x = "Verweildauer in HaNS pro Visit in Minuten")
+       x = "Verweildauer in HaNS pro Visit in h:m:s") +
+  scale_x_time(breaks = pretty_breaks())
 ```
 
 
@@ -666,13 +679,14 @@ time_spent |>
 
 ```{r plot-time-spent2}
 time_spent |> 
-  ggplot(aes(x = t_min)) +
-  geom_histogram(binwidth = 5) +
+  ggplot(aes(x = time_diff)) +
+  geom_histogram(binwidth = 5*60) +
   theme_minimal() +
   labs(y = "n",
        x = "Verweildauer in Minuten",
-       title = "Verweildauer in HaNS pro Visit",
-       caption = "binwidth = 5 Min.")
+       title = "Verweildauer in HaNS pro Visit in h:m:s",
+       caption = "binwidth = 5 Min.") +
+  scale_x_time(breaks = pretty_breaks())
 ```
 
 ### Zeitdauer begrenzt auf 1-120 Min.
@@ -680,10 +694,10 @@ time_spent |>
 ```{r plot-time-spent3}
 time_spent2 <- 
 time_spent |> 
-  filter(t_min > 1, t_min < 120) 
+  filter(time_diff > 1, time_diff < 120) 
 
 time_spent2 |> 
-  ggplot(aes(x = t_min)) +
+  ggplot(aes(x = time_diff)) +
   geom_histogram(binwidth = 10) +
   theme_minimal() +
   labs(y = "n",
@@ -700,19 +714,17 @@ time_spent2 |>
 ```{r}
 time_spent_by_month <-
   time_spent |> 
-  mutate(date = ymd_hms(value)) |> 
-  mutate(month_start = floor_date(date, "month")) |> 
+  mutate(month_start = floor_date(time_min, "month")) |> 
   mutate(month_name = month(month_start, label = TRUE, abbr = FALSE),
          month_num = month(month_start, label = FALSE),
          year = year(month_start)) |> 
   group_by(month_num, year) |> 
-  summarise(time_spent_month_avg = mean(t_min, na.rm = TRUE),
-            time_spent_month_sd = sd(t_min, na.rm = TRUE)) |> 
+  summarise(time_spent_month_avg = mean(time_diff, na.rm = TRUE),
+            time_spent_month_sd = sd(time_diff, na.rm = TRUE)) |> 
   arrange(year, month_num)
 
 time_spent_by_month |> 
-  gt() |> 
-  fmt_auto()
+  tt(digits = 2)
 ```
 
 
@@ -727,14 +739,13 @@ time_spent_by_month |>
 ```{r time_spent_by_month_name}
 time_spent_by_month_name <- 
 time_spent |> 
-  mutate(date = ymd_hms(value)) |> 
-  mutate(month_start = floor_date(date, "month")) |> 
+  mutate(month_start = floor_date(time_min, "month")) |> 
   mutate(month_name = month(month_start, label = TRUE, abbr = FALSE),
          month_num = month(month_start, label = FALSE),
          year = year(month_start)) |> 
   group_by(month_start, year) |> 
-  summarise(time_spent_month_avg = mean(t_min, na.rm = TRUE),
-            time_spent_month_sd = sd(t_min, na.rm = TRUE))
+  summarise(time_spent_month_avg = mean(time_diff, na.rm = TRUE),
+            time_spent_month_sd = sd(time_diff, na.rm = TRUE))
 
 time_spent_by_month_name |> 
 ggplot(aes(x = month_start, y = time_spent_month_avg)) +
@@ -765,7 +776,8 @@ Für das Objekt `count_action_type` wurde die Spalte `subtitle` in den Langforma
 
 ```{r}
 count_action_type |> 
-  head(30)
+  head(30) |> 
+  kable()
 ```
 
 
@@ -1053,7 +1065,8 @@ time_visit_wday |>
 time2 <- 
 time_visit_wday |> 
   ungroup() |> 
-  mutate(date = as.Date(date_time))
+  mutate(date = as.Date(date_time)) |> 
+  mutate(month_start = floor_date(date_time, "month")) 
 
 time2 |> 
   ggplot(aes(x = date, y = hour)) +
@@ -1061,7 +1074,8 @@ time2 |>
   scale_x_date(date_breaks = "1 month") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
-  labs(caption = "Each x-bin maps to one week")
+  labs(caption = "Each x-bin maps to one week") +
+  scale_x_date(breaks = breaks_pretty())
  
 ```
 
@@ -1076,8 +1090,9 @@ time2 |>
   scale_x_date(date_breaks = "1 week", date_labels = "%W") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c()  +
-  labs(x = "Week number in 2023/2024",
-       caption = "Each x-bin maps to one week")
+  labs(x = "Week number in 2023/2024", 
+       caption = "Each x-bin maps to one week") +
+  scale_x_date(breaks = breaks_pretty())
 ```
 
 ## Anzahl der Visits nach Datum (Wochen) und Wochentag (bin2d)
@@ -1096,7 +1111,9 @@ time2 |>
   labs(x = "Week number in 2023/2024",
        caption = "Each x-bin maps to one week",
        y = "Day of Week") +
-  scale_y_continuous(breaks = 1:7)
+  scale_y_continuous(breaks = 1:7)   +
+  scale_x_date(breaks = breaks_pretty())
+
 ```
 
 
@@ -1188,24 +1205,28 @@ idvisit_has_llm_timeline |>
 idvisit_has_llm |> 
   count(year_month, uses_llm) |> 
   ungroup() |> 
-  group_by(year_month) |> 
-  mutate(prop = n/sum(n)) |> 
-  ggplot(aes(x = year_month, y = prop, color = uses_llm, groups = uses_llm)) +
+  mutate(year_month_date = ymd(paste0(year_month,"-01"))) |> 
+  group_by(year_month_date) |> 
+  mutate(prop = n/sum(n))  |> 
+  ggplot(aes(x = year_month_date, y = prop, color = uses_llm, groups = uses_llm)) +
   geom_point() +
   geom_line(aes(group = uses_llm)) +
-  labs(title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anteile)")
+  labs(title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anteile)") +
+  scale_x_date(breaks = pretty_breaks())
 ```
 
 
 ```{r}
 idvisit_has_llm |> 
   count(year_month, uses_llm) |> 
-  ungroup() |> 
+  ungroup()  |> 
+  mutate(year_month_date = ymd(paste0(year_month,"-01"))) |> 
   group_by(year_month) |> 
-  ggplot(aes(x = year_month, y = n, color = uses_llm, groups = uses_llm)) +
+  ggplot(aes(x = year_month_date, y = n, color = uses_llm, groups = uses_llm)) +
   geom_point() +
   geom_line(aes(group = uses_llm)) +
-  labs(title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anzahl)")
+  labs(title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anzahl)") +
+  scale_x_date(breaks = pretty_breaks())
 ```
 
 ## Klick auf ein Wort im Transkript
@@ -1218,7 +1239,7 @@ data_slim_filtered |>
   filter(!is.na(value) & value != "") |> 
   count(click_transcript_word = str_detect(value, "click_transcript_word")) |> 
   mutate(prop = round(n/sum(n), 2)) |> 
-  gt()
+  tt()
 ```
 
 
@@ -1237,7 +1258,8 @@ tar_load(data_long)
 
 ```{r}
 data_long |> 
-  head(30)
+  head(30) |> 
+  tt()
 ```
 
 
@@ -1264,7 +1286,7 @@ ai_actions_count <-
   count(category, sort = TRUE) 
 
 ai_actions_count |> 
-  gt()
+  tt()
 ```
 
 
@@ -1331,7 +1353,7 @@ Die Nutzer beenden keine Videos, in dem sie auf "Pause" drücken,
 sondern indem sie andere Aktionen durchführen.
 Dies ist aber analytisch schwer abzubilden.
 
-```{r}
+```{r load-glotzdauer}
 tar_load(glotzdauer)
 ```
 
@@ -1348,7 +1370,7 @@ Die Definition [der Funktion glotzdauer.R](https://github.com/sebastiansauer/han
 ```{r}
 glotzdauer |> 
   head(30) |> 
-  kable()
+  tt()
 ```
 
 Für die folgende Darstellung wurden die *absoluten* Zeitwerte verwendet, d.h. ohne Vorzeichen.
@@ -1369,7 +1391,6 @@ glotzdauer |>
 
 
 ```{r glotzdauer-stats}
-
 glotzdauer_prepped <- 
 glotzdauer |> 
   # we will assume that negative glotzdauer is the as positive glotzdauer:
@@ -1384,10 +1405,10 @@ glotzdauer_tbl <-
   describe_distribution()
 
 glotzdauer_tbl |> 
-  kable()
+  tt()
 ```
 
-```{r}
+```{r glotzdauer_tbl-ggtexttable}
 glotzdauer_tbl |>
   mutate(across(where(is.numeric), ~ round(., 2))) |>
   ggpubr::ggtexttable()
@@ -1397,7 +1418,7 @@ glotzdauer_tbl |>
 
 ## Glotzdauer im Zeitverlauf
 
-```{r}
+```{r glotzdauer_prepped_tbl}
 glotzdauer_prepped_tbl <-
 glotzdauer_prepped |> 
   mutate(first_of_month = floor_date(date, unit = "month")) |> 
@@ -1406,10 +1427,10 @@ glotzdauer_prepped |>
   
 
 glotzdauer_prepped_tbl |> 
-  kable()
+  tt()
 ```
 
-```{r}
+```{r glotzdauer_prepped_tbl}
 glotzdauer_prepped_tbl |> 
   ggplot(aes(x = first_of_month, y = time_diff_mean)) +
   geom_line()
