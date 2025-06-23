@@ -536,7 +536,7 @@ count_action2 |>
 
 ## Berechnungsgrundlage der Verweildauer
 
-Die Verweildauer wurde berechnet als Differenz zwischen kleinstem und größtem Datumszeitwert (POSixct) eines Visits, vgl. [Funktion `diff_time](https://github.com/sebastiansauer/hans/blob/main/funs/diff_time.R).
+Die Verweildauer wurde berechnet als Differenz zwischen kleinstem und größtem Datumszeitwert (POSixct) eines Visits (also pro Wert der Variablen `idvisit`), vgl. [Funktion `diff_time](https://github.com/sebastiansauer/hans/blob/main/funs/diff_time.R).
 Diese Variable heißt `time_diff` im Objekt `time_spent`.
 
 Dabei wird das Objekt `data_slim_filtered` herangezogen, vgl. [die Definition es Targets "time_spent" in der Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L205).
@@ -569,13 +569,13 @@ time_spent |>
 time_spent <- 
   time_spent |> 
   # compute time (t) in minutes (min):
-  mutate(t_min = as.numeric(time_diff, units = "mins")) |> 
-  filter(t_min < 600)
+  mutate(t_minutes = as.numeric(time_diff, units = "mins")) |> 
+  filter(t_minutes < 600)
 ```
 
 ## Verweildauer-Statistiken in Sekunden 
 
-Die Verweildauer ist dargestellt auf Grundlage oben dargestellter Berechnungsgrundlage.
+Die Verweildauer ist im Folgenden dargestellt auf Grundlage oben dargestellter Berechnungsgrundlage (in Sekunden).
 
 
 ```{r comp-diff-time-stats}
@@ -583,18 +583,9 @@ time_spent |>
   summarise(
     mean_time_diff = round(mean(time_diff), 2),
     sd_time_diff = sd(time_diff),
-    min_time_diff = min(time_diff),
-    max_time_diff = max(time_diff)
-  ) |> 
-  summarise(
-    mean_time_diff_avg = mean(mean_time_diff),
-    sd_time_diff_avg = mean(sd_time_diff, na.rm = TRUE),
-    min_time_diff_avg = mean(min_time_diff),
-    max_time_diff_avg = mean(max_time_diff)
-  ) |> 
-  gt() |> 
-  fmt_number(columns = everything(),
-             decimals = 2)
+    min_time_diff = min(time_diff),  # shortest duration
+    max_time_diff = max(time_diff)  # longest
+  )
 ```
 
 
@@ -627,26 +618,17 @@ time_duration |>
 ## Verweildauer-Statistiken in Minuten
 
 ```{r time-spent-tbl}
-time_spent_summary <- 
-time_spent |> 
-  summarise(
-    mean_t_min = mean(t_min),
-    sd_t_min = sd(t_min),
-    min_t_min = min(t_min),
-    max_t_min = max(t_min)
-  ) |> 
-   summarise(
-    mean_t_min_avg = mean(mean_t_min),
-    sd_t_min_avg = mean(sd_t_min, na.rm = TRUE),
-    min_t_min_avg = mean(min_t_min),
-    max_t_min_avg = mean(max_t_min)
-  )
 
-time_spent_summary |> 
-  gt() |> 
-  fmt_number(columns = everything(),
-             decimals = 2)
+time_spent |> 
+  mutate(time_diff_minutes = time_length(time_diff, unit = "minute")) |> 
+  summarise(
+    mean_time_diff = round(mean(time_diff_minutes), 2),
+    sd_time_diff = sd(time_diff_minutes),
+    min_time_diff = min(time_diff_minutes),  # shortest duration
+    max_time_diff = max(time_diff_minutes)  # longest
+  )
 ```
+
 
 ```{r}
 small_padding_theme <- ggpubr::ttheme(
@@ -670,9 +652,9 @@ ggpubr::ggtexttable(time_spent_summary,
 
 ```{r plot-time-spent1}
 time_spent |> 
-  ggplot(aes(x = t_min)) +
+  ggplot(aes(x = time_diff/60)) +
   geom_histogram() +
-  scale_x_time() +
+  #scale_x_time() +
   theme_minimal() +
   labs(y = "n",
        x = "Verweildauer in HaNS pro Visit in Minuten")
