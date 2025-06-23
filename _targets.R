@@ -114,6 +114,13 @@ list(
                          contains("pageid"),
                          #select(-matches("\\w+_(?!0)\\d+_timestamp")),
                          contains("timespent")))),
+  # it appears that "idivisit" is NOT unique :-(
+
+  tar_target(data_unique_id,
+             data_less_cols |> 
+               mutate(idvisit_old = idvisit,
+                      idvisit = 1:nrow(data_less_cols)) |> 
+  select(idvisit, everything())),
 
 
   
@@ -135,28 +142,35 @@ list(
              packages = "collapse"),
 
 tar_target(data_wide_slim,
-           data_less_cols |> 
-           get_vars(vars = c("idvisit", 
-                             # get only the "actiondetails_XXX" variables:
-                             grep("actiondetails_", names(data_less_cols),
-                                  value = TRUE))),
+           data_unique_id |> 
+             get_vars(vars = c("idvisit", 
+                               # get only the "actiondetails_XXX" variables:
+                               grep("actiondetails_", names(data_unique_id),
+                                    value = TRUE))),
            packages = "collapse"),
 
+  tar_target(data_wide_slim_head,
+             data_unique_id[1:100, ]),
+  # time tags are still okay: starting with 2023
+  
 
 
 # pivot longer ------------------------------------------------------------
 
+# pivot longer to get a handle on the number of cols per login:
   tar_target(data_long,
-             data_less_cols |> longify_data(),
+             data_unique_id |> longify_data(),
              packages = "collapse"),
   
-  # pivot longer to get a handle on the number of cols per login:
-  # tar_target(data_long2,
-  #            data_all_chr |> longify_data(),
-  #            packages = "collapse"),
+ 
+  # tidyverse appears to come the same object, but better double check:
+  tar_target(data_long_tidyverse,
+             data_wide_slim |> 
+               longify_data_tidyverse()),
   
   
   # drop rows with missing data:
+  # time tags appear to be wrong! It should start in 2023, not in 2024!
   tar_target(data_long_nona,
              data_long |> drop_na() |> filter(value != "")),  # drop rows with missing data
 
