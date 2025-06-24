@@ -1430,7 +1430,7 @@ glotzdauer_prepped_tbl |>
   tt()
 ```
 
-```{r glotzdauer_prepped_tbl}
+```{r glotzdauer_prepped_plot}
 glotzdauer_prepped_tbl |> 
   ggplot(aes(x = first_of_month, y = time_diff_mean)) +
   geom_line()
