@@ -1,7 +1,5 @@
 
 
-
-
 import_data <- function(file, verbose = TRUE){
   
   print(paste0("Now processing: ", file))
@@ -30,8 +28,3 @@ import_data <- function(file, verbose = TRUE){
     mutate(across(where(is.numeric), as.character))
 }
 
-
-
-# dttm    (1): lastActionDateTime
-# date    (1): serverDate
-# time    (3): serverTimePretty, serverTimePrettyFirstActio...
