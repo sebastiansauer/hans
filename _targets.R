@@ -6,12 +6,11 @@
 library(targets)
 library(dplyr)
 library(tarchetypes)
-#library(crew)
+
 
 # packages available for all targets:
 tar_option_set(
-  packages = c("dplyr", "purrr", "readr", "tidyr", "collapse")
-  )
+  packages = c("dplyr", "purrr", "readr", "tidyr", "collapse")  )
 
 # set options:
 options(lubridate.week.start = 1)
@@ -30,13 +29,12 @@ list(
   # read data path as saved in config.yaml:
   tar_target(config_file, "config.yaml", 
              format = "file"),  # watch config file for changes
+  
   tar_target(config, read_yaml(config_file), 
              packages = "yaml"),
+  
   tar_target(data_files_list, 
-             list.files(path = config$data,  # all SEMSTERs
-                        full.names = TRUE,
-                        pattern = config$data_raw_pattern,
-                        recursive = TRUE), 
+             find_data_files(config), 
              format = "file"),  # watch data source files
   
   # exclude duplicate data files:
@@ -54,7 +52,7 @@ list(
                rbindlist(fill = TRUE), 
              packages = c("lubridate", "stringr", "dplyr", "data.table")),
   
-  
+
   
 
 # prep data ---------------------------------------------------------------
@@ -116,11 +114,17 @@ list(
                          contains("timespent")))),
   # it appears that "idivisit" is NOT unique :-(
 
+
+  # make sure the ID is now unique
   tar_target(data_unique_id,
              data_less_cols |> 
                mutate(idvisit_old = idvisit,
                       idvisit = 1:nrow(data_less_cols)) |> 
-  select(idvisit, everything())),
+               select(idvisit, everything())),
+
+
+  tar_target(test_unique_idvisit,
+             check_unique_ids(data_unique_id)),
 
 
   
@@ -297,32 +301,8 @@ tar_target(glotzdauer,
 
 
 
+# END OF PIPELINE ---------------------------------------------------------
 
-# render report in Quarto -------------------------------------------------
 
-
-  
-  # render report:
-  #tar_quarto(report01, "report01.qmd")
-
-  # export small XLS files
-  
-  # export processed data to disk as RDS file:
-  # tar_target(data_to_be_exported, 
-  #            list(
-  #              time_spent = time_spent, 
-  #              data_slim = data_slim, 
-  #              count_action = count_action,
-  #              data_little = data_little,
-  #              data_all_chr = data_all_chr,
-  #              data_all_fct = data_all_fct,
-  #              data_user1 = data_user1,
-  #              data_user1_long = data_user1_long,
-  #              data_little_long = data_little_long,
-  #              data_slim_head = data_slim_head)),
-  # tar_target(export_data, 
-  #            save_data_as_rds(
-  #              data_to_be_exported, config_file),
-  #            packages = c("purrr", "yaml"))
             
 )
