@@ -1,4 +1,7 @@
 longify_data <- function(data, no.na = TRUE){
+  
+  assert_that(length(data$idvisit) == length(unique(data$idvisit)))
+
   out <- 
     data |> 
     # fast "select":
