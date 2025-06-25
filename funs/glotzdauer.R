@@ -1,5 +1,5 @@
 
-glotzdauer_playpause <- function(d, idvisit, action_type, nr){
+glotzdauer_playpause <- function(d){
 
 d_filtered_wide <- 
 d |> 
