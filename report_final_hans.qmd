@@ -17,6 +17,7 @@ format:
     code-fold: true
     code-summary: "Show the code"
     code-tools: true
+    df-print: paged
     
 execute: 
   warning: false
@@ -818,8 +819,7 @@ count_action_type |>
 ```
 
 ```{r}
-count_action_type_per_month |> 
-  gt()
+count_action_type_per_month 
 ```
 
 ### Nur die Top3-Kategorien
@@ -831,8 +831,7 @@ tar_load(time_visit_wday)
 
 ```{r}
 time_visit_wday |> 
-  head(30) |> 
-  kable()
+  head(30)
 ```
 
 
@@ -850,8 +849,7 @@ count_action_type |>
 ```
 
 ```{r count_action_type_per_month_top3-gt}
-count_action_type_per_month_top3 |> 
-  gt()
+count_action_type_per_month_top3 
 ```
 
 

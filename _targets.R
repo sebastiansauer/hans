@@ -56,11 +56,12 @@ list(
 
 # prep data ---------------------------------------------------------------
   
-  # remove empty cols:
+  # prep data:
   tar_target(data_prepped, 
              data_imported |> prep_data(),
              packages = "janitor"),
   
+
   # transform all columns to character:
   # but why?
   tar_target(data_all_chr, 
@@ -132,6 +133,10 @@ tar_target(data_wide_slim,
   # tar_target(data_wide_slim_head,
   #            data_wide_slim[1:100, ]),
   # time tags are still okay: starting with 2023
+
+
+  tar_target(course_per_visit,
+             data_wide_slim |> extract_course_of_visit()),
   
 
 
@@ -191,8 +196,14 @@ tar_target(data_wide_slim,
   tar_target(count_action,
              data_separated_filtered |>
                group_by(idvisit) |>
-               # "nr" is the id of the action of this visit:
+               # column "nr" is the id of the action of this visit:
+               # we just count the rows per idivist:
                summarise(nr_max = max(nr))), 
+
+  # # count courses:
+  # tar_target(count_courses,
+  #            data_separated_filtered )
+
   
   # compute time variables per visit:
   tar_target(time_spent,
