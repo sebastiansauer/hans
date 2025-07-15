@@ -3,23 +3,25 @@
 
 
 # setup -------------------------------------------------------------------
-library(targets)
-library(dplyr)
-library(tarchetypes)
+library("data.table")
+library("targets")
+library("tarchetypes")
+
 
 
 # packages available for all targets:
 tar_option_set(
-  packages = c("dplyr", "purrr", "readr", "tidyr", "collapse"))
+  packages = c("data.table", "dplyr", "purrr", "readr", "tidyr", "collapse", "stringr", "lubridate"))
 
 # set options:
 options(lubridate.week.start = 1)
 #options(collapse_mask = "all") # use collapse for all dplyr operations
 
 # source funs:
-funs_files <- list.files(
-  path = "funs", pattern = "\\.R", full.names = TRUE)
-lapply(X = funs_files, FUN = source)
+# funs_files <- list.files(
+#   path = "funs", pattern = "\\.R", full.names = TRUE)
+# lapply(X = funs_files, FUN = source)
+tar_source()
 
 
 # import data -------------------------------------------------------------
@@ -49,7 +51,7 @@ list(
   tar_target(data_imported, 
              data_files_no_json |>  
                import_and_bind_data(), 
-             packages = c("lubridate", "data.table", "stringr")),
+             packages = c("data.table", "stringr")),
   
 
   
