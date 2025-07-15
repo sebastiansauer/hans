@@ -281,17 +281,17 @@ tar_load(config)
 
 
 ```{r time_minmax-load}
-tar_load(time_minmax)
+tar_load(n_action_w_date)
 
-time_minmax |> 
+n_action_w_date |> 
   head(30)
 ```
 
 
 ```{r comp-time-min-max}
-time_minmax |> 
-  summarise(time_min = min(time_min, na.rm = T),
-            time_max = max(time_max, na.rm = T)) |> 
+n_action_w_date |> 
+  summarise(time_min = min(date_time_start, na.rm = T),
+            time_max = max(date_time_start, na.rm = T)) |> 
   gt()
 ```
 
@@ -840,32 +840,33 @@ ggpubr::ggtexttable(time_spent_summary,
 
 ## Visualisierung der Verweildauer
 
-### bins=20
+### Binwidth=10 Minutes
 
 ```{r plot-time-spent1}
 time_spent |> 
-  ggplot(aes(x = time_diff/60)) +
-  geom_histogram() +
+  mutate(time_diff_minutes = time_diff/60) |> 
+  ggplot(aes(x = time_diff_minutes)) +  # minutes
+  geom_histogram(binwidth=10) +
   #scale_x_time() +
   theme_minimal() +
   labs(y = "n",
-       x = "Verweildauer in HaNS pro Visit in h:m:s") +
+       x = "Verweildauer in HaNS pro Visit in d:h:m") +
   scale_x_time(breaks = pretty_breaks())
 ```
 
 
 
-### bins=100
+### Bin width= 20 Minutes
 
 ```{r plot-time-spent2}
 time_spent |> 
-  ggplot(aes(x = time_diff)) +
-  geom_histogram(binwidth = 5*60) +
+ mutate(time_diff_minutes = time_diff/60) |> 
+  ggplot(aes(x = time_diff_minutes)) +  # minutes
+  geom_histogram(binwidth = 20) +
   theme_minimal() +
   labs(y = "n",
-       x = "Verweildauer in Minuten",
-       title = "Verweildauer in HaNS pro Visit in h:m:s",
-       caption = "binwidth = 5 Min.") +
+       x = "Verweildauer",
+       title = "Verweildauer in HaNS pro Visit in d:h:m") +
   scale_x_time(breaks = pretty_breaks())
 ```
 
@@ -881,7 +882,7 @@ time_spent2 |>
   geom_histogram(binwidth = 10) +
   theme_minimal() +
   labs(y = "n",
-       x = "Verweildauer in HaNS pro Visit in h:m:s",
+       x = "Verweildauer in HaNS pro Visit in Minuten",
        title = "Verweildauer begrenzt auf 1-120 Minuten",
        caption = "bindwidth = 10 Min.")
 ```
