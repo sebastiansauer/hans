@@ -1,5 +1,5 @@
 this_semester: "25-ss"
-data: "data/test"
+data: "data/data-raw"
 data_23ws: "data/data-raw/23-ws"
 data_24ss: "data/data-raw/24-ss"
 data_test: "data/data-raw/test"

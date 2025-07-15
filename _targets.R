@@ -49,7 +49,7 @@ list(
   tar_target(data_imported, 
              data_files_no_json |>  
                import_and_bind_data(), 
-             packages = c("lubridate", "data.table")),
+             packages = c("lubridate", "data.table", "stringr")),
   
 
   
@@ -135,8 +135,9 @@ tar_target(data_wide_slim,
   # time tags are still okay: starting with 2023
 
 
-  tar_target(course_per_visit,
-             data_wide_slim |> extract_course_of_visit()),
+  tar_target(course_and_uni_per_visit,
+             data_wide_slim |> extract_course_role_university_of_visit(),
+             packages = c("stringr", "lubridate")),
   
 
 
@@ -192,26 +193,41 @@ tar_target(data_wide_slim,
 
 # count stuff per visit -------------------------------------------------
 
-  # count rows per visit (n):
-  tar_target(count_action,
+  # count rows per visit (n, WIDE formatted data):
+  tar_target(n_action,
              data_separated_filtered |>
                group_by(idvisit) |>
                # column "nr" is the id of the action of this visit:
                # we just count the rows per idivist:
                summarise(nr_max = max(nr))), 
 
+  # count rows per visit (WIDE format) plus the date/time of the start of this visit:
+  tar_target(n_action_w_date,
+             data_separated_filtered |> 
+               count_action_w_date(),
+             packages = "lubridate"),
+
   # # count courses:
   # tar_target(count_courses,
   #            data_separated_filtered )
 
   
-  # compute time variables per visit:
+  # compute time variables per visit (WIDE format data):
   tar_target(time_spent,
              data_separated_filtered |> diff_time(),
              packages = "lubridate"),
   # tar_target(time_minmax,
   #            data_separated_filtered |> time_min_max(),
   #            packages = "lubridate"),
+
+
+  tar_target(time_spent_w_course_university,
+             time_spent |> 
+               mutate(idvisit = as.character(idvisit)) |> 
+               left_join(course_and_uni_per_visit, by = "idvisit") |> 
+               extract_date_components(time_min)),
+
+
   tar_target(time_duration,
              data_all_chr %>% 
                select(idvisit, visitduration) %>% 
@@ -223,14 +239,23 @@ tar_target(data_wide_slim,
              data_separated_filtered |> when_visited(), 
              packages = c("collapse", "lubridate")),
   tar_target(time_since_last_visit,
-             data_all_fct |> 
+             data_all_chr |>  # changed from "fct" to "chr" 
                select(idvisit, dayssincelastvisit)
              ),
   
   # count action categories per visit:
-  tar_target(count_action_type,
+  tar_target(n_action_type,
              count_user_action_type(data_separated_filtered), packages = "stringr"),
-  
+
+
+  tar_target(llm_response_text,
+             n_action_type |> 
+               filter(str_detect(value, "llm_response")) |> 
+               select(value) |> 
+               mutate(lang = str_extract(value, "llm_response_([\\w]+)", group = 1),
+                      tokens_n = lengths(tokenize_words(value))),
+             packages = c("tokenizers", "stringr")),
+
   # count AI transcript clicks per month:
   tar_target(ai_transcript_clicks_per_month,
              data_separated_filtered |> 
