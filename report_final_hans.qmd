@@ -542,7 +542,7 @@ ggplot(aes(y = reorder(university, n), x = n)) +
 geom_col()
 ```
 
-## Visists nach Lehrveranstaltung und JAhr
+## Visits nach Lehrveranstaltung und JAhr
 
 ```{r}
 tar_load(time_spent_w_course_university)
@@ -1652,7 +1652,8 @@ ai_transcript_clicks_per_month_count |>
   mutate(date = ymd(paste0(year_month,"-01"))) |> 
   ggplot(aes(x = date, y = n)) +
   geom_line(group = 1) +
-  geom_point()
+  geom_point() +
+  theme_minimal()
 ```
 
 
@@ -1725,7 +1726,8 @@ glotzdauer |>
   geom_histogram() +
   scale_x_time() +
   labs(x = "Time interval [minutes]",
-       caption = "Only time intervals less than 10 minutes. It is assumed that video time is positive only (no negative time intervals).")
+       caption = "Only time intervals less than 10 minutes. It is assumed that video time is positive only (no negative time intervals).") +
+  theme_minimal()
 ```
 
 
@@ -1772,7 +1774,8 @@ glotzdauer_prepped_tbl
 ```{r glotzdauer_prepped_plot}
 glotzdauer_prepped_tbl |> 
   ggplot(aes(x = first_of_month, y = time_diff_mean)) +
-  geom_line()
+  geom_line() +
+  theme_minimal()
 ```
 
 
