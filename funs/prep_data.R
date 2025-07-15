@@ -1,4 +1,5 @@
 prep_data <- function(d){
+  # prepare the raw Matomo data for further analysis:
   d |> 
     transform_to_true_NAs() |> 
     remove_empty(which = c("rows", "cols")) |> 
@@ -16,6 +17,7 @@ prep_data <- function(d){
               contains("pageid"),
               #select(-matches("\\w+_(?!0)\\d+_timestamp")),
               contains("timespent"))) |> 
+    # assign own IDs, as the original ID are *not* unique!
     mutate(idvisit_old = idvisit,
            idvisit = 1:n()) |> 
     select(idvisit, everything())
