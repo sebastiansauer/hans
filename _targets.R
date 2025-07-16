@@ -6,15 +6,13 @@
 library("targets")
 library("tarchetypes")
 
-
 tar_option_set(
-  packages = c("data.table", "dplyr", "purrr", "readr", "tidyr", "collapse", "stringr", "lubridate"))
+  packages = c("data.table", "dplyr", "purrr", "readr", "tidyr", 
+               "collapse", "stringr", "lubridate"))
 
 options(lubridate.week.start = 1)
 
-
 tar_source()
-
 
 # START OF PIPELINE -------------------------------------------------------
 
@@ -140,7 +138,7 @@ list(
       compute_glotzdauer())
   
   # END OF PIPELINE ---------------------------------------------------------
-  
-  
-  
 )
+
+
+
