@@ -1,4 +1,5 @@
 diff_time <- function(data) {
+  # compute time variables per visit (WIDE format data):
   data |> 
     filter(type ==  "timestamp") |> 
     select(idvisit, value) |> 
