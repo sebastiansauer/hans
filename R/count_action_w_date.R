@@ -1,4 +1,6 @@
 count_action_w_date <- function(d = data_separated_filtered){
+  # count rows per visit (WIDE format) plus the date/time of the start of this visit:
+  
   d |>
   mutate(date_time = ymd_hms(value)) |> 
   group_by(idvisit) |> 
