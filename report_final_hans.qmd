@@ -90,6 +90,8 @@ library(tinytable)
 ```
 
 ```{r}
+#| cache: false
+library(ggplot2)
 theme_set(theme_minimal())
 ```
 
@@ -101,6 +103,13 @@ options(lubridate.week.start = 1)  # Monday as first day
 #options(collapse_mask = "all") # use collapse for all dplyr operations
 options(chromote.headless = "new")  # Chrome headleass needed for gtsave
 ```
+
+
+```{r}
+scale_colour_discrete <- function(...) scale_colour_brewer(palette = "Set2")
+scale_fill_discrete <- function(...) scale_fill_brewer(palette = "Set2")
+```
+
 
 <!-- Immer `knitr::kable` für das Zeigen von Data frames verwenden: -->
 
@@ -309,6 +318,8 @@ tar_load(time_since_last_visit)
 ```
 
 
+### Insgesamt
+
 ```{r}
 time_visit_wday |> 
   head(30) 
@@ -329,6 +340,62 @@ time_since_last_visit |>
   geom_density()
 ```
 
+
+### Nach Lehrveranstaltungen
+
+
+```{r course_and_uni_per_visit}
+tar_load(course_and_uni_per_visit)
+```
+
+
+
+```{r time_since_last_visit_per_course}
+time_since_last_visit_per_course <- 
+time_since_last_visit |> 
+  left_join(course_and_uni_per_visit) |> 
+  drop_na()
+```
+
+
+```{r time_since_last_visit_per_course_summary}
+time_since_last_visit_per_course_summary <- 
+time_since_last_visit_per_course |> 
+  group_by(course) |> 
+  summarise(dayssincelastvisit_mean = mean(dayssincelastvisit),
+            dayssincelastvisit_sd = sd(dayssincelastvisit),
+            dayssincelastvisit_n = n()) |> 
+  mutate(dayssincelastvisit_n_log = log(dayssincelastvisit_n, base = 10) + 0.001)
+```
+
+
+```{r}
+time_since_last_visit_per_course_summary |> 
+  print_md()
+```
+
+
+```{r}
+time_since_last_visit_per_course_summary |> 
+  ggplot(aes(y = reorder(course, dayssincelastvisit_mean), 
+             x = dayssincelastvisit_mean)) +
+  geom_errorbar(aes(xmin = dayssincelastvisit_mean - dayssincelastvisit_sd,
+                    xmax = dayssincelastvisit_mean + dayssincelastvisit_sd)) +
+  geom_point(aes(alpha = log(dayssincelastvisit_n)),
+             show.legend = FALSE) +
+  labs(x = "Days since last visit (mean±sd)",
+       y = "course",
+       caption = "Grey saturation of the mean dots refers to the log10 of the sample size (N)") +
+  geom_text(aes(label = round(dayssincelastvisit_n)),
+            x = Inf,
+            hjust = 1.2,
+            size = 2) +
+  annotate(x = Inf, y = Inf, label = "N", geom = "label",
+           hjust = 1,
+           vjust = 1) +
+  scale_y_discrete(expand = expansion(mult = 0.1)) +
+  theme_minimal()
+```
 
 
 ## Visits im Zeitverlauf
@@ -415,7 +482,8 @@ time_visit_wday_summary |>
   mutate(n_cumsum = cumsum(n)) |> 
   ggplot(aes(x = month_start, y = n_cumsum)) +
   geom_line(group = 1, color = "grey60") +
-  geom_point() 
+  geom_point() +
+  theme_minimal()
 ```
 
 
@@ -430,7 +498,8 @@ time_visit_wday_summary_week |>
   mutate(n_cumsum = cumsum(n)) |> 
   ggplot(aes(x = week_start, y = n_cumsum)) +
   geom_line(group = 1, color = "grey60") +
-  geom_point() 
+  geom_point() +
+  theme_minimal()
 ```
 
 
@@ -468,7 +537,7 @@ tbl_n_action
 ```
 
 
-![](tbl_n_action.png)
+![](tbl_count_action.png)
 
 
 
@@ -524,10 +593,6 @@ n_action_lt_500 |>
 # Lehrveranstaltungen
 
 
-```{r}
-tar_load(course_and_uni_per_visit)
-```
-
 ## Anzahl an Lehrveranstaltungen
 
 ```{r}
@@ -535,21 +600,22 @@ course_and_uni_per_visit |>
 count(university)
 ```
 
-```{r}
+```{r course_and_uni_per_visit_plot}
 course_and_uni_per_visit |> 
 count(university) |> 
 ggplot(aes(y = reorder(university, n), x = n)) +
-geom_col()
+geom_col() +
+theme_minimal()
 ```
 
-## Visits nach Lehrveranstaltung und JAhr
+## Visits nach Lehrveranstaltung und Jahr
 
-```{r}
+```{r time_spent_w_course_university}
 tar_load(time_spent_w_course_university)
 ```
 
 
-```{r}
+```{r time_spent_w_course_university_count}
 time_spent_w_course_university |> 
 count(year, course)
 ```
@@ -559,7 +625,7 @@ time_spent_w_course_university |>
 count(year, course) |> 
 drop_na() |> 
 ggplot(aes(x = n, y = course, fill = factor(year),)) +
-geom_col()
+geom_col(position = "dodge")
 ```
 
 
@@ -1154,11 +1220,17 @@ geom_col()
 
 ## Verteilung
 
-### Rohwerte
+```{r}
+n_action_type_counted <- 
+n_action_type |> 
+  count(category, sort = TRUE) 
+```
+
+
+### Insgesamt - Rohwerte
 
 ```{r vis-count-action-type}
-n_action_type |> 
-  count(category, sort = TRUE) |> 
+n_action_type_counted |> 
   ggplot(aes(y = reorder(category, n), x = n)) +
   geom_col() +
   geom_bar_text() +
@@ -1172,12 +1244,11 @@ n_action_type |>
 ```
 
 
-### Log-Skalierung
+### Insgesamt - Log-Skalierung
 
 ```{r vis-count-action-type-log}
 #| fig-width: 9
-n_action_type |> 
-  count(category, sort = TRUE) |> 
+n_action_type_counted |> 
   ggplot(aes(y = reorder(category, n), x = n)) +
   geom_col() +
   geom_bar_text() +
@@ -1192,13 +1263,42 @@ n_action_type |>
 ```
 
 
+### Pro Kurs - Rohwerte
+
+
+
+```{r n_action_type_course_uni} 
+n_action_type_course_uni <-
+n_action_type |> 
+  left_join(course_and_uni_per_visit |> mutate(idvisit = as.integer(idvisit)))
+```
+
+
+```{r n_action_type_course_uni_counted}
+n_action_type_course_uni_counted <- 
+n_action_type_course_uni |> 
+  group_by(course) |> 
+  count(category, sort = TRUE) |> 
+  drop_na()
+```
+
+
+```{r n_action_type_course_uni_counted_plot}
+#|ffig-asp: 1.5
+n_action_type_course_uni_counted |> 
+  ggplot() +
+  aes(y = category, x = log(n, base = 10)) +
+  geom_col() +
+  facet_wrap(~course)
+```
+
 
 # An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?
 
 ## Setup
 
 
-```{r}
+```{r setup-dates}
 # Define a vector with the names of the days of the week
 # Note: Adjust the start of the week (Sunday or Monday) as per your requirement
 days_of_week <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -1391,7 +1491,7 @@ Berechnungsgrundlage: Für diese Analyse wurden alle Events der Kategorie `llm` 
 
 
 
-```{r}
+```{r data_slim_filtered_ai}
 data_slim_filtered_ai <- 
 data_slim_filtered |> 
   filter(type == "eventcategory") |> 
@@ -1436,7 +1536,7 @@ data_slim_filtered_llm_interact |>
 
 ### ... Im Zeitverlauf
 
-```{r}
+```{r idvisit_has_llm}
 tar_load(idvisit_has_llm)
 
 idvisit_has_llm |> 
@@ -1444,7 +1544,7 @@ idvisit_has_llm |>
 ```
 
 
-```{r}
+```{r idvisit_has_llm_timeline}
 idvisit_has_llm_timeline <- 
 idvisit_has_llm |> 
   count(year_month, uses_llm) |> 
@@ -1461,7 +1561,7 @@ idvisit_has_llm_timeline |>
 ```
 
 
-```{r}
+```{r idvisit_has_llm_plot}
 idvisit_has_llm |> 
   count(year_month, uses_llm) |> 
   ungroup() |> 
@@ -1539,7 +1639,7 @@ data_slim_filtered |>
 ### Im Zeitverlauf
 
 
-```{r}
+```{r click_transcript_word_per_month}
 click_transcript_word_per_month <- 
 data_slim_filtered |>
   # rm all groups WITHOUT "click_transcript_word":
@@ -1558,7 +1658,7 @@ click_transcript_word_per_month
 ```
 
 
-```{r}
+```{r click_transcript_word_per_month_plot}
 click_transcript_word_per_month |> 
   ggplot(aes(x = month_visit, y = n)) +
   geom_line()
@@ -1621,7 +1721,7 @@ Im Objekt wird gezählt, wie oft der String `"click_transcript_word"` in den Dat
 
 
 
-```{r}
+```{r ai_transcript_clicks_per_month}
 tar_load(ai_transcript_clicks_per_month)
 
 ai_transcript_clicks_per_month |> 
@@ -1661,7 +1761,7 @@ ai_transcript_clicks_per_month_count |>
 
 ## Output des LLMs: `llm_response`
 
-```{r}
+```{r llm_response_text}
 tar_load(llm_response_text)
 ```
 
@@ -1680,6 +1780,78 @@ llm_response_text |>
 ```{r}
 llm_response_text |> 
   describe_distribution(select = "tokens_n") |> 
+  print_md()
+```
+
+
+
+### Anzahl vorab existierender Fragen
+
+
+#### Anzahl `verify_option_wrong`
+
+```{r verify_option_summary}
+verify_option_summary <- 
+data_slim_filtered |> 
+  group_by(idvisit) |> 
+  filter(value == "verify_option_wrong" | value == "verify_option_correct") |> 
+  summarise(verify_option = n()) 
+```
+
+```{r}
+verify_option_summary |> 
+  gghistogram(x = "verify_option")
+```
+
+```{r}
+verify_option_summary |> 
+  describe_distribution(verify_option) |> 
+  print_md()
+```
+
+
+#### Anzahl `generate_questionaire`
+
+```{r generate_questionaire_summary}
+generate_questionaire_summary <- 
+data_slim_filtered |> 
+  group_by(idvisit) |> 
+  filter(value == "generate_questionaire") |> 
+  summarise(generate_questionaire = n()) 
+```
+
+
+```{r}
+generate_questionaire_summary |> 
+  describe_distribution(generate_questionaire) |> 
+  print_md()
+```
+
+
+
+
+
+#### Anzahl vorab existierender Fragen
+
+
+```{r prior_existing_questions_summary}
+prior_existing_questions_summary <- 
+generate_questionaire_summary |> 
+  full_join(verify_option_summary) |> 
+  mutate(prior_existing_questions_n = verify_option - generate_questionaire)
+```
+
+
+```{r}
+prior_existing_questions_summary |> 
+ # drop_na() |> 
+  gghistogram(x = "prior_existing_questions_n")
+```
+
+
+```{r}
+prior_existing_questions_summary |> 
+  describe_distribution(prior_existing_questions_n) |> 
   print_md()
 ```
 
