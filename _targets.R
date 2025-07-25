@@ -49,7 +49,6 @@ list(
              packages = "collapse"),
   
   ## tinify data -------------------------------------------------------------
-  
   tar_target(test_unique_idvisit,
              check_unique_ids(data_prepped)),
   
@@ -133,7 +132,7 @@ list(
 
   ## Glotzdauer --------------------------------------------------------------
   tar_target(
-    data_separated_distinct_slice1,
+    data_separated_distinct_slice,
     data_separated |> 
       compute_glotzdauer())
   
