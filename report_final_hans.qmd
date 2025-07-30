@@ -633,6 +633,80 @@ geom_col(position = "dodge")
 
 # Aktionen pro Visit
 
+## Statistiken pro Visit
+
+
+```{r data_prepped}
+tar_load(data_prepped)
+
+n_actions_searches_interactions <- 
+  data_prepped |> 
+  select(idvisit, fingerprint, searches, actions, interactions, referrertype, referrername, language, devicetype, devicemodel, operatingsystem, browsername) 
+
+```
+
+### Unique IDs, Fingerprints, Mean searches, Mean actions
+
+Auswertung 
+- der Anzahlen der uniquen visitids und uniquen Fingerprints
+- Mittelwerte der Anzahl der Suchen und Aktionen pro Besuch
+
+
+
+```{r}
+n_actions_searches_interactions |> 
+  as.data.frame() |> 
+  summarise(idvisit_n = length(unique(idvisit)),
+fingerprint_n = length(unique(fingerprint)),
+actions_mean = mean(as.integer(actions), na.rm = TRUE),
+searches_mean = mean(as.integer(searches), na.rm = TRUE))
+```
+
+
+### Referrer Type pro Visit
+
+```{r}
+n_actions_searches_interactions |> 
+count(referrertype, sort = TRUE)
+```
+
+
+### Referrer Type Name pro Visit
+
+```{r}
+n_actions_searches_interactions |> 
+count(referrername, sort = TRUE)
+```
+
+###devicemodel
+
+ , operatingsystem, browsername) 
+ 
+```{r}
+n_actions_searches_interactions |> 
+count(devicemodel, sort = TRUE) |> 
+slice_head(n = 10)
+```
+
+### operatingsystem
+
+```{r}
+n_actions_searches_interactions |> 
+count(operatingsystem, sort = TRUE) |> 
+slice_head(n = 10)
+```
+
+### browsername
+
+
+```{r}
+n_actions_searches_interactions |> 
+count(browsername, sort = TRUE) |> 
+slice_head(n = 10)
+```
+
+
+
 ## Mit den 499er-Daten
 
 ```{r plot-count-action}
@@ -1164,6 +1238,26 @@ n_action_type_per_month_top3 |>
   geom_line()
 ```
 
+### Top3 - Pro Kurs
+
+```{r}
+n_action_type_per_month_top3_per_course <- 
+n_action_type_course_uni |> 
+  filter(category %in% c("video", "click_slideChange", "visit_page")) |> 
+  drop_na() |> 
+  mutate(month_start = floor_date(actiondetails_0_timestamp, "month")) |> 
+  count(course, month_start, category)
+```
+
+```{r}
+#| fig-asp: 1.5
+n_action_type_per_month_top3_per_course |> 
+  ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  facet_wrap(~ course) +
+  geom_line()
+```
+
+
 
 ### `eventcategory`
 
@@ -1172,7 +1266,7 @@ Für folgende Analyse wurde eine andere Variable als oben herangezogen, nämlich
 
 ```{r data_slim_filtered_count}
 data_slim_filtered_count <- 
-data_slim_filtered |> 
+data_separated_filtered |> 
   filter(type == "eventcategory") |> 
   count(value, sort = TRUE) |> 
   mutate(prop = n / sum(n))
@@ -1493,15 +1587,13 @@ Berechnungsgrundlage: Für diese Analyse wurden alle Events der Kategorie `llm` 
 
 ```{r data_slim_filtered_ai}
 data_slim_filtered_ai <- 
-data_slim_filtered |> 
+data_separated_filtered |> 
   filter(type == "eventcategory") |> 
   filter(str_detect(value, "llm")) |> 
   count(value, sort = TRUE) |> 
   mutate(prop = n / sum(n))
 
-data_slim_filtered_ai |> 
-  gt() |> 
-  fmt_auto()
+data_slim_filtered_ai 
 ```
 
 ```{r}
@@ -1509,6 +1601,38 @@ data_slim_filtered_ai |>
   mutate(prop = round(prop, 3)) |> 
   ggtexttable()
 ```
+
+
+## Anzahl der `message_to_llm` pro Visit
+
+
+```{r llm_interactions}
+llm_interactions <- 
+  data_separated_filtered |> 
+  filter(str_detect(value, "message_to_llm"))
+```
+
+### Verteilung
+
+```{r}
+llm_interactions_count <- 
+llm_interactions |> 
+  count(idvisit, sort = TRUE) |> 
+  rename(messages_to_llm_n = n)
+  
+llm_interactions_count |> 
+  describe_distribution(messages_to_llm_n, centrality = c("mean", "median"))
+
+```
+
+### Diagramm
+
+```{r}
+gghistogram(llm_interactions_count, x = "messages_to_llm_n",
+  bins = 10, add = "median") +
+  labs(caption = "The vertical dotted line denotes the median.")
+```
+
 
 
 
@@ -1681,7 +1805,7 @@ data_long |>
 ```
 
 
-#### Im Detail
+### Im Detail
 
 
 
@@ -1759,7 +1883,7 @@ ai_transcript_clicks_per_month_count |>
 
 
 
-## Output des LLMs: `llm_response`
+## Output des LLMs: `llm_response` - Tokens und Tokenlänge
 
 ```{r llm_response_text}
 tar_load(llm_response_text)
@@ -1856,6 +1980,19 @@ prior_existing_questions_summary |>
 ```
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Videozeit
 
 Wie viel Zeit verbringen die Nutzer mit dem Betrachten von Videos ("Glotzdauer")?
@@ -1869,7 +2006,7 @@ sondern indem sie andere Aktionen durchführen.
 Dies ist aber analytisch schwer abzubilden.
 
 ```{r load-glotzdauer}
-tar_load(glotzdauer)
+tar_load(data_separated_distinct_slice)
 ```
 
 Vgl. die Definition des Targets `glotzdauer` in der [Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L269).
@@ -1883,14 +2020,14 @@ Daher ist diese Analyse nur vorsichtig zu interpretieren.
 Die Definition [der Funktion glotzdauer.R](https://github.com/sebastiansauer/hans/blob/main/funs/glotzdauer.R) ist online dokumentiert.
 
 ```{r}
-glotzdauer |> 
+data_separated_distinct_slice |> 
   head(30) 
 ```
 
 Für die folgende Darstellung wurden die *absoluten* Zeitwerte verwendet, d.h. ohne Vorzeichen.
 
 ```{r p-plotzdauer}
-glotzdauer |> 
+data_separated_distinct_slice |> 
   # we will assume that negative glotzdauer is the as positive glotzdauer:
   mutate(time_diff = abs(time_diff)) |> 
   # without glotzdauer smaller than 10 minutes:
@@ -1907,7 +2044,7 @@ glotzdauer |>
 
 ```{r glotzdauer-stats}
 glotzdauer_prepped <- 
-glotzdauer |> 
+data_separated_distinct_slice |> 
   # we will assume that negative glotzdauer is the as positive glotzdauer:
   mutate(time_diff_abs_sec = abs(as.numeric(time_diff, units = "secs"))) |> 
   # without glotzdauer smaller than 10 minutes:
@@ -1919,8 +2056,7 @@ glotzdauer_tbl <-
   select(time_diff_abs_sec, time_diff_abs_min) |> 
   describe_distribution()
 
-glotzdauer_tbl |> 
-  tt()
+glotzdauer_tbl 
 ```
 
 ```{r glotzdauer_tbl-ggtexttable}
