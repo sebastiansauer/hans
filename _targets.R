@@ -6,7 +6,7 @@
 library("targets")
 library("tarchetypes")
 
-_ar_option_set(
+tar_option_set(
   packages = c("data.table", "dplyr", "purrr", "readr", "tidyr", 
                "collapse", "stringr", "lubridate"))
 
