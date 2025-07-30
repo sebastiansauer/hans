@@ -1216,8 +1216,7 @@ n_action_type_course_uni |>
   count(course, month_start, category)
 ```
 
-```{rn_action_type_per_month_top3_per_course-plot}
-#| fig-asp: 1.5
+```{r n_action_type_per_month_top3_per_course-plot}
 n_action_type_per_month_top3_per_course |> 
   ggplot(aes(x = month_start, y = n, color = category, group = category)) +
   facet_wrap(~ course) +
@@ -1339,7 +1338,7 @@ n_action_type_course_uni |>
 
 
 ```{r n_action_type_course_uni_counted_plot}
-#|ffig-asp: 1.5
+#| fig-asp: 1.5
 n_action_type_course_uni_counted |> 
   ggplot() +
   aes(y = category, x = log(n, base = 10)) +
