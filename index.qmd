@@ -584,7 +584,7 @@ n_action_lt_500 |>
 # Lehrveranstaltungen
 
 
-## Anzahl an Lehrveranstaltungen
+## Anzahl an Lehrveranstaltungen nach Hochschule
 
 ```{r course_and_uni_per_visit-count}
 course_and_uni_per_visit |> 
