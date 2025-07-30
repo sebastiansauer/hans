@@ -6,7 +6,7 @@
 library("targets")
 library("tarchetypes")
 
-tar_option_set(
+_ar_option_set(
   packages = c("data.table", "dplyr", "purrr", "readr", "tidyr", 
                "collapse", "stringr", "lubridate"))
 
@@ -48,7 +48,6 @@ list(
              data_prepped |> mutate(across(everything(), as.factor)),
              packages = "collapse"),
   
-  ## tinify data -------------------------------------------------------------
   tar_target(test_unique_idvisit,
              check_unique_ids(data_prepped)),
   

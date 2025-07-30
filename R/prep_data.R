@@ -15,7 +15,7 @@ prep_data <- function(d){
               contains("pageviewposition"),
               contains("pageid"),
               contains("timespent"))) |> 
-    # assign own IDs, as the original ID are *not* unique!
+    # assign own IDs, as the original ID are *not* unique:
     mutate(idvisit_old = idvisit,
            idvisit = 1:n()) |> 
     select(idvisit, everything())
