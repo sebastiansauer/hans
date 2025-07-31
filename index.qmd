@@ -132,7 +132,7 @@ tar_load(data_long)
 tar_load(data_prepped)
 tar_load(data_separated_distinct_slice)
 tar_load(data_separated_filtered)
-tar_load(data_users_only)
+#tar_load(data_users_only)
 tar_load(idvisit_has_llm)
 tar_load(llm_response_text)
 tar_load(n_action)
@@ -227,12 +227,18 @@ d_na_cols |>
 #### Fast leere Spalten
 
 ```{r}
+no_na_cols <- 
 d_na_cols |>  
   filter(na_prop > .9) |> 
   nrow()
+
+no_na_cols
 ```
 
-Sehr viele Spalten sind fast leer.
+:::{.callout-important}
+Sehr viele Spalten, `r no_na_cols` sind fast leer.
+:::
+
 
 ### Namen (1-100)
 
@@ -258,7 +264,7 @@ data_all_fct_head100
 
 
 
-### Datensatz data__filtered, Zeilen 1-100
+### Datensatz data_separated_filtered, Zeilen 1-100
 
 ```{r data_separated_filtered}
 data_separated_filtered %>% 
@@ -300,11 +306,24 @@ n_action_w_date |>
 
 
 ```{r comp-time-min-max}
+min_max_time <-
 n_action_w_date |> 
   summarise(time_min = min(date_time_start, na.rm = T),
-            time_max = max(date_time_start, na.rm = T)) |> 
+            time_max = max(date_time_start, na.rm = T)) 
+
+min_max_time |> 
   gt()
 ```
+
+
+
+:::{.callout-important}
+Erster Visit im Datensatz: `r min_max_time$time_min`.
+
+Letzter Visit im Datensatz: `r min_max_time$time_max`.
+:::
+
+
 
 Diese Statistik wurde auf Basis des Datenobjekts `data_separated_filtered` berechnet,
 vgl. [das Target dieses Objekts in der Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L170).
@@ -333,8 +352,14 @@ time_since_last_visit |>
 
 time_since_last_visit |>
   ggplot(aes(x=dayssincelastvisit)) +
-  geom_density()
+  geom_density() +
+  labs(title = "If visitor return, they return mostly not later than a few days.")
 ```
+
+
+:::{.callout-important}
+Die Nutzer nutzen die Seite in Abständen von wenigen Tagen?
+:::
 
 
 ### Nach Lehrveranstaltungen
@@ -361,8 +386,7 @@ time_since_last_visit_per_course |>
 
 
 ```{r time_since_last_visit_per_course_summary-print}
-time_since_last_visit_per_course_summary |> 
-  print_md()
+time_since_last_visit_per_course_summary
 ```
 
 
@@ -376,6 +400,7 @@ time_since_last_visit_per_course_summary |>
              show.legend = FALSE) +
   labs(x = "Days since last visit (mean±sd)",
        y = "course",
+       title = "In some courses, users use HaNS frequently.",
        caption = "Grey saturation of the mean dots refers to the log10 of the sample size (N)") +
   geom_text(aes(label = round(dayssincelastvisit_n)),
             x = Inf,
@@ -421,7 +446,9 @@ time_visit_wday_summary |>
   summarise(n = n()) |> 
   ggplot(aes(x = month_start, y = n)) +
   geom_line(group = 1, color = "grey60") +
-  geom_point() 
+  geom_point() +
+  labs(title = "The number of visits reflect the teaching periods of the semesters.",
+       x = "month/year")
 ```
 
 
@@ -448,16 +475,30 @@ time_visit_wday_summary_week   |>
 time_visit_wday_summary_week_summarized
 ```
 
-```{r time_visit_wday_summary2-plot2}
-time_visit_wday_summary_week_summarized |> 
-  ggplot(aes(x = week_num, y = n)) +
-  geom_line(group = 1, color = "grey60") +
-  geom_point() +
-  geom_smooth(method = "gam", se = FALSE, color = "blue")
+
+
+```{r time_visit_wday_summary_week_summarized_dateformat}
+time_visit_wday_summary_week_summarized_dateformat <-
+time_visit_wday_summary_week   |> 
+  group_by(week_start) |> 
+  summarise(n = n())
 ```
 
 
+```{r time_visit_wday_summary_week_summarized_dateformat-plot}
+time_visit_wday_summary_week_summarized_dateformat |> 
+  ggplot(aes(x = week_start, y = n)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  geom_smooth(method = "gam", se = FALSE, color = "blue") +
+  labs(title = "The number of visits is increasing and reflects the teaching periods of the semesters.",
+       x = "week number/year")
+```
 
+
+:::{.callout-important}
+The number of visits has increased over time.
+:::
 
 
 ### Akkumulierte Seitenaufrufe im Zeitverlauf
@@ -474,7 +515,10 @@ time_visit_wday_summary |>
   ggplot(aes(x = month_start, y = n_cumsum)) +
   geom_line(group = 1, color = "grey60") +
   geom_point() +
-  theme_minimal()
+  theme_minimal() +
+  geom_smooth(method = "lm") +
+  labs(title = "Visits have increased linearly over time.",
+       x = "month/year")
 ```
 
 
@@ -490,7 +534,10 @@ time_visit_wday_summary_week |>
   ggplot(aes(x = week_start, y = n_cumsum)) +
   geom_line(group = 1, color = "grey60") +
   geom_point() +
-  theme_minimal()
+  theme_minimal() +
+  geom_smooth(method = "lm") +
+  labs(title = "Visits have increased approx. linearly over time.",
+       x = "week/year")
 ```
 
 
@@ -513,19 +560,12 @@ glimpse(data_separated_filtered)
 ```{r tbl_n_action}
 tbl_n_action <- 
 n_action |> 
-  describe_distribution(nr_max) |> 
-  gt() |> 
-  fmt_number(columns = where(is.numeric),
-             decimals = 2)
+  describe_distribution(nr_max, centrality = c("median", "mean")) 
 
 tbl_n_action
 ```
 
 
-```{r}
-#| eval: !expr params$recompute_gt
-#gtsave(tbl_n_action, filename = "tbl_n_action.png")
-```
 
 
 ![](tbl_count_action.png)
@@ -540,8 +580,18 @@ Betrachtet man die Anzahl der Aktionen pro Visit näher, so fällt auf, dass der
 n_action |> 
   count(nr_max) |> 
   ggplot(aes(x = nr_max, y = n)) +
-  geom_col()
+  geom_col() +
+  geom_vline(xintercept = tbl_n_action$Median, color = "blue", linetype = "dashed") +
+  labs(caption = "Vertical dashed lines shows the median.",
+       title = "Most users to only a few actions, but some do many.")
+
 ```
+
+
+:::{.callout-important}
+Die meisten Nutzer machen nur wenige Aktionen pro Visit,
+aber einige machen sehr viele.
+:::
 
 Hier noch in einer anderen Darstellung:
 
@@ -596,7 +646,9 @@ course_and_uni_per_visit |>
 count(university) |> 
 ggplot(aes(y = reorder(university, n), x = n)) +
 geom_col() +
-theme_minimal()
+theme_minimal() +
+  labs(title = "TH Nürnberg hosts the most courses on HaNS by far.",
+       y = "University")
 ```
 
 ## Visits nach Lehrveranstaltung und Jahr
@@ -613,7 +665,8 @@ time_spent_w_course_university |>
 count(year, course) |> 
 drop_na() |> 
 ggplot(aes(x = n, y = course, fill = factor(year),)) +
-geom_col(position = "dodge")
+geom_col(position = "dodge") +
+  labs(title = "The course 'GeSOA' is the most active course on HaNS.")
 ```
 
 
@@ -647,6 +700,11 @@ fingerprint_n = length(unique(fingerprint)),
 actions_mean = mean(as.integer(actions), na.rm = TRUE),
 searches_mean = mean(as.integer(searches), na.rm = TRUE))
 ```
+
+
+:::{.callout-note}
+Es gibt etwa doppelt so viele Besucher wie unique Nutzer.
+:::
 
 
 ### Referrer Type pro Visit
@@ -692,12 +750,15 @@ slice_head(n = 10)
 ```
 
 
+Die Mac-User scheinen besonders aktiv zu sein auf HaNS.
 
 ## Mit den 499er-Daten
 
 ```{r plot-count-action}
 n_action_avg = mean(n_action$nr_max) |> round(0)
+n_action_median = median(n_action$nr_max) |> round(0)
 n_action_sd = sd(n_action$nr_max) |> round(0)
+n_action_iqr = IQR(n_action$nr_max) |> round(0)
 
 n_action |> 
   ggplot() +
@@ -721,12 +782,38 @@ n_action |>
            y = 0, 
            label = paste0("SD = ", n_action_sd))
   #geom_label(aes(x = n_action_avg), y = 1, label = "Mean")
+
+
+n_action |> 
+  ggplot() +
+  geom_histogram(aes(x = nr_max)) +
+  labs(x = "Anzahl von Aktionen pro Visit",
+       y = "n",
+       caption = "Der vertikale Strich zeigt den Median; der horizontale Median±IQR") +
+  theme_minimal() +
+  geom_vline(xintercept = n_action_median,
+             color = palette_okabe_ito()[1]) +
+  geom_segment(x = n_action_median - n_action_iqr,
+               y = 0,
+               xend = n_action_median + n_action_iqr,
+               yend = 0,
+               color = palette_okabe_ito()[2],
+               size = 2) +
+  annotate("label", x = n_action_median, y = 1500, 
+           label = paste0("Md = ", n_action_median)) +
+  annotate("label", 
+           x = n_action_median + n_action_iqr, 
+           y = 0, 
+           label = paste0("IQR = ", n_action_iqr))
+  #geom_label(aes(x = n_action_avg), y = 1, label = "Mean")
 ```
 
 
 
 - Mittelwert der Aktionen pro Visit: `r round(n_action_avg, 2)`.
 - SD der Aktionen pro Visit: `r round(n_action_sd, 2)`.
+- MD:  `r round(n_action_median, 2)`.
+- IQR: : `r round(n_action_iqr, 2)`. 
 
 
 ## Ohne 499er-Daten
@@ -776,8 +863,12 @@ n_action_lt_500 |>
 n_action_w_date |> 
   ggplot(aes(x = month_date, y = nr_max)) +
 stat_summary(fun = mean, geom = "point", size = 2) +
-stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0.2)
+stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), geom = "errorbar", width = 0.2) +
+  geom_smooth(method = "lm") +
+  labs(title = "The number of actions per visit has incresed over time")
 ```
+
+
 
 
 
@@ -787,6 +878,15 @@ n_action_w_date |>
 geom_jitter(alpha = .1) 
 ```
 
+
+
+
+### Regression (Monat)
+
+```{r}
+lm(nr_max ~ month_date, data = n_action_w_date)
+```
+
 ### Woche
 
 ```{r}
@@ -794,8 +894,17 @@ n_action_w_date |>
   mutate(week_date = as.Date(week_date)) |> 
   ggplot(aes(x = week_date, y = nr_max)) +
 stat_summary(fun = mean, geom = "point", size = 2) +
-stat_summary(fun.data = mean_sdl, geom = "errorbar", width = 0.2)
+stat_summary(fun.data = mean_sdl, geom = "errorbar", width = 0.2) +
+  geom_smooth(method = "lm") +
+  labs(title = "The number of actions per visit has incresed over time")
 ```
+
+### Regression (Woche)
+
+```{r}
+lm(nr_max ~ week_date, data = n_action_w_date)
+```
+
 
 
 ## Gruppierung der Visits nach Anzahl der Aktionen
@@ -1001,6 +1110,8 @@ time_spent2 |>
 
 #### Monat
 
+Die Einheit von `time_spent` ist Sekunden.
+
 ```{r}
 time_spent_by_month <-
   time_spent |> 
@@ -1039,6 +1150,32 @@ time_spent |>
 
 time_spent_by_month_name |> 
 ggplot(aes(x = month_start, y = time_spent_month_avg)) +
+  geom_line(group = 1, color = "grey60") +
+    geom_point() 
+```
+
+
+#### Jahr
+
+```{r}
+time_spent_by_year <- 
+time_spent |> 
+  mutate(month_start = floor_date(time_min, "month")) |> 
+  mutate(month_name = month(month_start, label = TRUE, abbr = FALSE),
+         month_num = month(month_start, label = FALSE),
+         year = year(month_start)) |> 
+  group_by(year) |> 
+  summarise(time_spent_avg = mean(time_diff, na.rm = TRUE),
+            time_spent_sd = sd(time_diff, na.rm = TRUE))
+
+time_spent_by_year
+```
+
+
+
+```{r}
+time_spent_by_year |> 
+  ggplot(aes(x = year, y = time_spent_avg)) +
   geom_line(group = 1, color = "grey60") +
     geom_point() 
 ```
@@ -1830,7 +1967,9 @@ ai_transcript_clicks_per_month_count |>
   ggplot(aes(x = date, y = n)) +
   geom_line(group = 1) +
   geom_point() +
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "Number of AI transcript clicks per month",
+  x = "date [months]")
 ```
 
 
