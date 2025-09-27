@@ -18,6 +18,6 @@ slimify_data <- function(data_long) {
   #   group_by(idvisit) |> 
   #   summarise(max_nr = max(nr)) 
   # 
-  return(out)
+  return(data_long2)
 
 }

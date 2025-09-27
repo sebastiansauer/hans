@@ -1,5 +1,6 @@
 compute_glotzdauer <- function(d) {
-  d |> 
+  d |>
+    # discard dublicates:
     distinct(.keep_all = TRUE) |> 
     group_by(nr, type, idvisit) |> 
     slice(1) |>

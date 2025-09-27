@@ -1,8 +1,8 @@
-when_visited <- function(data, idvar){
+when_visited_fingerprint <- function(data){
   
 data |> 
     dplyr::filter(type == "timestamp") |> 
-    dplyr::group_by({{idvar}}) |> 
+    dplyr::group_by(fingerprint) |> 
     dplyr::filter(dplyr::row_number() == 1) |> 
     dplyr::ungroup() |> 
     dplyr::mutate(
@@ -11,7 +11,7 @@ data |>
       dow = lubridate::wday(date_time, week_start = 1),
       hour = lubridate::hour(date_time)
     ) |> 
-    dplyr::select({{idvar}}, dow, hour, date_time) |>
+    dplyr::select(fingerprint, dow, hour, date_time) |>
     ungroup() 
     # dplyr::group_by({{idvar}}, dow, hour)
 }

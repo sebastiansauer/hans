@@ -4,17 +4,24 @@ prep_data <- function(d){
     remove_empty(which = c("rows", "cols")) |> 
     repair_dttm_cols() |> 
     remove_constant(na.rm = TRUE) |> 
-    select(-contains("svg")) |> 
-    select(-contains("icon")) |> 
+    # select(-contains("svg")) |> 
+    # select(-contains("icon")) |> 
     filter(!str_detect(actiondetails_0_url, 
                        "=admin|=developer|=lecturer")) |> 
     filter(!str_detect(actiondetails_1_subtitle, 
                        "=admin|=developer|=lecturer")) |> 
     select(-c(contains("idpageview"), 
               contains("pretty"),
-              contains("pageviewposition"),
+              contains("pageviewPosition"),
               contains("pageid"),
-              contains("timespent"))) |> 
+              contains("icon"),
+              contains("pageTitle"),
+              contains("pageIdAction"),
+              contains("idpageview"),
+              contains("pageLoadTime"),
+              contains("_title"),
+              contains("type"),
+              contains("_timeSpent"))) |> 
     # assign own IDs, as the original ID are *not* unique:
     mutate(idvisit_old = idvisit,
            idvisit = 1:n()) |> 

@@ -1,28 +1,28 @@
 longify_data <- function(data, no.na = TRUE){
   
+  #' returns long dataframe with three columns: idvar, variable value
+    
   assert_that(length(data$idvisit) == length(unique(data$idvisit)))
 
-  out <- 
-    data |> 
-    # fast "select":
-    get_vars(vars = c("idvisit", 
-                      grep("actiondetails_", names(data),
-                           value = TRUE)
-                      )
-             ) |> 
-    # fast "pivot_longer":
-    pivot(ids = "idvisit",
-          how = "longer",
-          check.dups = TRUE, 
-          factor = FALSE)
+
+
+# data.table for speed:
+dt <- as.data.table(data)
+data_long_dt <- melt(
+  dt,
+  id.vars = c("idvisit", "fingerprint"),   # two id variables
+  measure.vars = patterns("^actiondetails_"),
+  variable.name = "variable",
+  value.name = "value"
+)
+data_long <- tibble(data_long_dt)
   
   # optional - rm missing values ("no NA"):
   if (no.na) {
-    out <-
-      out %>% 
-      filter(complete.cases(.)) |> 
-      filter(value != "")
+  data_long <- data_long[complete.cases(data_long) & data_long$value != "", ]
   }
+
+  data_long$variable <- as.factor(data_long$variable)
   
-  return(out)
+  return(data_long)
 }

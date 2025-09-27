@@ -1,18 +1,22 @@
+#' Select and prepare the relevant columns
+
+
 slimify_nona_data <- function(data_long) {
   
-  out <- 
+  data_separated <- 
     data_long |> 
+    # head(1e4) |> 
     # prepare to count the number of things a user does:
-    select(variable, value, idvisit) |> 
+    select(variable, value, idvisit, fingerprint) |> 
     separate(variable, sep = "_", into = c("constant", "nr", "type")) |> 
     select(-c(constant)) |> 
     mutate(nr = as.integer(nr),
                idvisit = as.integer(idvisit),
-               type = factor(type),
-               value = as.character(value)) |> 
+               type = as.factor(type),
+               value = as.factor(value)) |> 
     #ungroup() |> 
     arrange(idvisit, nr)
     
-  return(out)
+  return(data_separated)
 
 }

@@ -1,9 +1,9 @@
-diff_time <- function(data) {
+diff_time <- function(data, idvar = idvisit) {
   # compute time variables per visit (WIDE format data):
   data |> 
     filter(type ==  "timestamp") |> 
-    select(idvisit, value) |> 
-    group_by(idvisit) |> 
+    select({{idvar}}, value) |> 
+    group_by({{idvar}}) |> 
     mutate(time = parse_date_time(value, "ymd HMS")) |> 
     summarise(time_diff = max(time) - min(time),
               time_min = min(time),
