@@ -1,5 +1,5 @@
 ---
-title: "Analyse der Matoma-HaNS-Daten"
+title: "Analyse der HaNS-Matomo-Daten"
 date: now
 author: Sebastian Sauer
 
@@ -143,6 +143,7 @@ tar_load(time_since_last_visit)
 tar_load(time_spent)
 tar_load(time_spent_w_course_university)
 tar_load(time_visit_wday)
+tar_load(n_mc_answers_selected)
 ```
 
 
@@ -2025,8 +2026,11 @@ verify_option_summary |>
 #### Anzahl `verify_option_wrong` verify_option_div_by_4 - geteilt durch 4
 
 ```{r}
+verify_option_summary <- 
 verify_option_summary |> 
-  mutate(verify_option_div_by_4 = verify_option / 4) |> 
+  mutate(verify_option_div_by_4 = verify_option / 4)
+
+verify_option_summary |> 
   gghistogram(x = "verify_option_div_by_4")
 ```
 
@@ -2037,9 +2041,41 @@ verify_option_summary |>
   print_md()
 ```
 
+#### Anzahl "Multiple choice answer selected"
+
+```{r}
+check_if_both_methods_give_same_number <- 
+n_mc_answers_selected |> 
+  full_join(verify_option_summary)
+
+check_if_both_methods_give_same_number |> 
+  head(20) |> 
+  gt()
+```
+
+Nein, beide Methoden liefern *nicht* die gleiche Zahl.
 
 
+####  "Multiple choice answer selected" im Zeitverlauf
 
+```{r}
+mc_answers_with_timestamps <-
+mc_answers_with_timestamps |> 
+ mutate(month_start = floor_date(timestamp, "month")) |> 
+  ungroup() |> 
+  arrange(timestamp) |> 
+  mutate(n_cumulated = cumsum(n)) |> 
+  mutate(date = as.Date(timestamp))
+
+lim <- c(min(mc_answers_with_timestamps$date),
+  max(mc_answers_with_timestamps$date))
+
+mc_answers_with_timestamps |> 
+  ggplot(aes(x = date, y = n_cumulated)) +
+  scale_x_date(limits = lim, labels = scales::label_date_short()) +
+  geom_point() +
+  geom_line()
+```
 
 #### Anzahl `generate_questionaire`
 

@@ -14,7 +14,8 @@ extract_date_components <- function(d, date_time_var) {
   }
   
   # Extract components
-  result <- d |> 
+  result <- 
+    d |> 
     mutate(
       month = month(!!date_col),
       week = week(!!date_col),
