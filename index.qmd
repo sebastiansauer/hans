@@ -1999,7 +1999,7 @@ llm_response_text |>
 ### Anzahl vorab existierender Fragen
 
 
-#### Anzahl `verify_option_wrong`
+#### Anzahl `verify_option_wrong` und `verify_opton_correct`
 
 ```{r verify_option_summary}
 verify_option_summary <- 
@@ -2019,6 +2019,26 @@ verify_option_summary |>
   describe_distribution(verify_option) |> 
   print_md()
 ```
+
+
+
+#### Anzahl `verify_option_wrong` verify_option_div_by_4 - geteilt durch 4
+
+```{r}
+verify_option_summary |> 
+  mutate(verify_option_div_by_4 = verify_option / 4) |> 
+  gghistogram(x = "verify_option_div_by_4")
+```
+
+```{r}
+verify_option_summary |> 
+  mutate(verify_option_div_by_4 = verify_option / 4) |> 
+  describe_distribution(verify_option_div_by_4) |> 
+  print_md()
+```
+
+
+
 
 
 #### Anzahl `generate_questionaire`
@@ -2174,3 +2194,6 @@ glotzdauer_prepped_tbl |>
 
 
 
+# Abschluss
+
+.
