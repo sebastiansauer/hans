@@ -1,7 +1,6 @@
 # pre-preparation:
 # delete all redundant data files, i.,e all ".tsv" and ".json" files
 
-
 target_dir <- "/Users/sebastiansaueruser/github-repos/hans/data/data-raw"
 
 files_to_delete <- list.files(
