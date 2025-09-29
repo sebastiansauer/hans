@@ -88,6 +88,7 @@ library(collapse)
 library(ggpubr)
 library(knitr)
 library(tinytable)
+library(data.table)
 ```
 
 ```{r}
@@ -415,7 +416,7 @@ time_visit_wday_fingerprint |> head()
 
 ```{r days-since-last-visit_finggerprint}
 time_since_last_visit_fingerprint <-
-  time_since_last_visit_fingerprint |>
+  time_since_last_visit |>
   mutate(dayssincelastvisit = as.numeric(dayssincelastvisit)) |>
   distinct(fingerprint, .keep_all = TRUE)
 
@@ -549,7 +550,7 @@ time_visit_wday_summary |>
 #### fingerprint
 
 
-```{r time_visit_wday_summary}
+```{r time_visit_wday_summary_2}
 time_visit_wday_summary_fingerprint <-
   time_visit_wday_fingerprint |>
   ungroup() |>
@@ -562,7 +563,7 @@ time_visit_wday_summary_fingerprint <-
 ```
 
 
-```{r time_visit_wday_summary-table}
+```{r time_visit_wday_summary-table_2}
 time_visit_wday_summary_fingerprint |>
   group_by(year_num, month_num) |>
   summarise(n = n()) |>
@@ -572,7 +573,7 @@ time_visit_wday_summary_fingerprint |>
 
 
 
-```{r time_visit_wday_summary2-plot}
+```{r time_visit_wday_summary2-plot_2}
 time_visit_wday_summary_fingerprint |>
   group_by(year_num, month_start) |>
   summarise(n = n()) |>
@@ -658,7 +659,7 @@ time_visit_wday_summary |>
 #### Monat - fingerprint
 
 
-```{r time_visit_wday_summary-plot}
+```{r time_visit_wday_summary-plot_2}
 time_visit_wday_summary_fingerprint |>
   group_by(year_num, month_start) |>
   summarise(n = n()) |>
@@ -784,7 +785,7 @@ also viele Werte, die eigentlich größer wären (aber dann zensiert wurden).
 
 ### fingerprint
 
-```{r tbl_n_action}
+```{r tbl_n_action_2}
 tbl_n_action_fingerprint <-
   n_action_fingerprint |>
   describe_distribution(nr_max, centrality = c("median", "mean"))
@@ -1233,7 +1234,7 @@ n_action_lt_500 |>
 
 ### fingerprint
 
-```{r plot-count-action-2}
+```{r plot-count-action-2_2}
 n_action_fingerprint_avg2 = mean(n_action_lt_500_fingerprint$nr_max) |> round(0)
 n_action_fingerprint_sd2 = sd(n_action_lt_500_fingerprint$nr_max) |> round(2)
 
@@ -1327,7 +1328,7 @@ n_action_w_date_fingerprint |>
 
 
 
-```{r n_action_w_date-plot}
+```{r n_action_w_date-plot_2}
 n_action_w_date_fingerprint |>
   ggplot(aes(x = month_date, y = nr_max)) +
   geom_jitter(alpha = .1)
@@ -1530,7 +1531,7 @@ time_spent_fingerprint |>
 ```
 
 
-```{r load-time-spent}
+```{r load-time-spent_2}
 time_spent_fingerprint <-
   time_spent_fingerprint |>
   # compute time (t) in minutes (min):
@@ -1557,7 +1558,7 @@ time_spent |>
 
 ### fingerprint
 
-```{r comp-diff-time-stats}
+```{r comp-diff-time-stats_2}
 time_spent_fingerprint |>
   summarise(
     mean_time_diff = round(mean(time_diff), 2),
@@ -1594,7 +1595,7 @@ time_duration |>
 
 ### Für unique idvisits 
 
-```{r time-duration}
+```{r time-duration_2}
 time_duration |>
   distinct(idvisit, .keep_all = TRUE) |>
   summarise(duration_sec_avg = mean(visitduration_sec, na.rm = TRUE)) |>
@@ -1954,7 +1955,7 @@ time_visit_wday_fingerprint |>
 ```
 
 
-```{r n_action_type_per_month_top3}
+```{r n_action_type_per_month_top3_2}
 n_action_type_per_month_top3_fingerprint <-
   n_action_type |>
   select(nr, fingerprint, category) |>
@@ -1967,12 +1968,12 @@ n_action_type_per_month_top3_fingerprint <-
   count(month_start, category)
 ```
 
-```{r n_action_type_per_month_top3-gt}
+```{r n_action_type_per_month_top3-gt_2}
 n_action_type_per_month_top3_fingerprint
 ```
 
 
-```{r n_action_type_per_month_top3-ggplot}
+```{r n_action_type_per_month_top3-ggplot_2}
 n_action_type_per_month_top3_fingerprint |>
   ggplot(aes(x = month_start, y = n, color = category, group = category)) +
   geom_line()
@@ -2175,7 +2176,7 @@ time_visit_wday$dow2 <- factor(
 ```
 
 ### fingerprint
-```{r setup-dates}
+```{r setup-dates-fin}
 # Define a vector with the names of the days of the week
 # Note: Adjust the start of the week (Sunday or Monday) as per your requirement
 days_of_week <- c(
@@ -2216,7 +2217,7 @@ time_visit_wday |>
 
 ### fingerprint
 
-```{r vis-hans-login-hour}
+```{r vis-hans-login-hour-fi}
 time_visit_wday_fingerprint |>
   as_tibble() |>
   count(hour) |>
@@ -2270,7 +2271,7 @@ time_visit_wday |>
 
 
 
-```{r vis-hans-login-wday-polar}
+```{r vis-hans-login-wday-polar-fi}
 time_visit_wday |>
   as_tibble() |>
   count(dow2) |>
@@ -2289,7 +2290,7 @@ time_visit_wday |>
 #### fingerprint
 
 
-```{r vis-hans-login-wday-bar}
+```{r vis-hans-login-wday-bar-fi}
 time_visit_wday_fingerprint |>
   as_tibble() |>
   count(dow2) |>
@@ -2373,7 +2374,7 @@ time_visit_wday |>
 #### fingerprint
 
 
-```{r vis-hans-login-wday-hour}
+```{r vis-hans-login-wday-hour_2}
 time_visit_wday_fingerprint |>
   as_tibble() |>
   count(dow2, hour) |>
@@ -2393,7 +2394,7 @@ time_visit_wday_fingerprint |>
 
 
 
-```{r vis-hans-login-wday-hour-polar}
+```{r vis-hans-login-wday-hour-polar_2}
 #| fig-width: 9
 #| fig-asp: 1.5
 time_visit_wday_fingerprint |>
@@ -2516,7 +2517,7 @@ time2 |>
 
 ### fingerprint
 
-```{r p-visits-day-wday}
+```{r p-visits-day-wday_2}
 time2_fingerprint |>
   ggplot(aes(x = date, y = dow)) +
   geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
@@ -2719,9 +2720,9 @@ d_n_interactions_w_llm <-
 ```
 
 ```{r d_n_interactions_w_llm-describe-distro}
-d_n_interactions_w_llm |> 
-  select(n_interactions_w_llm) |> 
-  describe_distribution() |> 
+d_n_interactions_w_llm |>
+  select(n_interactions_w_llm) |>
+  describe_distribution() |>
   print_md()
 ```
 
@@ -2784,7 +2785,7 @@ click_transcript_word_per_month |>
 #### fingerprint
 
 
-```{r click_transcript_word_per_month}
+```{r click_transcript_word_per_month_2}
 click_transcript_word_per_month_fingerprint <-
   data_separated_filtered |>
   # rm all groups WITHOUT "click_transcript_word":
@@ -2803,7 +2804,7 @@ click_transcript_word_per_month_fingerprint
 ```
 
 
-```{r click_transcript_word_per_month_plot}
+```{r click_transcript_word_per_month_plot_2}
 click_transcript_word_per_month_fingerprint |>
   ggplot(aes(x = month_visit, y = n)) +
   geom_line()
@@ -2947,12 +2948,29 @@ verify_option_summary |>
 
 ##### fingerprint
 
-```{r verify_option_summary}
-verify_option_summary_fingerprint <-
-  data_separated_filtered |>
-  group_by(fingerprint) |>
-  filter(value == "verify_option_wrong" | value == "verify_option_correct") |>
-  summarise(verify_option = n())
+```{r verify_option_summary_2}
+# verify_option_summary_fingerprint <-
+#   data_separated_filtered |>
+#   group_by(fingerprint) |>
+#   filter(value == "verify_option_wrong" | value == "verify_option_correct") |>
+#   summarise(verify_option = n())
+
+setDT(data_separated_filtered) # Ensure your data frame is a data.table
+
+verify_option_summary_fingerprint <- data_separated_filtered[
+  # 1. Filtering (i)
+  value %in% c("verify_option_wrong", "verify_option_correct"),
+
+  # 2. Summarize (.j) - calculate the count (n)
+  .(verify_option = .N),
+
+  # 3. Grouping (by)
+  by = .(fingerprint)
+]
+
+verify_option_summary_fingerprint <- as_tibble(
+  verify_option_summary_fingerprint
+)
 ```
 
 ```{r}
@@ -3025,11 +3043,24 @@ mc_answers_with_timestamps |>
 #### Anzahl `generate_questionaire`
 
 ```{r generate_questionaire_summary}
-generate_questionaire_summary <-
-  data_separated_filtered |>
-  group_by(idvisit) |>
-  filter(value == "generate_questionaire") |>
-  summarise(generate_questionaire = n())
+# generate_questionaire_summary <-
+#   data_separated_filtered |>
+#   group_by(idvisit) |>
+#   filter(value == "generate_questionaire") |>
+#   summarise(generate_questionaire = n())
+
+setDT(data_separated_filtered) # Convert the data.frame to a data.table in place
+
+generate_questionaire_summary <- data_separated_filtered[
+  # 1. Filtering (i)
+  value == "generate_questionaire",
+
+  # 2. Summarize (.j) - calculate the count (.N) and rename it
+  .(generate_questionaire = .N),
+
+  # 3. Grouping (by)
+  by = .(idvisit)
+]
 ```
 
 
@@ -3047,10 +3078,29 @@ generate_questionaire_summary |>
 
 
 ```{r prior_existing_questions_summary}
-prior_existing_questions_summary <-
-  generate_questionaire_summary |>
-  full_join(verify_option_summary) |>
-  mutate(prior_existing_questions_n = verify_option - generate_questionaire)
+setDT(generate_questionaire_summary)
+setDT(verify_option_summary)
+
+# 1. Full Join (Merge)
+# Use the 'merge' function with all.x=TRUE and all.y=TRUE for a full join
+# Assumes the join column is 'idvisit' as used in your previous examples
+prior_existing_questions_summary <- merge(
+  generate_questionaire_summary,
+  verify_option_summary,
+  by = "idvisit",
+  all = TRUE
+)
+
+# 2. Mutate (Calculation)
+# Use .j to create the new column
+prior_existing_questions_summary[,
+  prior_existing_questions_n := verify_option - generate_questionaire
+]
+
+# prior_existing_questions_summary <-
+#   generate_questionaire_summary |>
+#   full_join(verify_option_summary) |>
+#   mutate(prior_existing_questions_n = verify_option - generate_questionaire)
 ```
 
 

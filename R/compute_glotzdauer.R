@@ -4,14 +4,6 @@ compute_glotzdauer <- function(d) {
   # Much faster deduplication using data.table
   d_no_dublicates <- unique(d, by = c("nr", "type", "idvisit"))
 
-  # d_no_dublicates <-
-  # d |>
-  #   # discard dublicates:
-  #   distinct(.keep_all = TRUE) |>
-  #   group_by(nr, type, idvisit) |>
-  #   slice(1) |>
-  #   ungroup()
-
   setDT(d_no_dublicates)
   # Even faster approach - avoid pivoting entirely
   d_events <- d_no_dublicates[
@@ -26,21 +18,6 @@ compute_glotzdauer <- function(d) {
 
   # Join them directly
   d_filtered_wide_dt <- events[timestamps, on = c("nr", "idvisit"), nomatch = 0]
-
-  # d_play_pause_timestamps <-
-  #   d_no_dublicates|>
-  #   # for each id_visit, we are interested in the actions where some videoplayer clicks happened:
-  #   mutate(
-  #     is_target = value %in% c("play", "pause")) %>%
-  #   filter(is_target | type == "timestamp") |>
-  #   select(-is_target) |>
-  #   group_by(idvisit) |>
-  #   arrange(idvisit) |>
-  #   ungroup()
-
-  # d_play_pause_timestamps |>
-  #   pivot_wider(names_from = "type", values_from = "value") |>
-  #   drop_na()
 
   d_glotzdauer_dt <- d_filtered_wide_dt[,
     {
