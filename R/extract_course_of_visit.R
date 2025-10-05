@@ -1,4 +1,8 @@
 extract_course_role_university_of_visit <- function(d) {
+#' Extract course, role, and university from visit data
+  #' param d Data frame containing visit data with URLs
+  #' return Data frame with extracted course, role, and university information
+
   d |> # WIDE data such as "data_wide_slim"
     select(
       idvisit,

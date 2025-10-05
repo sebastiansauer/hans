@@ -1,64 +1,29 @@
 compute_glotzdauer <- function(d) {
+  
   setDT(d)
 
-  # Much faster deduplication using data.table
-  d_no_dublicates <- unique(d, by = c("nr", "type", "idvisit"))
-
-  setDT(d_no_dublicates)
-  # Even faster approach - avoid pivoting entirely
-  d_events <- d_no_dublicates[
-    value %in% c("play", "pause") | type == "timestamp"
-  ][
-    order(idvisit, nr)
+  # Filter relevant rows first
+  d_events <- d[
+    type %in%
+      c("timestamp", "eventaction") &
+      (value %in% c("play", "pause") | type == "timestamp")
   ]
 
-  # Split into separate data.tables for each type
-  timestamps <- d_events[type == "timestamp", .(nr, idvisit, timestamp = value)]
-  events <- d_events[type == "eventaction", .(nr, idvisit, eventaction = value)]
+  # Convert timestamps once
+  d_events[type == "timestamp", timestamp := as.POSIXct(value)]
 
-  # Join them directly
-  d_filtered_wide_dt <- events[timestamps, on = c("nr", "idvisit"), nomatch = 0]
-
-  d_glotzdauer_dt <- d_filtered_wide_dt[,
-    {
-      # Convert timestamp to proper datetime if it's not already
-      ts <- as.POSIXct(timestamp)
-
-      # Get play and pause timestamps
-      play_times <- ts[eventaction == "play"]
-      pause_times <- ts[eventaction == "pause"]
-
-      # Calculate results
-      list(
-        first_play = if (length(play_times) > 0) {
-          min(play_times)
-        } else {
-          as.POSIXct(NA)
-        },
-        last_pause = if (length(pause_times) > 0) {
-          max(pause_times)
-        } else {
-          as.POSIXct(NA)
-        }, # Note: using max for last pause
-        date = as.Date(min(ts, na.rm = TRUE))
-      )
-    },
+  # Compute by group
+  d_glotzdauer_dt <- d_events[,
+    .(
+      
+      first_play = min(timestamp[type == "eventaction" & value == "play"], na.rm = TRUE),
+      last_pause = max(timestamp[type == "eventaction" & value == "pause"], na.rm = TRUE),
+      date = as.Date(min(timestamp, na.rm = TRUE))
+    ),
     by = idvisit
-  ][,
-    time_diff := difftime(last_pause, first_play)
   ]
 
-  # d_glotzdauer <-
-  #   d_filtered_wide |>
-  #   group_by(idvisit) %>%
-  #   summarise(
-  #     first_play = min(timestamp[eventaction == "play"], na.rm = TRUE),
-  #     last_pause = min(timestamp[eventaction == "pause"], na.rm = TRUE),
-  #     date = date(min(timestamp))
-  #   ) %>%
-  #   #filter(!is.na(first_play) & !is.na(last_pause)) %>%
-  #   mutate(time_diff = difftime(last_pause, first_play)) %>%
-  #   ungroup()
+  d_glotzdauer_dt[, time_diff := difftime(last_pause, first_play)]
 
   return(d_glotzdauer_dt)
 }
