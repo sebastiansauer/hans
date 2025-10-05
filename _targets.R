@@ -99,6 +99,14 @@ list(
       filter_column_type()
   ),
 
+  tar_target(
+    data_separated_filtered_date_uni_course,
+    add_date_uni_course_to_long_data(
+      data_separated_filtered,
+      course_and_uni_per_visit
+    )
+  ),
+
   ## count stuff per visit -------------------------------------------------
   # count number of actions per visit:
   tar_target(
@@ -127,8 +135,7 @@ list(
   ),
 
   # compute how much time was spent per visit:
-  tar_target(time_spent,
-     data_separated_filtered |> diff_time()),
+  tar_target(time_spent, data_separated_filtered |> diff_time()),
   tar_target(
     time_spent_fingerprint,
     data_separated_filtered |> diff_time(idvar = fingerprint)
@@ -240,6 +247,20 @@ list(
     idvisit_has_llm_fingerprint,
     data_separated_filtered |>
       count_visitor_interaction_with_llm(idvar = fingerprint)
+  ),
+  tar_target(
+    prompt_length,
+    data_separated_filtered |>
+      compute_prompt_length(),
+    packages = c("tokenizers", "stringr")
+  ),
+
+  tar_target(
+    prompt_length_date_uni_course,
+    prompt_length |>
+      select(-any_of(c("type", "value"))) |>
+      mutate(date_time = floor_date(actiondetails_0_timestamp)),
+    packages = c("dplyr", "lubridate")
   ),
 
   ## Glotzdauer --------------------------------------------------------------

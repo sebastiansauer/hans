@@ -1,6 +1,6 @@
 #' Get timestamp (first) for each idvisit
 
-idvar_timestamp <- function(data, idvar) {
+idvar_timestamp <- function(data, idvar = idvisit) {
   #' param data data,long
   #' return df with n_unique(idivisit) rows, vars: idivisit, timestamp
 
@@ -16,3 +16,4 @@ idvar_timestamp <- function(data, idvar) {
 
   data_separated_filtered_timestamp
 }
+
