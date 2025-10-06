@@ -1,0 +1,535 @@
+
+# Was machen die User?
+
+
+```{r load-libs}
+library(tidyverse)
+library(lubridate)
+library(gt)
+library(targets)
+library(ggpubr)
+library(scales)
+library(ggfittext)
+```
+
+```{r source-common-start}
+source("_common.r")
+```
+
+
+
+```{r load-targets}
+tar_load(c(
+ course_and_uni_per_visit,
+n_action,
+n_action_type,
+time_visit_wday,
+time_visit_wday_fingerprint,
+data_separated_filtered_date_uni_course,
+data_separated_filtered
+))
+```
+
+Was machen die Visitors eigentlich? Und wie oft?
+
+## Häufigkeiten
+
+ 
+
+
+Für das Objekt `n_action_type` wurde die Spalte `subtitle` in den Langformat-Daten ausgewertet, s. [Funktionsdefinition von `count_user_action_type`](https://github.com/sebastiansauer/hans/blob/main/funs/count_user_action.R).
+
+
+```{r}
+n_action_type |>
+  head(30)
+```
+
+
+
+Achtung: Es kann sinnvoller sein,
+alternativ zu dieser Analyse
+die Analyse auf Basis von `eventcategory` heranzuziehen.
+Dort werden alle Arten von Events berücksichtigt. 
+Hier, in der vorliegenden, nur ausgewählte Events.
+
+
+
+### Nach bestimmten Kategorien
+
+```{r category-tab}
+n_action_type_counted <-
+  n_action_type |>
+  drop_na() |>
+  count(category, sort = TRUE) |>
+  mutate(prop = round(n / sum(n), 2))
+
+n_action_type_counted |>
+  gt()
+```
+
+
+
+
+### Nach Kategorien im Zeitverlauf
+
+```{r n_action_type_per_month}
+n_action_type_per_month <-
+  n_action_type |>
+  select(nr, idvisit, category) |>
+  ungroup() |>
+  left_join(time_visit_wday |> ungroup()) |>
+  select(-c(dow, hour, nr)) |>
+  drop_na() |>
+  mutate(month_start = floor_date(date_time, "month")) |>
+  count(month_start, category)
+```
+
+```{r}
+n_action_type_per_month
+```
+
+### Nur die Top3-Kategorien
+
+#### idvisit
+
+##### Absolutzahlen
+```{r}
+time_visit_wday |>
+  head(30)
+```
+
+
+```{r n_action_type_per_month_top3}
+n_action_type_per_month_top3 <-
+  n_action_type |>
+  select(nr, idvisit, category) |>
+  ungroup() |>
+  filter(category %in% c("video", "click_slideChange", "visit_page")) |>
+  left_join(time_visit_wday |> ungroup()) |>
+  select(-c(dow, hour, nr)) |>
+  drop_na() |>
+  mutate(month_start = floor_date(date_time, "month")) |>
+  count(month_start, category)
+```
+
+```{r n_action_type_per_month_top3-gt}
+n_action_type_per_month_top3
+```
+
+
+```{r n_action_type_per_month_top3-ggplot}
+n_action_type_per_month_top3 |>
+  ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  geom_line()
+```
+
+##### Relative Anteile
+```{r}
+n_action_type_per_month_top3 |>
+  ggplot(aes(
+    x = month_start,
+    y = n,
+    fill = category # Changed from 'color' to 'fill'
+  )) +
+  # Use geom_area() and set position="fill" to stack and normalize to 100%
+  geom_area(position = "fill") +
+
+  # Optional: Customize the y-axis to show percentages
+  scale_y_continuous(labels = scales::label_percent()) +
+
+  labs(
+    y = "Proportion",
+    fill = "Category"
+  )
+```
+
+
+#### fingerprint unique
+
+##### Absolutzahlen
+
+```{r}
+time_visit_wday_fingerprint |>
+  head(30)
+```
+
+
+```{r n_action_type_per_month_top3_2}
+n_action_type_per_month_top3_fingerprint <-
+  n_action_type |>
+  select(nr, fingerprint, category) |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  ungroup() |>
+  filter(category %in% c("video", "click_slideChange", "visit_page")) |>
+  left_join(time_visit_wday_fingerprint |> ungroup()) |>
+  select(-c(dow, hour, nr)) |>
+  drop_na() |>
+  mutate(month_start = lubridate::floor_date(date_time, "month")) |>
+  count(month_start, category)
+```
+
+```{r n_action_type_per_month_top3-gt_2}
+n_action_type_per_month_top3_fingerprint
+```
+
+
+```{r n_action_type_per_month_top3-ggplot_2}
+n_action_type_per_month_top3_fingerprint |>
+  ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  geom_line()
+```
+
+##### Relative Anteile
+
+```{r}
+n_action_type_per_month_top3_fingerprint |>
+  ggplot(aes(
+    x = month_start,
+    y = n,
+    fill = category # Changed from 'color' to 'fill'
+  )) +
+  # Use geom_area() and set position="fill" to stack and normalize to 100%
+  geom_area(position = "fill") +
+
+  # Optional: Customize the y-axis to show percentages
+  scale_y_continuous(labels = scales::label_percent()) +
+
+  labs(
+    y = "Proportion",
+    fill = "Category"
+  )
+```
+
+
+### Top3 - Pro Kurs
+
+
+
+```{r  n_action_type_course_uni}
+n_action_type_course_uni <-
+  n_action_type |>
+  left_join(course_and_uni_per_visit |> mutate(idvisit = as.integer(idvisit)))
+```
+
+```{r n_action_type_per_month_top3_per_course}
+n_action_type_per_month_top3_per_course <-
+  n_action_type_course_uni |>
+  filter(category %in% c("video", "click_slideChange", "visit_page")) |>
+  drop_na() |>
+  mutate(month_start = floor_date(actiondetails_0_timestamp, "month")) |>
+  count(course, month_start, category)
+```
+
+```{r n_action_type_per_month_top3_per_course-plot}
+#| fig-asp: 1.5
+n_action_type_per_month_top3_per_course |>
+  ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  facet_wrap(~course, ncol = 3, scales = "free_y") +
+  geom_line() +
+  theme(legend.position = "bottom") +
+  scale_x_date(date_labels = "%b %Y")
+```
+
+
+
+### `eventcategory`
+
+
+#### Insgesamt
+
+Für folgende Analyse wurde eine andere Variable als oben herangezogen, 
+nämlich `eventcategory`. Dadurch resultieren etwas andere Ergebnisse - ausführlichere.
+
+
+```{r}
+data_eventcategory <-
+  data_separated_filtered |>
+  filter(type == "eventcategory")
+```
+
+```{r data_separated_filtered_count}
+data_separated_filtered_count <-
+  data_eventcategory |> 
+count(value, sort = TRUE) |>
+  mutate(prop = n / sum(n))
+
+data_separated_filtered_count
+```
+
+```{r}
+data_separated_filtered_count |>
+  ggtexttable()
+```
+
+
+```{r}
+#data_separated_filtered_count |>
+#  writexl::write_xlsx(path = "obj/data_separated_filtered_count.xlsx")
+```
+
+
+
+#### Pro Universität 
+
+```{r}
+data_separated_filtered_date_uni_course_top5_uni <-
+  data_separated_filtered_date_uni_course |>
+  compute_prop_eventcategory_per_uni_course()
+
+data_separated_filtered_date_uni_course_top5_uni |>
+  gt::gt()
+```
+ 
+
+```{r}
+data_separated_filtered_date_uni_course_top5_uni |>
+  # --- Visualization ---
+  ggplot(aes(
+    x = reorder(value, prop), # Reorder bars by proportion within each facet
+    y = prop,
+    fill = value # Use 'value' for color
+  )) +
+
+  # Bar chart
+  geom_col() +
+
+  # Separate plot for each university
+  facet_wrap(~university, scales = "free_y") +
+
+  # Flip coordinates for better readability of long category names
+  coord_flip() +
+
+  # Clean up labels and aesthetics
+  scale_y_continuous(labels = label_percent()) +
+  labs(
+    title = "Top 5 'eventcategory' Values by University",
+    subtitle = "Proportion of total events within each university",
+    x = "Event Category (Value)",
+    y = "Proportion (%)",
+    fill = "Category"
+  ) +
+  # Use a minimal theme
+  theme_minimal() +
+  # Remove the legend since the categories are on the y-axis
+  theme(legend.position = "none")
+```
+
+```{r}
+data_separated_filtered_date_uni_course_top5_uni |>
+  ungroup() |>
+  mutate(value = fct_lump(value, 5)) |>
+  ggplot(aes(x = university, y = n, fill = value)) +
+  geom_col(position = "fill") +
+
+  # Ensure the Y-axis range is correct
+  scale_y_continuous(
+    labels = scales::label_percent()
+  ) +
+
+  labs(
+    title = "Top 5 Event Category Proportions by University",
+    y = "Proportion of Total Events (%)",
+    x = "University",
+    fill = "Event Category"
+  ) +
+  theme_minimal()
+```
+
+
+#### Pro Kurs
+
+
+```{r}
+data_separated_filtered_date_uni_course_top5_course <-
+  data_separated_filtered_date_uni_course |>
+  compute_prop_eventcategory_per_uni_course(group_var = course)
+```
+
+
+```{r}
+data_separated_filtered_date_uni_course_top5_course |>
+  # --- Visualization ---
+  mutate(value = fct_lump(value, 5)) |>
+  ggplot(aes(
+    x = course, # Reorder bars by proportion within each facet
+    y = prop,
+    fill = value # Use 'value' for color
+  )) +
+
+  # Bar chart
+  geom_col(position = "fill")
+
+
+```
+
+#### Jahr
+
+```{r}
+data_separated_filtered_date_uni_course_top5_date <-
+  data_separated_filtered_date_uni_course |>
+  compute_prop_eventcategory_per_uni_course(group_var = month)
+```
+
+
+```{r}
+data_separated_filtered_date_uni_course_top5_date |>
+  # --- Visualization ---
+  mutate(value = fct_lump(value, 5)) |>
+  ggplot(aes(
+    x = month, # Reorder bars by proportion within each facet
+    y = prop,
+    fill = value # Use 'value' for color
+  )) +
+
+  # Bar chart
+  geom_col(position = "fill")
+
+
+```
+
+```{r}
+data_separated_filtered_date_uni_course_top5_date |>
+
+  mutate(value = fct_lump(value, 5)) |>
+  # 2. Visualization
+  ggplot(aes(
+    x = month,
+    y = prop, # Plot the calculated proportion
+    fill = value # Use 'value' for the fill (stacking segments)
+  )) +
+
+  # Use geom_area() with position = "fill" to ensure the areas stack to 100%
+  geom_area(position = "fill") +
+
+  # Customize the Y-axis to show percentages
+  scale_y_continuous(labels = scales::label_percent()) +
+
+  # Customize the X-axis for dates
+  scale_x_datetime(
+    breaks = pretty_breaks(n = 6), # Request roughly 6 "nice" breaks
+    date_labels = "%b %Y" # Label format: e.g., "Mar 2024"
+  ) +
+  # Labels and Theme
+  labs(
+    title = "Relative Frequency of Top Event Categories Over Time",
+    subtitle = "Showing the monthly composition of the top 5 events",
+    x = "Month",
+    y = "Proportion of Total Events (%)",
+    fill = "Event Category"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+
+### User-Typen nach Aktivitäten
+
+Was ist die Hauptaktivität pro User? - Verteilung
+
+#### idvisit
+```{r}
+n_action_type_distro <-
+  n_action_type |>
+  group_by(idvisit) |>
+  summarise(category_max = max(category, na.rm = TRUE)) |>
+  count(category_max)
+
+n_action_type_distro
+```
+
+
+```{r}
+n_action_type_distro |>
+  ggplot(aes(x = n, y = category_max)) +
+  geom_col()
+```
+
+#### fingerprint
+
+```{r}
+n_action_type_distro_fingerpr <-
+  n_action_type |>
+  group_by(fingerprint) |>
+  summarise(category_max = max(category, na.rm = TRUE)) |>
+  count(category_max)
+
+n_action_type_distro
+```
+
+
+```{r}
+n_action_type_distro_fingerpr |>
+  ggplot(aes(x = n, y = category_max)) +
+  geom_col()
+```
+
+## Verteilung
+
+```{r}
+n_action_type_counted <-
+  n_action_type |>
+  count(category, sort = TRUE)
+```
+
+
+### Insgesamt - Rohwerte
+
+```{r vis-count-action-type}
+n_action_type_counted |>
+  ggplot(aes(y = reorder(category, n), x = n)) +
+  geom_col() +
+  geom_bar_text() +
+  labs(
+    x = "User-Aktion",
+    y = "Aktion",
+    title = "Anzahl der User-Aktionen nach Kategorie"
+  ) +
+  theme_minimal() +
+  scale_x_continuous(labels = scales::comma)
+```
+
+
+### Insgesamt - Log-Skalierung
+
+```{r vis-count-action-type-log}
+#| fig-width: 9
+n_action_type_counted |>
+  ggplot(aes(y = reorder(category, n), x = n)) +
+  geom_col() +
+  geom_bar_text() +
+  labs(
+    x = "Anazhl der User-Aktionen",
+    y = "Aktion",
+    title = "Anzahl der User-Aktionen nach Kategorie",
+    caption = "Log10-Skala"
+  ) +
+  theme_minimal() +
+  scale_x_log10()
+```
+
+
+### Pro Kurs - Rohwerte
+
+
+
+
+```{r n_action_type_course_uni_counted}
+n_action_type_course_uni_counted <-
+  n_action_type_course_uni |>
+  group_by(course) |>
+  count(category, sort = TRUE) |>
+  drop_na()
+```
+
+
+```{r n_action_type_course_uni_counted_plot}
+#| fig-asp: 1.5
+n_action_type_course_uni_counted |>
+  ggplot() +
+  aes(y = category, x = log(n, base = 10)) +
+  geom_col() +
+  facet_wrap(~course)
+```
+

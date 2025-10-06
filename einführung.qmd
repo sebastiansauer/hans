@@ -1,0 +1,150 @@
+
+
+# Überblick über die Daten
+
+## Roh-Daten laden und inspizieren (data_all_fact)
+
+
+
+
+### Dimension
+
+Der Roh-Datensatz verfügt über
+
+- `r nrow(data_all_fct)` Zeilen
+- `r ncol(data_all_fct)` Spalten (Dubletten und Spalten mit Bildern bereits entfernt)
+
+Jede Zeile entspricht einem "Visit".
+
+
+### Erster Blick
+
+
+```{r data_all_fct_head100}
+data_all_fct_head100 <-
+  data_all_fct %>%
+  select(1:100) %>%
+  slice_head(n = 100)
+```
+
+
+```{r vis-dat}
+data_all_fct_head100 %>%
+  visdat::vis_dat()
+```
+
+### (Fast) leere Spalten
+
+```{r}
+d_na_cols <- data.frame(
+  id = 1:ncol(data_all_fct),
+  names = names(data_all_fct),
+  na_prop = colMeans(is.na(data_all_fct))
+)
+```
+
+
+#### Leere Spalten
+
+```{r}
+d_na_cols |>
+  filter(na_prop == 1)
+```
+
+
+#### Fast leere Spalten
+
+```{r}
+no_na_cols <-
+  d_na_cols |>
+  filter(na_prop > .9) |>
+  nrow()
+
+no_na_cols
+```
+
+:::{.callout-important}
+Sehr viele Spalten, `r no_na_cols` sind fast leer.
+:::
+
+
+### Namen (1-100)
+
+
+
+```{r data_all_fct_head100-2}
+d_100_names <- data.frame(
+  id = 1:100,
+  col_name = data_all_fct_head100 %>% names()
+)
+
+d_100_names
+```
+
+
+
+### Werte der erst 100 Spalten
+
+
+```{r}
+data_all_fct_head100
+```
+
+
+
+
+### Datensatz data_separated_filtered, Zeilen 1-100
+
+```{r data_separated_filtered}
+data_separated_filtered %>%
+  slice(1:100)
+```
+
+
+## Fallzahl im Nur-User-Datensatz 
+
+Entfernt man *Developer*, *Admins* und *Lecturers* aus dem Roh-Datensatz so bleiben weniger Zeilen übrig:
+
+
+
+- `r nrow(data_prepped)` Zeilen
+- `r ncol(data_prepped)` Spalten 
+
+
+  
+
+## Datensatz mit Anzahl der Aktionen pro User
+### idvisit
+
+```{r}
+n_action |> dim()
+```
+
+
+
+```{r load-count-action}
+n_action |>
+  head(30)
+```
+
+
+```{r}
+n_action |>
+  ggplot(aes(x = nr_max)) +
+  geom_histogram()
+```
+
+
+### fingerprint
+
+```{r}
+n_action_fingerprint |> head(30)
+```
+
+```{r}
+n_action_fingerprint |>
+  ggplot(aes(x = nr_max)) +
+  geom_histogram()
+```
+
+

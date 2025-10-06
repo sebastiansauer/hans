@@ -1,0 +1,126 @@
+# Videozeit
+
+
+
+
+```{r load-libs}
+library(tidyverse)
+library(lubridate)
+# library(gt)
+library(targets)
+# library(ggpubr)
+library(scales)
+# library(ggfittext)
+library(easystats)
+# library(ggokabeito)
+```
+
+```{r source-common-start}
+source("_common.r")
+```
+
+
+
+```{r load-targets}
+tar_load(c(
+  data_separated_distinct_slice
+))
+```
+
+
+
+
+Wie viel Zeit verbringen die Nutzer mit dem Betrachten von Videos ("Glotzdauer")?
+
+
+## Glotzdauer allgemein
+
+Achtung: Die Videozeit ist schwierig auszuwerten:
+Die Nutzer beenden keine Videos, in dem sie auf "Pause" drücken,
+sondern indem sie andere Aktionen durchführen.
+Dies ist aber analytisch schwer abzubilden.
+
+
+Vgl. die Definition des Targets `glotzdauer` in der [Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L269).
+
+Kurz gesagt wird die Zeit-Differenz zwischen zwei aufeinander folgenden "Play" und "Pause" Aktionen berechnet.
+
+Allerdings hat dieses Vorgehen Schwierigkeiten: Nicht immer folgt auf einem "Play" ein "Pause". 
+Es ist schwer auszuwerten, wann die Betrachtung eines Videos endet.
+Daher ist diese Analyse nur vorsichtig zu interpretieren.
+
+Die Definition [der Funktion glotzdauer.R](https://github.com/sebastiansauer/hans/blob/main/funs/glotzdauer.R) ist online dokumentiert.
+
+```{r}
+data_separated_distinct_slice |>
+  head(30)
+```
+
+Für die folgende Darstellung wurden die *absoluten* Zeitwerte verwendet, d.h. ohne Vorzeichen.
+
+```{r p-plotzdauer}
+data_separated_distinct_slice |>
+  # we will assume that negative glotzdauer is the as positive glotzdauer:
+  mutate(time_diff = abs(time_diff)) |>
+  # without glotzdauer smaller than 10 minutes:
+  filter(time_diff < 60 * 10) |>
+  ggplot(aes(x = time_diff)) +
+  geom_histogram() +
+  scale_x_time() +
+  labs(
+    x = "Time interval [minutes]",
+    caption = "Only time intervals less than 10 minutes. It is assumed that video time is positive only (no negative time intervals)."
+  ) +
+  theme_minimal()
+```
+
+
+
+```{r glotzdauer-stats}
+glotzdauer_prepped <-
+  data_separated_distinct_slice |>
+  # we will assume that negative glotzdauer is the as positive glotzdauer:
+  mutate(time_diff_abs_sec = abs(as.numeric(time_diff, units = "secs"))) |>
+  # without glotzdauer smaller than 10 minutes:
+  filter(time_diff_abs_sec < 60 * 10) |>
+  mutate(time_diff_abs_min = time_diff_abs_sec / 60)
+
+glotzdauer_tbl <-
+  glotzdauer_prepped |>
+  select(time_diff_abs_sec, time_diff_abs_min) |>
+  describe_distribution()
+
+glotzdauer_tbl
+```
+
+```{r glotzdauer_tbl-ggtexttable}
+glotzdauer_tbl |>
+  mutate(across(where(is.numeric), ~ round(., 2))) |>
+  ggpubr::ggtexttable()
+```
+
+
+
+## Glotzdauer im Zeitverlauf
+
+```{r glotzdauer_prepped_tbl}
+glotzdauer_prepped_tbl <-
+  glotzdauer_prepped |>
+  mutate(first_of_month = floor_date(date, unit = "month")) |>
+  group_by(first_of_month) |>
+  summarise(time_diff_mean = mean(time_diff, na.rm = TRUE))
+
+
+glotzdauer_prepped_tbl
+```
+
+```{r glotzdauer_prepped_plot}
+glotzdauer_prepped_tbl |>
+  ggplot(aes(x = first_of_month, y = time_diff_mean)) +
+  geom_line() +
+  theme_minimal()
+```
+
+
+
+

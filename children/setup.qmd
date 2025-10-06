@@ -1,0 +1,105 @@
+# Setup
+
+## R-Pakete starten
+
+
+
+```{r load-libs}
+library(targets)
+library(tidyverse)
+library(ggokabeito)
+library(easystats)
+library(gt)
+library(ggfittext)
+library(scales)
+library(visdat)
+library(collapse)
+library(ggpubr)
+library(knitr)
+library(tinytable)
+library(data.table)
+library(lubridate)
+```
+
+```{r}
+#| cache: false
+library(ggplot2)
+theme_set(theme_minimal())
+```
+
+
+## Funktionen sourcen
+
+```{r source-funs, include=FALSE}
+list.files("R", full.names = TRUE) |>
+  walk(source)
+```
+
+
+
+## Optionen setzen
+
+```{r options}
+options(lubridate.week.start = 1) # Monday as first day
+#options(collapse_mask = "all") # use collapse for all dplyr operations
+options(chromote.headless = "new") # Chrome headleass needed for gtsave
+```
+
+
+```{r}
+scale_colour_discrete <- function(...) scale_colour_brewer(palette = "Set2")
+scale_fill_discrete <- function(...) scale_fill_brewer(palette = "Set2")
+```
+
+
+<!-- Immer `knitr::kable` für das Zeigen von Data frames verwenden: -->
+
+
+<!-- ```{r setup-kable, include=FALSE} -->
+<!-- knitr::opts_chunk$set( -->
+<!--   print.opts = list(use.kable = TRUE) -->
+<!-- ) -->
+<!-- ``` -->
+
+
+## Daten laden
+
+```{r import-tar-objects-data}
+tar_load(ai_transcript_clicks_per_month)
+tar_load(config)
+tar_load(course_and_uni_per_visit)
+tar_load(data_all_fct)
+tar_load(data_long)
+tar_load(data_prepped)
+tar_load(data_separated_distinct_slice)
+tar_load(data_separated_filtered)
+#tar_load(data_users_only)
+tar_load(idvisit_has_llm)
+tar_load(llm_response_text)
+tar_load(n_action)
+tar_load(n_action_type)
+tar_load(n_action_w_date)
+tar_load(time_duration)
+tar_load(time_since_last_visit)
+tar_load(time_spent)
+tar_load(time_spent_w_course_university)
+tar_load(time_visit_wday)
+tar_load(n_mc_answers_selected)
+tar_load(mc_answers_with_timestamps)
+tar_load(n_action_fingerprint)
+tar_load(time_visit_wday_fingerprint)
+tar_load(n_action_w_date_fingerprint)
+tar_load(time_spent_fingerprint)
+tar_load(prompt_length)
+tar_load(data_separated_filtered_date_uni_course)
+```
+
+
+
+
+```{r data_separated_filtered_head}
+data_separated_filtered |>
+  head(30)
+```
+
+
