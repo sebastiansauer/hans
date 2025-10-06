@@ -1,10 +1,22 @@
 project:
   type: book
+  resources:
+    - "!**/Icon*"
+
+license: "MIT"
+  
+lang: de
 
 
 book:
   title: "Analyse der HaNS-Matomo-Daten"
-  author: Sebastian Sauer
+  author: 
+    - name: Sebastian Sauer
+      orcid: 0000-0003-1515-8348
+  date: today
+  reader-mode: true      
+  repo-actions: [source, issue]
+  repo-url: https://github.com/sebastiansauer/hans
   chapters:
     - index.qmd
     - 10-nutzereigenschaften.qmd
@@ -14,12 +26,11 @@ book:
     - 50-video.qmd
     - 60-llm.qmd
 
-toc: true
-number-sections: true
-
 format: 
   html:
-    theme: lumen
+    theme:
+      light: lumen
+      dark: darkly
     embed-resources: true
     toc: true
     toc-location: right
@@ -28,6 +39,7 @@ format:
     code-fold: true
     code-summary: "Show the code"
     code-tools: true
+    code-link: true
     df-print: paged
 lightbox: true
 
