@@ -1,5 +1,85 @@
 [
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Analyse der HaNS-Matomo-Daten",
+    "section": "",
+    "text": "1 Hintergrund\nDieser Arbeitsbericht schildert das technische Vorgehen im Rahmen der Analyse der Matomo-Daten des BMBF-Projekt “HaNS”.\n\n\n2 Vorgehen\nDie Matomo-Klickdaten aller Semester der Projektlaufzeit wurden für diese Analyse verarbeitet. Mit Hilfe einer R-Pipeline wurden eine Reihe von Forschungsfragen analysiert.\nDer komplette Code ist online dokumentiert unter https://github.com/sebastiansauer/hans. Aus Datenschutzgründen sind online keine Daten eingestellt.\nDie zentrale Analyse-Pipeline-Datei ist https://github.com/sebastiansauer/hans/blob/main/_targets.R.\n\n\n3 Forschungsfragen\n\nWie viele Nutzer gibt es und in welchem Zeitraum?\nIn welcher Frequenz wird HaNS aufgesucht? Wie groß sind die zeitlichen Zwischenräume zwischen der Benutzung der Plattform?\nWie oft wird HaNS pro Zeitraum (z.B. Monat) besucht?\nWie verändert sich die Nutzung im Zeitverlauf?\nWie viele Aktionen bringt ein Visit mit sich? Wie ist die statistische Verteilung der Aktionen pro Visit?\nWie lang verweilen die Nutzer pro Visit?\nW ie verändert sich die Nutzungsdauer pro Visit im Zeitverlauf?\nWelche Aktionen führen die Nutzer auf Hans aus?\nWie verändern sich die Verteilungen der Aktionshäufigkeiten im Zeitverlauf?\nAn welchen Tagen und zu welcher Zeit kommen die User zu HaNS?\nWie häufig und in welcher Art inteagieren die Nutzer mit dem LLM in HaNS?\nWie groß ist der Anteil der Nutzer, die mit dem LLM interagieren?\nWie verändert sich der Anteil der Nutzer, die mit dem LLM interagieren, im Zeitverlauf?\nWie oft wird auf ein Wort im Transkript des LLM geklickt?\nWie oft wird ein Transkript-Dienst in HaNS in Anspruch genommen?\nWie verändert sich die Nutzung der Transkript-Dienste in HaNS im Zeitverlauf?\nWie lange werden Videos angeschaut?\nWie verändert sich die Betrachtungsdauer im Zeitverlauf?\n\n\n\n4 Targets-Pipeline stellt Überblick aller Analyseschritte dar\nDie Analyse wird im Rahmen einer Targets-Pipeline beschrieben und ist offen auf Github einsehbar.\n\n\n5 Langformat\nAufgrund des “rechts flatternden” Datenformat (d.h. unterschiedliche Zeilenlängen) wurden die Daten in ein Langformat überführt, zwecks besserer/einfacherer Analyse.\nDazu wurden (neben den ID-Variablen, v.a. idvisit) die actionDetails_-Variablen verwendet. Der Code des Pivotierens in das Langformat ist in der Funktion longify-data.R einsehbar.\nDie Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion slimify-data.R.\n\n\n6 Targets-Objekte\n\n\nShow the code\ntargets::tar_manifest() |&gt; \n  print(n = Inf) |&gt; \n  knitr::kable()\n\n\n# A tibble: 39 × 2\n   name                                       command                           \n   &lt;chr&gt;                                      &lt;chr&gt;                             \n 1 config_file                                \"\\\"config.yaml\\\"\"                 \n 2 config                                     \"read_yaml(config_file)\"          \n 3 data_files_list                            \"find_data_files(config)\"         \n 4 data_files_dupes_excluded                  \"exclude_dupes(data_files_list)\"  \n 5 data_imported                              \"import_and_bind_data(data_files_…\n 6 data_prepped                               \"prep_data(data_imported)\"        \n 7 data_all_fct                               \"mutate(data_prepped, across(ever…\n 8 test_unique_idvisit                        \"check_unique_ids(data_prepped)\"  \n 9 time_since_last_visit                      \"select(data_all_fct, idvisit, fi…\n10 data_wide_slim                             \"get_vars(data_all_fct, vars = c(…\n11 data_long                                  \"longify_data(data_all_fct)\"      \n12 time_duration                              \"data_all_fct %&gt;% select(idvisit,…\n13 course_and_uni_per_visit                   \"extract_course_role_university_o…\n14 data_separated                             \"slimify_nona_data(data_long)\"    \n15 data_separated_filtered                    \"filter_column_type(data_separate…\n16 data_separated_distinct_slice              \"compute_glotzdauer(data_separate…\n17 n_action                                   \"summarise(group_by(data_separate…\n18 n_action_w_date                            \"count_action_w_date(data_separat…\n19 n_action_fingerprint                       \"summarise(group_by(data_separate…\n20 timestamps_added_to_idvisits               \"idvar_timestamp(data_separated_f…\n21 data_separated_filtered_date_uni_course    \"add_date_uni_course_to_long_data…\n22 time_spent_fingerprint                     \"diff_time(data_separated_filtere…\n23 n_action_type                              \"count_user_action_type(data_sepa…\n24 ai_llm_per_months                          \"count_llm_interactions(data_sepa…\n25 timestamps_added_to_fingerprints           \"idvar_timestamp(data_separated_f…\n26 n_action_w_date_fingerprint                \"count_action_w_date(data_separat…\n27 prompt_length                              \"compute_prompt_length(data_separ…\n28 n_mc_answers_selected                      \"count(group_by(count_mc_answers(…\n29 time_spent                                 \"diff_time(data_separated_filtere…\n30 time_visit_wday_fingerprint                \"when_visited_fingerprint(data = …\n31 ai_transcript_clicks_per_month             \"count_ai_transcripts_per_month(d…\n32 idvisit_has_llm_fingerprint                \"count_visitor_interaction_with_l…\n33 idvisit_has_llm                            \"count_visitor_interaction_with_l…\n34 time_visit_wday                            \"when_visited(data_separated_filt…\n35 time_spent_w_course_university_fingerprint \"compute_time_per_course_uni(data…\n36 llm_response_text                          \"get_llm_response_text(n_action_t…\n37 prompt_length_date_uni_course              \"mutate(select(prompt_length, -an…\n38 mc_answers_with_timestamps                 \"select(drop_na(left_join(select(…\n39 time_spent_w_course_university             \"compute_time_per_course_uni(data…\n\n\n\n\n\n\n\n\n\nname\ncommand\n\n\n\n\nconfig_file\n“config.yaml”\n\n\nconfig\nread_yaml(config_file)\n\n\ndata_files_list\nfind_data_files(config)\n\n\ndata_files_dupes_excluded\nexclude_dupes(data_files_list)\n\n\ndata_imported\nimport_and_bind_data(data_files_dupes_excluded)\n\n\ndata_prepped\nprep_data(data_imported)\n\n\ndata_all_fct\nmutate(data_prepped, across(everything(), as.factor))\n\n\ntest_unique_idvisit\ncheck_unique_ids(data_prepped)\n\n\ntime_since_last_visit\nselect(data_all_fct, idvisit, fingerprint, dayssincelastvisit)\n\n\ndata_wide_slim\nget_vars(data_all_fct, vars = c(“idvisit”, “fingerprint”,\n\n\ngrep(“actiondetails_”, names(data_all_fct), value = TRUE)))\n\n\n\ndata_long\nlongify_data(data_all_fct)\n\n\ntime_duration\ndata_all_fct %&gt;% select(idvisit, fingerprint, visitduration) %&gt;%\n\n\n\n mutate(visitduration_sec = as.numeric(visitduration)) %&gt;% \n select(-visitduration)  |\n|course_and_uni_per_visit |extract_course_role_university_of_visit(data_wide_slim) | |data_separated |slimify_nona_data(data_long) | |data_separated_filtered |filter_column_type(data_separated) | |data_separated_distinct_slice |compute_glotzdauer(data_separated) | |n_action |summarise(group_by(data_separated_filtered, idvisit), nr_max = max(nr)) | |n_action_w_date |count_action_w_date(data_separated_filtered) | |n_action_fingerprint |summarise(group_by(data_separated_filtered, fingerprint), nr_max = max(nr)) | |timestamps_added_to_idvisits |idvar_timestamp(data_separated_filtered) | |data_separated_filtered_date_uni_course |add_date_uni_course_to_long_data(data_separated_filtered, course_and_uni_per_visit) | |time_spent_fingerprint |diff_time(data_separated_filtered, idvar = fingerprint) | |n_action_type |count_user_action_type(data_separated_filtered) | |ai_llm_per_months |count_llm_interactions(data_separated_filtered) | |timestamps_added_to_fingerprints |idvar_timestamp(data_separated_filtered, idvar = fingerprint) | |n_action_w_date_fingerprint |count_action_w_date(data_separated_filtered, idvar = fingerprint) | |prompt_length |compute_prompt_length(data_separated_filtered) | |n_mc_answers_selected |count(group_by(count_mc_answers(data_separated_filtered), idvisit)) | |time_spent |diff_time(data_separated_filtered) | |time_visit_wday_fingerprint |when_visited_fingerprint(data = data_separated_filtered) | |ai_transcript_clicks_per_month |count_ai_transcripts_per_month(data_separated_filtered) | |idvisit_has_llm_fingerprint |count_visitor_interaction_with_llm(data_separated_filtered, idvar = fingerprint) | |idvisit_has_llm |count_visitor_interaction_with_llm(data_separated_filtered) | |time_visit_wday |when_visited(data_separated_filtered) | |time_spent_w_course_university_fingerprint |compute_time_per_course_uni(data = time_spent_fingerprint, course_and_uni = course_and_uni_per_visit, idvar = fingerprint) | |llm_response_text |get_llm_response_text(n_action_type) | |prompt_length_date_uni_course |mutate(select(prompt_length, -any_of(c(“type”, “value”))), date_time = floor_date(actiondetails_0_timestamp)) | |mc_answers_with_timestamps |select(drop_na(left_join(select(timestamps_added_to_idvisits, idvisit, timestamp), n_mc_answers_selected, by = “idvisit”)), idvisit, timestamp, n) | |time_spent_w_course_university |compute_time_per_course_uni(data = time_spent, course_and_uni = course_and_uni_per_visit, idvar = idvisit) |",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Hintergrund</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html",
+    "href": "10-nutzereigenschaften.html",
+    "title": "2  Nutzereigenschaften",
+    "section": "",
+    "text": "2.1 Unique IDs, Fingerprints, Mean searches, Mean actions\nAuswertung - der Anzahlen der uniquen visitids und uniquen Fingerprints - Mittelwerte der Anzahl der Suchen und Aktionen pro Besuch",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html#unique-ids-fingerprints-mean-searches-mean-actions",
+    "href": "10-nutzereigenschaften.html#unique-ids-fingerprints-mean-searches-mean-actions",
+    "title": "2  Nutzereigenschaften",
+    "section": "",
+    "text": "2.1.1 idivisit und fingerprint jeweils unique\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  as.data.frame() |&gt;\n  summarise(\n    idvisit_n = length(unique(idvisit)),\n    fingerprint_n = length(unique(fingerprint)),\n    actions_mean = mean(as.integer(actions), na.rm = TRUE),\n    searches_mean = mean(as.integer(searches), na.rm = TRUE)\n  )\n\n\n\n  \n\n\n\n\n\n\n\n\n\nNote\n\n\n\nEs gibt etwa doppelt so viele Besucher wie unique Nutzer.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html#referrer-type-pro-visit",
+    "href": "10-nutzereigenschaften.html#referrer-type-pro-visit",
+    "title": "2  Nutzereigenschaften",
+    "section": "2.2 Referrer Type pro Visit",
+    "text": "2.2 Referrer Type pro Visit\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(referrertype, sort = TRUE)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html#referrer-type-name-pro-visit",
+    "href": "10-nutzereigenschaften.html#referrer-type-name-pro-visit",
+    "title": "2  Nutzereigenschaften",
+    "section": "2.3 Referrer Type Name pro Visit",
+    "text": "2.3 Referrer Type Name pro Visit\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(referrername, sort = TRUE)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html#devicemodel",
+    "href": "10-nutzereigenschaften.html#devicemodel",
+    "title": "2  Nutzereigenschaften",
+    "section": "2.4 devicemodel",
+    "text": "2.4 devicemodel\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(devicemodel, sort = TRUE) |&gt;\n  slice_head(n = 10)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html#operatingsystem",
+    "href": "10-nutzereigenschaften.html#operatingsystem",
+    "title": "2  Nutzereigenschaften",
+    "section": "2.5 operatingsystem",
+    "text": "2.5 operatingsystem\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(operatingsystem, sort = TRUE) |&gt;\n  slice_head(n = 10)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
+    "objectID": "10-nutzereigenschaften.html#browsername",
+    "href": "10-nutzereigenschaften.html#browsername",
+    "title": "2  Nutzereigenschaften",
+    "section": "2.6 browsername",
+    "text": "2.6 browsername\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(browsername, sort = TRUE) |&gt;\n  slice_head(n = 10)\n\n\n\n  \n\n\n\nDie Mac-User scheinen besonders aktiv zu sein auf HaNS.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
+    ]
+  },
+  {
     "objectID": "20-nutzungszeiten.html",
     "href": "20-nutzungszeiten.html",
     "title": "3  Zeitraum",
@@ -77,76 +157,6 @@
     "text": "3.7 An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?\n\n3.7.1 Setup\n\n3.7.1.1 idvisit\n\n\nShow the code\n# Define a vector with the names of the days of the week\n# Note: Adjust the start of the week (Sunday or Monday) as per your requirement\ndays_of_week &lt;- c(\n  \"Monday\",\n  \"Tuesday\",\n  \"Wednesday\",\n  \"Thursday\",\n  \"Friday\",\n  \"Saturday\",\n  \"Sunday\"\n)\n\n# Replace numbers with day names\ntime_visit_wday$dow2 &lt;- factor(\n  days_of_week[time_visit_wday$dow],\n  levels = days_of_week\n)\n\n\n\n\n3.7.1.2 fingerprint\n\n\nShow the code\n# Define a vector with the names of the days of the week\n# Note: Adjust the start of the week (Sunday or Monday) as per your requirement\ndays_of_week &lt;- c(\n  \"Monday\",\n  \"Tuesday\",\n  \"Wednesday\",\n  \"Thursday\",\n  \"Friday\",\n  \"Saturday\",\n  \"Sunday\"\n)\n\n# Replace numbers with day names\ntime_visit_wday_fingerprint$dow2 &lt;- factor(\n  days_of_week[time_visit_wday_fingerprint$dow],\n  levels = days_of_week\n)\n\n\n\n\n\n3.7.2 HaNS-Login nach Uhrzeit\n\n3.7.2.1 idvisit\n\n\nShow the code\ntime_visit_wday |&gt;\n  as_tibble() |&gt;\n  count(hour) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  labs(\n    title = \"HaNS-Nutzer sind keine Frühaufsteher\",\n    x = \"Uhrzeit\",\n    y = \"Anteil\"\n  )\n\n\n\n\n\n\n\n\n\nShow the code\n# coord_polar()\n\n\n\n\n3.7.2.2 fingerprint unique\n\n\nShow the code\ntime_visit_wday_summary_fingerprint |&gt;\n  as_tibble() |&gt;\n  distinct(hour, .keep_all = TRUE) |&gt;\n  count(hour) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  labs(\n    title = \"HaNS-Nutzer sind keine Frühaufsteher\",\n    x = \"Uhrzeit\",\n    y = \"Anteil\"\n  )\n\n\n\n\n\n\n\n\n\nShow the code\n# coord_polar()\n\n\n\n\nShow the code\ntime_visit_wday |&gt;\n  as_tibble() |&gt;\n  count(hour) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  coord_polar()\n\n\n\n\n\n\n\n\n\n\n\n\n3.7.3 Verteilung der HaNS-Besuche nach Wochentagen\n\n3.7.3.1 idvisit\n\n\nShow the code\ntime_visit_wday |&gt;\n  as_tibble() |&gt;\n  count(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = dow2, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  )\n\n\n\n\n\n\n\n\n\nShow the code\n# coord_polar()\n\n\n\n\nShow the code\ntime_visit_wday |&gt;\n  as_tibble() |&gt;\n  count(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = dow2, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  ) +\n  coord_polar()\n\n\n\n\n\n\n\n\n\n\n3.7.3.1.1 fingerprint\n\n\nShow the code\ntime_visit_wday_fingerprint |&gt;\n  as_tibble() |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  count(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = dow2, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  )\n\n\n\n\n\n\n\n\n\nShow the code\n# coord_polar()\n\n\n\n\nShow the code\ntime_visit_wday_fingerprint |&gt;\n  as_tibble() |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  count(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = dow2, y = prop)) +\n  geom_col() +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  ) +\n  coord_polar()\n\n\n\n\n\n\n\n\n\n\n\n\n3.7.3.2 HaNS-Login nach Wochentagen Uhrzeit\n\n3.7.3.2.1 idvisit\n\n\nShow the code\ntime_visit_wday |&gt;\n  as_tibble() |&gt;\n  count(dow2, hour) |&gt;\n  group_by(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  facet_wrap(~dow2) +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  )\n\n\n\n\n\n\n\n\n\nShow the code\n# coord_polar()\n\n\n\n\nShow the code\ntime_visit_wday |&gt;\n  as_tibble() |&gt;\n  count(dow2, hour) |&gt;\n  group_by(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  facet_wrap(~dow2) +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  ) +\n  coord_polar()\n\n\n\n\n\n\n\n\n\n\n\n3.7.3.2.2 fingerprint\n\n\nShow the code\ntime_visit_wday_fingerprint |&gt;\n  as_tibble() |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  count(dow2, hour) |&gt;\n  group_by(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  facet_wrap(~dow2) +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  )\n\n\n\n\n\n\n\n\n\nShow the code\n# coord_polar()\n\n\n\n\nShow the code\ntime_visit_wday_fingerprint |&gt;\n  as_tibble() |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  count(dow2, hour) |&gt;\n  group_by(dow2) |&gt;\n  mutate(prop = n / sum(n)) |&gt;\n  ggplot(aes(x = hour, y = prop)) +\n  geom_col() +\n  facet_wrap(~dow2) +\n  theme_minimal() +\n  labs(\n    title = \"Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten\",\n    x = \"Wochentag\",\n    y = \"Anteil\"\n  ) +\n  coord_polar()\n\n\n\n\n\n\n\n\n\n\n\n\n\n3.7.4 Anzahl der Visits nach Datum (Tagen) und Uhrzeit (bin2d)\n\n3.7.4.1 idvisit\n\n\nShow the code\ntime2 &lt;-\n  time_visit_wday |&gt;\n  ungroup() |&gt;\n  mutate(date = as.Date(date_time)) |&gt;\n  mutate(month_start = floor_date(date_time, \"month\"))\n\ntime2 |&gt;\n  ggplot(aes(x = date, y = hour)) +\n  geom_bin2d(binwidth = c(1, 1)) + # (1 day, 1 hour)\n  scale_x_date(date_breaks = \"1 month\") +\n  theme(legend.position = \"bottom\") +\n  scale_fill_viridis_c() +\n  labs(caption = \"Each x-bin maps to one week\") +\n  scale_x_date(breaks = breaks_pretty())\n\n\n\n\n\n\n\n\n\n\n\n3.7.4.2 fingerprint unique\n\n\nShow the code\ntime2_fingerprint &lt;-\n  time_visit_wday_fingerprint |&gt;\n  ungroup() |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  mutate(date = as.Date(date_time)) |&gt;\n  mutate(month_start = floor_date(date_time, \"month\"))\n\ntime2_fingerprint |&gt;\n  ggplot(aes(x = date, y = hour)) +\n  geom_bin2d(binwidth = c(1, 1)) + # (1 day, 1 hour)\n  scale_x_date(date_breaks = \"1 month\") +\n  theme(legend.position = \"bottom\") +\n  scale_fill_viridis_c() +\n  labs(caption = \"Each x-bin maps to one week\") +\n  scale_x_date(breaks = breaks_pretty())\n\n\n\n\n\n\n\n\n\n\n\n\n3.7.5 Anzahl der Visits nach Datum (Wochen) und Uhrzeit (bin2d)\n\n3.7.5.1 idvisit\n\n\nShow the code\ntime2 |&gt;\n  ggplot(aes(x = date, y = hour)) +\n  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour\n  scale_x_date(date_breaks = \"1 week\", date_labels = \"%W\") +\n  theme(legend.position = \"bottom\") +\n  scale_fill_viridis_c() +\n  labs(\n    x = \"Week number in 2023/2024\",\n    caption = \"Each x-bin maps to one week\"\n  ) +\n  scale_x_date(breaks = breaks_pretty())\n\n\n\n\n\n\n\n\n\n\n\n3.7.5.2 fingerprint\n\n\nShow the code\ntime2_fingerprint |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  ggplot(aes(x = date, y = hour)) +\n  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour\n  scale_x_date(date_breaks = \"1 week\", date_labels = \"%W\") +\n  theme(legend.position = \"bottom\") +\n  scale_fill_viridis_c() +\n  labs(\n    x = \"Week number in 2023/2024\",\n    caption = \"Each x-bin maps to one week\"\n  ) +\n  scale_x_date(breaks = breaks_pretty())\n\n\n\n\n\n\n\n\n\n\n\n\n3.7.6 Anzahl der Visits nach Datum (Wochen) und Wochentag (bin2d)\n\n3.7.6.1 idvisit\n\n\nShow the code\ntime2 |&gt;\n  ggplot(aes(x = date, y = dow)) +\n  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour\n  scale_x_date(date_breaks = \"1 week\", date_labels = \"%W\") +\n  theme(legend.position = \"bottom\") +\n  scale_fill_viridis_c() +\n  labs(\n    x = \"Week number in 2023/2024\",\n    caption = \"Each x-bin maps to one week\",\n    y = \"Day of Week\"\n  ) +\n  scale_y_continuous(breaks = 1:7) +\n  scale_x_date(breaks = breaks_pretty())\n\n\n\n\n\n\n\n\n\n\n\n3.7.6.2 fingerprint\n\n\nShow the code\ntime2_fingerprint |&gt;\n  distinct(fingerprint, .keep_all = TRUE) |&gt;\n  ggplot(aes(x = date, y = dow)) +\n  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour\n  scale_x_date(date_breaks = \"1 week\", date_labels = \"%W\") +\n  theme(legend.position = \"bottom\") +\n  scale_fill_viridis_c() +\n  labs(\n    x = \"Week number in 2023/2024\",\n    caption = \"Each x-bin maps to one week\",\n    y = \"Day of Week\"\n  ) +\n  scale_y_continuous(breaks = 1:7) +\n  scale_x_date(breaks = breaks_pretty())",
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Zeitraum</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html",
-    "href": "10-nutzereigenschaften.html",
-    "title": "2  Nutzereigenschaften",
-    "section": "",
-    "text": "2.1 Unique IDs, Fingerprints, Mean searches, Mean actions\nAuswertung - der Anzahlen der uniquen visitids und uniquen Fingerprints - Mittelwerte der Anzahl der Suchen und Aktionen pro Besuch",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html#unique-ids-fingerprints-mean-searches-mean-actions",
-    "href": "10-nutzereigenschaften.html#unique-ids-fingerprints-mean-searches-mean-actions",
-    "title": "2  Nutzereigenschaften",
-    "section": "",
-    "text": "2.1.1 idivisit und fingerprint jeweils unique\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  as.data.frame() |&gt;\n  summarise(\n    idvisit_n = length(unique(idvisit)),\n    fingerprint_n = length(unique(fingerprint)),\n    actions_mean = mean(as.integer(actions), na.rm = TRUE),\n    searches_mean = mean(as.integer(searches), na.rm = TRUE)\n  )\n\n\n\n  \n\n\n\n\n\n\n\n\n\nNote\n\n\n\nEs gibt etwa doppelt so viele Besucher wie unique Nutzer.",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html#referrer-type-pro-visit",
-    "href": "10-nutzereigenschaften.html#referrer-type-pro-visit",
-    "title": "2  Nutzereigenschaften",
-    "section": "2.2 Referrer Type pro Visit",
-    "text": "2.2 Referrer Type pro Visit\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(referrertype, sort = TRUE)",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html#referrer-type-name-pro-visit",
-    "href": "10-nutzereigenschaften.html#referrer-type-name-pro-visit",
-    "title": "2  Nutzereigenschaften",
-    "section": "2.3 Referrer Type Name pro Visit",
-    "text": "2.3 Referrer Type Name pro Visit\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(referrername, sort = TRUE)",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html#devicemodel",
-    "href": "10-nutzereigenschaften.html#devicemodel",
-    "title": "2  Nutzereigenschaften",
-    "section": "2.4 devicemodel",
-    "text": "2.4 devicemodel\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(devicemodel, sort = TRUE) |&gt;\n  slice_head(n = 10)",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html#operatingsystem",
-    "href": "10-nutzereigenschaften.html#operatingsystem",
-    "title": "2  Nutzereigenschaften",
-    "section": "2.5 operatingsystem",
-    "text": "2.5 operatingsystem\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(operatingsystem, sort = TRUE) |&gt;\n  slice_head(n = 10)",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
-    ]
-  },
-  {
-    "objectID": "10-nutzereigenschaften.html#browsername",
-    "href": "10-nutzereigenschaften.html#browsername",
-    "title": "2  Nutzereigenschaften",
-    "section": "2.6 browsername",
-    "text": "2.6 browsername\n\n\nShow the code\nn_actions_searches_interactions |&gt;\n  count(browsername, sort = TRUE) |&gt;\n  slice_head(n = 10)\n\n\n\n  \n\n\n\nDie Mac-User scheinen besonders aktiv zu sein auf HaNS.",
-    "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Nutzereigenschaften</span>"
     ]
   },
   {
@@ -257,16 +267,6 @@
     "text": "5.2 Verteilung\n\n\nShow the code\nn_action_type_counted &lt;-\n  n_action_type |&gt;\n  count(category, sort = TRUE)\n\n\n\n5.2.1 Insgesamt - Rohwerte\n\n\nShow the code\nn_action_type_counted |&gt;\n  ggplot(aes(y = reorder(category, n), x = n)) +\n  geom_col() +\n  geom_bar_text() +\n  labs(\n    x = \"User-Aktion\",\n    y = \"Aktion\",\n    title = \"Anzahl der User-Aktionen nach Kategorie\"\n  ) +\n  theme_minimal() +\n  scale_x_continuous(labels = scales::comma)\n\n\n\n\n\n\n\n\n\n\n\n5.2.2 Insgesamt - Log-Skalierung\n\n\nShow the code\nn_action_type_counted |&gt;\n  ggplot(aes(y = reorder(category, n), x = n)) +\n  geom_col() +\n  geom_bar_text() +\n  labs(\n    x = \"Anazhl der User-Aktionen\",\n    y = \"Aktion\",\n    title = \"Anzahl der User-Aktionen nach Kategorie\",\n    caption = \"Log10-Skala\"\n  ) +\n  theme_minimal() +\n  scale_x_log10()\n\n\n\n\n\n\n\n\n\n\n\n5.2.3 Pro Kurs - Rohwerte\n\n\nShow the code\nn_action_type_course_uni_counted &lt;-\n  n_action_type_course_uni |&gt;\n  group_by(course) |&gt;\n  count(category, sort = TRUE) |&gt;\n  drop_na()\n\n\n\n\nShow the code\nn_action_type_course_uni_counted |&gt;\n  ggplot() +\n  aes(y = category, x = log(n, base = 10)) +\n  geom_col() +\n  facet_wrap(~course)",
     "crumbs": [
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Was machen die User?</span>"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Analyse der HaNS-Matomo-Daten",
-    "section": "",
-    "text": "1 Hintergrund\nDieser Arbeitsbericht schildert das technische Vorgehen im Rahmen der Analyse der Matomo-Daten des BMBF-Projekt “HaNS”.\n\n\n2 Vorgehen\nDie Matomo-Klickdaten aller Semester der Projektlaufzeit wurden für diese Analyse verarbeitet. Mit Hilfe einer R-Pipeline wurden eine Reihe von Forschungsfragen analysiert.\nDer komplette Code ist online dokumentiert unter https://github.com/sebastiansauer/hans. Aus Datenschutzgründen sind online keine Daten eingestellt.\nDie zentrale Analyse-Pipeline-Datei ist https://github.com/sebastiansauer/hans/blob/main/_targets.R.\n\n\n3 Forschungsfragen\n\nWie viele Nutzer gibt es und in welchem Zeitraum?\nIn welcher Frequenz wird HaNS aufgesucht? Wie groß sind die zeitlichen Zwischenräume zwischen der Benutzung der Plattform?\nWie oft wird HaNS pro Zeitraum (z.B. Monat) besucht?\nWie verändert sich die Nutzung im Zeitverlauf?\nWie viele Aktionen bringt ein Visit mit sich? Wie ist die statistische Verteilung der Aktionen pro Visit?\nWie lang verweilen die Nutzer pro Visit?\nW ie verändert sich die Nutzungsdauer pro Visit im Zeitverlauf?\nWelche Aktionen führen die Nutzer auf Hans aus?\nWie verändern sich die Verteilungen der Aktionshäufigkeiten im Zeitverlauf?\nAn welchen Tagen und zu welcher Zeit kommen die User zu HaNS?\nWie häufig und in welcher Art inteagieren die Nutzer mit dem LLM in HaNS?\nWie groß ist der Anteil der Nutzer, die mit dem LLM interagieren?\nWie verändert sich der Anteil der Nutzer, die mit dem LLM interagieren, im Zeitverlauf?\nWie oft wird auf ein Wort im Transkript des LLM geklickt?\nWie oft wird ein Transkript-Dienst in HaNS in Anspruch genommen?\nWie verändert sich die Nutzung der Transkript-Dienste in HaNS im Zeitverlauf?\nWie lange werden Videos angeschaut?\nWie verändert sich die Betrachtungsdauer im Zeitverlauf?\n\n\n\n4 Targets-Pipeline stellt Überblick aller Analyseschritte dar\nDie Analyse wird im Rahmen einer Targets-Pipeline beschrieben und ist offen auf Github einsehbar.\n\n\n5 Langformat\nAufgrund des “rechts flatternden” Datenformat (d.h. unterschiedliche Zeilenlängen) wurden die Daten in ein Langformat überführt, zwecks besserer/einfacherer Analyse.\nDazu wurden (neben den ID-Variablen, v.a. idvisit) die actionDetails_-Variablen verwendet. Der Code des Pivotierens in das Langformat ist in der Funktion longify-data.R einsehbar.\nDie Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion slimify-data.R.\n\n\n6 Targets-Objekte\n\n\nShow the code\ntargets::tar_manifest() |&gt; print(n = Inf)\n\n\n# A tibble: 39 × 2\n   name                                       command                           \n   &lt;chr&gt;                                      &lt;chr&gt;                             \n 1 config_file                                \"\\\"config.yaml\\\"\"                 \n 2 config                                     \"read_yaml(config_file)\"          \n 3 data_files_list                            \"find_data_files(config)\"         \n 4 data_files_dupes_excluded                  \"exclude_dupes(data_files_list)\"  \n 5 data_imported                              \"import_and_bind_data(data_files_…\n 6 data_prepped                               \"prep_data(data_imported)\"        \n 7 data_all_fct                               \"mutate(data_prepped, across(ever…\n 8 test_unique_idvisit                        \"check_unique_ids(data_prepped)\"  \n 9 time_since_last_visit                      \"select(data_all_fct, idvisit, fi…\n10 data_wide_slim                             \"get_vars(data_all_fct, vars = c(…\n11 data_long                                  \"longify_data(data_all_fct)\"      \n12 time_duration                              \"data_all_fct %&gt;% select(idvisit,…\n13 course_and_uni_per_visit                   \"extract_course_role_university_o…\n14 data_separated                             \"slimify_nona_data(data_long)\"    \n15 data_separated_filtered                    \"filter_column_type(data_separate…\n16 data_separated_distinct_slice              \"compute_glotzdauer(data_separate…\n17 n_action                                   \"summarise(group_by(data_separate…\n18 n_action_w_date                            \"count_action_w_date(data_separat…\n19 n_action_fingerprint                       \"summarise(group_by(data_separate…\n20 timestamps_added_to_idvisits               \"idvar_timestamp(data_separated_f…\n21 data_separated_filtered_date_uni_course    \"add_date_uni_course_to_long_data…\n22 time_spent_fingerprint                     \"diff_time(data_separated_filtere…\n23 n_action_type                              \"count_user_action_type(data_sepa…\n24 ai_llm_per_months                          \"count_llm_interactions(data_sepa…\n25 timestamps_added_to_fingerprints           \"idvar_timestamp(data_separated_f…\n26 n_action_w_date_fingerprint                \"count_action_w_date(data_separat…\n27 prompt_length                              \"compute_prompt_length(data_separ…\n28 n_mc_answers_selected                      \"count(group_by(count_mc_answers(…\n29 time_spent                                 \"diff_time(data_separated_filtere…\n30 time_visit_wday_fingerprint                \"when_visited_fingerprint(data = …\n31 ai_transcript_clicks_per_month             \"count_ai_transcripts_per_month(d…\n32 idvisit_has_llm_fingerprint                \"count_visitor_interaction_with_l…\n33 idvisit_has_llm                            \"count_visitor_interaction_with_l…\n34 time_visit_wday                            \"when_visited(data_separated_filt…\n35 time_spent_w_course_university_fingerprint \"compute_time_per_course_uni(data…\n36 llm_response_text                          \"get_llm_response_text(n_action_t…\n37 prompt_length_date_uni_course              \"mutate(select(prompt_length, -an…\n38 mc_answers_with_timestamps                 \"select(drop_na(left_join(select(…\n39 time_spent_w_course_university             \"compute_time_per_course_uni(data…",
-    "crumbs": [
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Hintergrund</span>"
     ]
   },
   {
