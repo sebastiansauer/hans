@@ -1,0 +1,119 @@
+
+# Nutzereigenschaften
+
+```{r load-libs}
+library(tidyverse)
+library(lubridate)
+library(gt)
+library(visdat)
+# library(data.table)
+# library(collapse)
+library(targets)
+```
+
+```{r}
+source("_common.r")
+```
+
+
+```{r load-targets}
+tar_load(c(n_action_searches_interactions, data_prepped, time_spent))
+```
+
+
+```{r data_prepped}
+n_actions_searches_interactions <-
+  data_prepped |>
+  select(
+    idvisit,
+    fingerprint,
+    any_of(c(
+      "searches",
+      "actions",
+      "interactions",
+      "referrertype",
+      "referrername",
+      "language",
+      "devicetype",
+      "devicemodel",
+      "operatingsystem",
+      "browsername"
+    ))
+  )
+
+```
+
+## Unique IDs, Fingerprints, Mean searches, Mean actions
+
+Auswertung 
+- der Anzahlen der uniquen visitids und uniquen Fingerprints
+- Mittelwerte der Anzahl der Suchen und Aktionen pro Besuch
+
+### idivisit und fingerprint jeweils unique
+
+```{r n_actions_searches_interactions-summary}
+n_actions_searches_interactions |>
+  as.data.frame() |>
+  summarise(
+    idvisit_n = length(unique(idvisit)),
+    fingerprint_n = length(unique(fingerprint)),
+    actions_mean = mean(as.integer(actions), na.rm = TRUE),
+    searches_mean = mean(as.integer(searches), na.rm = TRUE)
+  )
+```
+
+
+:::{.callout-note}
+Es gibt etwa doppelt so viele Besucher wie unique Nutzer.
+:::
+
+
+## Referrer Type pro Visit
+
+```{r}
+#| error: true
+n_actions_searches_interactions |>
+  count(referrertype, sort = TRUE)
+```
+
+
+## Referrer Type Name pro Visit
+
+```{r}
+#| error: true
+n_actions_searches_interactions |>
+  count(referrername, sort = TRUE)
+```
+
+## devicemodel
+
+
+ 
+```{r}
+#| error: true
+n_actions_searches_interactions |>
+  count(devicemodel, sort = TRUE) |>
+  slice_head(n = 10)
+```
+
+## operatingsystem
+
+```{r}
+#| error: true
+n_actions_searches_interactions |>
+  count(operatingsystem, sort = TRUE) |>
+  slice_head(n = 10)
+```
+
+## browsername
+
+
+```{r}
+#| error: true
+n_actions_searches_interactions |>
+  count(browsername, sort = TRUE) |>
+  slice_head(n = 10)
+```
+
+
+Die Mac-User scheinen besonders aktiv zu sein auf HaNS.

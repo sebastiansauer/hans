@@ -1,0 +1,736 @@
+
+# KI-Gebrauch
+
+
+
+
+```{r load-libs}
+library(tidyverse)
+library(lubridate)
+library(gt)
+library(targets)
+library(ggpubr)
+library(scales)
+# library(ggfittext)
+library(easystats)
+library(data.table)
+library(tinytable)
+# library(ggokabeito)
+```
+
+```{r source-common-start}
+source("_common.r")
+```
+
+
+
+```{r load-targets}
+tar_load(c(
+  ai_transcript_clicks_per_month,
+  data_long,
+  data_separated_distinct_slice,
+  data_separated_filtered,
+  idvisit_has_llm,
+  llm_response_text,
+  n_mc_answers_selected,
+  mc_answers_with_timestamps,
+  prompt_length
+))
+```
+
+
+
+## Interaktion mit dem LLM
+
+Berechnungsgrundlage: Für diese Analyse wurden alle Events der Kategorie `llm` gefiltert.
+
+### Art und Anzahl der Interaktionen mit dem LLM
+
+
+
+```{r data_separated_filtered_ai}
+data_separated_filtered_ai <-
+  data_separated_filtered |>
+  filter(type == "eventcategory") |>
+  filter(str_detect(value, "llm")) |>
+  count(value, sort = TRUE) |>
+  mutate(prop = n / sum(n))
+
+data_separated_filtered_ai
+```
+
+```{r}
+data_separated_filtered_ai |>
+  mutate(prop = round(prop, 3)) |>
+  ggtexttable()
+```
+
+
+## Anzahl der `message_to_llm` 
+
+
+
+```{r llm_interactions}
+llm_interactions <-
+  data_separated_filtered |>
+  filter(str_detect(value, "message_to_llm"))
+```
+
+### Verteilung
+
+```{r}
+llm_interactions_count <-
+  llm_interactions |>
+  count(idvisit, sort = TRUE) |>
+  rename(messages_to_llm_n = n)
+
+llm_interactions_count |>
+  describe_distribution(messages_to_llm_n, centrality = c("mean", "median"))
+
+```
+
+### Diagramm
+
+```{r}
+gghistogram(
+  llm_interactions_count,
+  x = "messages_to_llm_n",
+  bins = 10,
+  add = "median"
+) +
+  labs(caption = "The vertical dotted line denotes the median.")
+```
+
+
+
+
+### Anteil Visitors, die mit dem LLM interagieren
+
+#### idvisit
+```{r data_separated_filtered_llm_interact}
+data_separated_filtered_llm_interact <-
+  data_separated_filtered |>
+  mutate(has_llm = str_detect(value, "llm")) |>
+  group_by(idvisit) |>
+  summarise(llm_used_during_visit = any(has_llm == TRUE)) |>
+  count(llm_used_during_visit) |>
+  mutate(prop = round(n / sum(n), 2))
+
+data_separated_filtered_llm_interact |>
+  gt()
+```
+
+```{r}
+data_separated_filtered_llm_interact |>
+  ggtexttable()
+```
+
+#### fingerprint unique
+
+```{r data_separated_filtered_llm_interact_fingerprint}
+data_separated_filtered_llm_interact_fingerprint <-
+  data_separated_filtered |>
+  mutate(has_llm = str_detect(value, "llm")) |>
+  group_by(fingerprint) |>
+  summarise(llm_used_during_visit = any(has_llm == TRUE)) |>
+  count(llm_used_during_visit) |>
+  mutate(prop = round(n / sum(n), 2))
+
+data_separated_filtered_llm_interact_fingerprint |>
+  gt()
+```
+
+```{r}
+data_separated_filtered_llm_interact_fingerprint |>
+  ggtexttable()
+```
+
+
+
+
+### ... Im Zeitverlauf
+
+
+#### Absolutzahlen
+
+```{r idvisit_has_llm}
+idvisit_has_llm |>
+  head(30)
+```
+
+
+```{r idvisit_has_llm_timeline}
+idvisit_has_llm_timeline <-
+  idvisit_has_llm |>
+  count(year_month, uses_llm) |>
+  ungroup() |>
+  group_by(year_month) |>
+  mutate(prop = round(n / sum(n), 2))
+
+idvisit_has_llm_timeline
+```
+
+```{r}
+idvisit_has_llm_timeline |>
+  ggtexttable()
+```
+
+
+```{r idvisit_has_llm_plot}
+idvisit_has_llm |>
+  count(year_month, uses_llm) |>
+  ungroup() |>
+  mutate(year_month_date = ymd(paste0(year_month, "-01"))) |>
+  group_by(year_month_date) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(
+    x = year_month_date,
+    y = prop,
+    color = uses_llm,
+    groups = uses_llm
+  )) +
+  geom_point() +
+  geom_line(aes(group = uses_llm)) +
+  labs(
+    title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anteile)"
+  ) +
+  scale_x_date(breaks = pretty_breaks())
+```
+
+
+```{r}
+idvisit_has_llm |>
+  count(year_month, uses_llm) |>
+  ungroup() |>
+  mutate(year_month_date = ymd(paste0(year_month, "-01"))) |>
+  group_by(year_month) |>
+  ggplot(aes(x = year_month_date, y = n, color = uses_llm, groups = uses_llm)) +
+  geom_point() +
+  geom_line(aes(group = uses_llm)) +
+  labs(
+    title = "Visitors, die mit dem LLM interagieren im Zeitverlauf (Anzahl)"
+  ) +
+  scale_x_date(breaks = pretty_breaks())
+```
+
+#### Anteile
+```{r}
+idvisit_has_llm |>
+  count(year_month, uses_llm) |>
+  ungroup() |>
+  mutate(year_month_date = ymd(paste0(year_month, "-01"))) |>
+  group_by(year_month_date) |>
+  # ADDED: Calculate the proportion
+  mutate(proportion = n / sum(n)) |>
+
+  # Plot using the new 'proportion' variable
+  ggplot(aes(x = year_month_date, y = proportion, fill = uses_llm)) +
+
+  # ADDED: Use position = "fill"
+  geom_area(position = "fill") +
+
+  # ADDED: Format y-axis as percentage
+  scale_y_continuous(labels = scales::label_percent()) +
+
+  labs(
+    title = "Anteil der Besucher, die mit dem LLM interagieren (Prozent)",
+    y = "Prozentualer Anteil der Besucher",
+    fill = "Interagiert mit LLM"
+  ) +
+  scale_x_date(breaks = pretty_breaks())
+```
+
+
+## Länge der Prompts
+
+```{r}
+prompt_length_no_prompts <-
+  prompt_length |>
+  select(-any_of(c("prompt", "value", "type")))
+```
+
+
+```{r}
+prompt_length_no_prompts |>
+  ggplot(aes(x = token_length)) +
+  geom_histogram(binwidth = 10) +
+  labs(
+    title = "Length of prompts sent to the LLM",
+    x = "Prompt length (in tokens)",
+    y = "Number of prompts"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+describe_distribution(
+  prompt_length$prompt_length,
+  centrality = c("mean", "median")
+)
+```
+
+
+
+## Anzahl der Interaktionen bei den Usern, die mit dem LLM interagieren
+
+```{r d_n_interactions_w_llm}
+d_n_interactions_w_llm <-
+  data_separated_filtered |>
+  filter(type == "eventcategory") |>
+  filter(str_detect(value, "llm")) |>
+  group_by(idvisit) |>
+  summarise(n_interactions_w_llm = n())
+```
+
+```{r d_n_interactions_w_llm-describe-distro}
+d_n_interactions_w_llm |>
+  select(n_interactions_w_llm) |>
+  describe_distribution() |>
+  print_md()
+```
+
+
+```{r d_n_interactions_w_llm-plot}
+d_n_interactions_w_llm |>
+  ggplot(aes(x = n_interactions_w_llm)) +
+  geom_histogram()
+```
+
+
+## Klick auf ein Wort im Transkript
+
+Ausgewertet wird im Folgenden die Variable "click_transcript_word".
+
+### Insgesamt
+
+
+```{r ai-click-transcript-word}
+data_separated_filtered |>
+  filter(type == "subtitle") |>
+  # rm empty rows:
+  filter(!is.na(value) & value != "") |>
+  count(click_transcript_word = str_detect(value, "click_transcript_word")) |>
+  mutate(prop = round(n / sum(n), 2)) |>
+  gt()
+```
+
+
+
+### Im Zeitverlauf
+
+#### idvisit
+
+```{r click_transcript_word_per_month}
+click_transcript_word_per_month <-
+  data_separated_filtered |>
+  # rm all groups WITHOUT "click_transcript_word":
+  group_by(idvisit) |>
+  filter(!any(value = str_detect(value, "click_transcript_word"))) |>
+  ungroup() |>
+  mutate(date_visit = ymd_hms(value)) |>
+  mutate(month_visit = floor_date(date_visit, unit = "month")) |>
+  drop_na(date_visit) |>
+  group_by(idvisit) |>
+  slice(1) |>
+  ungroup() |>
+  count(month_visit)
+
+click_transcript_word_per_month
+```
+
+
+```{r click_transcript_word_per_month_plot}
+click_transcript_word_per_month |>
+  ggplot(aes(x = month_visit, y = n)) +
+  geom_line()
+```
+
+#### fingerprint unique
+
+
+```{r click_transcript_word_per_month_2}
+click_transcript_word_per_month_fingerprint <-
+  data_separated_filtered |>
+  # rm all groups WITHOUT "click_transcript_word":
+  group_by(fingerprint) |>
+  filter(!any(value = str_detect(value, "click_transcript_word"))) |>
+  ungroup() |>
+  mutate(date_visit = ymd_hms(value)) |>
+  mutate(month_visit = floor_date(date_visit, unit = "month")) |>
+  drop_na(date_visit) |>
+  group_by(fingerprint) |>
+  slice(1) |>
+  ungroup() |>
+  count(month_visit)
+
+click_transcript_word_per_month_fingerprint
+```
+
+
+```{r click_transcript_word_per_month_plot_2}
+click_transcript_word_per_month_fingerprint |>
+  ggplot(aes(x = month_visit, y = n)) +
+  geom_line()
+```
+
+## KI-Aktionen
+
+### Insgesamt (ganzer Zeitraum)
+
+
+```{r}
+data_long |>
+  head(300)
+```
+
+
+### Im Detail
+
+
+
+```{r ai-actions-count}
+regex_pattern <- "Category: \"(.*?)(?=', Action)"
+
+# Explaining this regex_pattern:
+# Find the literal string
+# 1. `Category: ` (surrounded by quotation marks)
+# 2. Capture any characters (.*?) that follow, non-greedily, until...
+# 3. ...it encounters the literal sequence,  ` Action`) immediately after the captured string.
+
+ai_actions_count <-
+  data_long |>
+  # slice(1:1000) |>
+  filter(str_detect(value, "transcript")) |>
+  mutate(category = str_extract(value, regex_pattern)) |>
+  select(category) |>
+  mutate(category = str_replace_all(category, "[\"']", "")) |>
+  count(category, sort = TRUE)
+
+ai_actions_count |>
+  tt()
+```
+
+
+
+
+
+
+
+
+
+### KI-Klicks pro Monat
+
+Im Objekt wird gezählt, wie oft der String `"click_transcript_word"` in den Daten (Langformat) gefunden wird, s. Target `ai_transcript_clicks_per_month` in der Targets-Pipeline.
+
+
+
+```{r ai_transcript_clicks_per_month}
+ai_transcript_clicks_per_month |>
+  head(30)
+```
+
+
+
+```{r ai-click-transcript-word-months}
+ai_transcript_clicks_per_month_count <-
+  ai_transcript_clicks_per_month |>
+  count(year_month, clicks_transcript_any) |>
+  ungroup() |>
+  group_by(year_month) |>
+  mutate(prop = round(n / sum(n), 2))
+
+ai_transcript_clicks_per_month_count
+```
+
+
+```{r}
+ai_transcript_clicks_per_month_count |>
+  ggtexttable()
+```
+
+
+```{r ai_transcript_clicks_per_month_count-plot}
+ai_transcript_clicks_per_month_count |>
+  mutate(date = ymd(paste0(year_month, "-01"))) |>
+  ggplot(aes(x = date, y = n)) +
+  geom_line(group = 1) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Number of AI transcript clicks per month", x = "date [months]")
+```
+
+
+
+## Output des LLMs: `llm_response` - Tokens und Tokenlänge
+
+
+
+### Deutsch vs. Englisch
+
+
+```{r llm_response_text-count}
+llm_response_text |>
+  count(lang) |>
+  mutate(prob = n / sum(n))
+```
+
+### Anzahl der Tokens
+
+```{r}
+llm_response_text |>
+  describe_distribution(select = "tokens_n")
+```
+
+
+
+### Anzahl vorab existierender Fragen
+
+
+#### Anzahl `verify_option_wrong` und `verify_option_correct`
+
+##### idvisit
+
+
+```{r verify_option_summary_dt}
+verify_option_summary <- as.data.table(data_separated_filtered)[,
+  .(idvisit, value) # keep only needed columns
+][
+  value %chin% c("verify_option_wrong", "verify_option_correct"), # filter
+  .(verify_option = .N), # summarise count
+  by = idvisit
+]
+
+verify_option_summary <- as_tibble(verify_option_summary)
+```
+
+
+
+```{r verify_option_summary}
+#| eval: false
+verify_option_summary <-
+  data_separated_filtered |>
+  group_by(idvisit) |>
+  filter(value == "verify_option_wrong" | value == "verify_option_correct") |>
+  summarise(verify_option = n())
+```
+
+```{r}
+verify_option_summary |>
+  gghistogram(x = "verify_option")
+```
+
+```{r}
+verify_option_summary |>
+  describe_distribution(verify_option) |>
+  print_md()
+```
+
+##### fingerprint unique
+
+```{r verify_option_summary_2}
+# verify_option_summary_fingerprint <-
+#   data_separated_filtered |>
+#   group_by(fingerprint) |>
+#   filter(value == "verify_option_wrong" | value == "verify_option_correct") |>
+#   summarise(verify_option = n())
+
+setDT(data_separated_filtered) # Ensure your data frame is a data.table
+
+verify_option_summary_fingerprint <- data_separated_filtered[
+  # 1. Filtering (i)
+  value %in% c("verify_option_wrong", "verify_option_correct"),
+
+  # 2. Summarize (.j) - calculate the count (n)
+  .(verify_option = .N),
+
+  # 3. Grouping (by)
+  by = .(fingerprint)
+]
+
+verify_option_summary_fingerprint <- as_tibble(
+  verify_option_summary_fingerprint
+)
+```
+
+```{r}
+verify_option_summary_fingerprint |>
+  gghistogram(x = "verify_option")
+```
+
+```{r}
+verify_option_summary_fingerprint |>
+  describe_distribution(verify_option) |>
+  print_md()
+```
+
+#### Anzahl `verify_option_wrong` verify_option_div_by_4 - geteilt durch 4
+
+```{r}
+verify_option_summary <-
+  verify_option_summary |>
+  mutate(verify_option_div_by_4 = verify_option / 4)
+
+verify_option_summary |>
+  gghistogram(x = "verify_option_div_by_4")
+```
+
+```{r}
+verify_option_summary |>
+  mutate(verify_option_div_by_4 = verify_option / 4) |>
+  describe_distribution(verify_option_div_by_4) |>
+  print_md()
+```
+
+#### Anzahl "Multiple choice answer selected"
+
+```{r}
+check_if_both_methods_give_same_number <-
+  n_mc_answers_selected |>
+  full_join(verify_option_summary)
+
+check_if_both_methods_give_same_number |>
+  head(20) |>
+  gt()
+```
+
+Nein, beide Methoden liefern *nicht* die gleiche Zahl.
+
+
+####  "Multiple choice answer selected" im Zeitverlauf
+
+```{r}
+mc_answers_with_timestamps <-
+  mc_answers_with_timestamps |>
+  mutate(month_start = floor_date(timestamp, "month")) |>
+  ungroup() |>
+  arrange(timestamp) |>
+  mutate(n_cumulated = cumsum(n)) |>
+  mutate(date = as.Date(timestamp))
+
+lim <- c(
+  min(mc_answers_with_timestamps$date),
+  max(mc_answers_with_timestamps$date)
+)
+
+mc_answers_with_timestamps |>
+  ggplot(aes(x = date, y = n_cumulated)) +
+  scale_x_date(limits = lim, labels = scales::label_date_short()) +
+  geom_point() +
+  geom_line()
+```
+
+#### Anzahl `generate_questionaire`
+
+```{r generate_questionaire_summary}
+# generate_questionaire_summary <-
+#   data_separated_filtered |>
+#   group_by(idvisit) |>
+#   filter(value == "generate_questionaire") |>
+#   summarise(generate_questionaire = n())
+
+setDT(data_separated_filtered) # Convert the data.frame to a data.table in place
+
+generate_questionaire_summary <- data_separated_filtered[
+  # 1. Filtering (i)
+  value == "generate_questionaire",
+
+  # 2. Summarize (.j) - calculate the count (.N) and rename it
+  .(generate_questionaire = .N),
+
+  # 3. Grouping (by)
+  by = .(idvisit)
+]
+```
+
+
+```{r}
+generate_questionaire_summary |>
+  describe_distribution(generate_questionaire) |>
+  print_md()
+```
+
+
+
+
+
+#### Anzahl vorab existierender Fragen
+
+
+```{r prior_existing_questions_summary}
+setDT(generate_questionaire_summary)
+setDT(verify_option_summary)
+
+# 1. Full Join (Merge)
+# Use the 'merge' function with all.x=TRUE and all.y=TRUE for a full join
+# Assumes the join column is 'idvisit' as used in your previous examples
+prior_existing_questions_summary <- merge(
+  generate_questionaire_summary,
+  verify_option_summary,
+  by = "idvisit",
+  all = TRUE
+)
+
+# 2. Mutate (Calculation)
+# Use .j to create the new column
+prior_existing_questions_summary[,
+  prior_existing_questions_n := verify_option - generate_questionaire
+]
+
+# prior_existing_questions_summary <-
+#   generate_questionaire_summary |>
+#   full_join(verify_option_summary) |>
+#   mutate(prior_existing_questions_n = verify_option - generate_questionaire)
+```
+
+
+```{r}
+prior_existing_questions_summary |>
+  # drop_na() |>
+  gghistogram(x = "prior_existing_questions_n")
+```
+
+
+```{r}
+prior_existing_questions_summary |>
+  describe_distribution(prior_existing_questions_n) |>
+  print_md()
+```
+
+
+
+
+
+
+
+
+
+
+## Input zum LLM: `message_to_llm` - Tokens und Tokenlänge
+
+```{r}
+prompt_length |>
+  head()
+```
+
+```{r}
+prompt_length |>
+  describe_distribution(token_length)
+```
+
+```{r}
+prompt_length |>
+  ggplot(aes(x = token_length)) +
+  geom_histogram(binwidth = 10) +
+  labs(
+    title = "Length of prompts sent to the LLM",
+    x = "Prompt length (in tokens)",
+    y = "Number of prompts"
+  ) +
+  theme_minimal()
+```
+
+
+
+
+

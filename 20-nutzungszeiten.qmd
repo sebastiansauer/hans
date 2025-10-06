@@ -1,0 +1,1051 @@
+
+# Zeitraum
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(gt)
+library(visdat)
+library(data.table)
+#library(collapse)
+library(targets)
+library(easystats)
+library(scales)
+```
+
+```{r}
+source("_common.r")
+```
+
+
+
+```{r}
+tar_load(c(
+  course_and_uni_per_visit,
+  n_action,
+  n_action_w_date,
+  time_since_last_visit,
+  time_visit_wday,
+  n_action_fingerprint,
+  time_visit_wday_fingerprint,
+  data_separated_filtered
+))
+
+```
+
+## Beginn/Ende der Daten
+
+
+
+```{r time_minmax-load}
+n_action_w_date |>
+  head(30)
+```
+
+
+```{r comp-time-min-max}
+min_max_time <-
+  n_action_w_date |>
+  summarise(
+    time_min = min(date_time_start, na.rm = T),
+    time_max = max(date_time_start, na.rm = T)
+  )
+
+min_max_time |>
+  gt()
+```
+
+
+
+:::{.callout-important}
+Erster Visit im Datensatz: `r min_max_time$time_min`.
+
+Letzter Visit im Datensatz: `r min_max_time$time_max`.
+:::
+
+
+
+Diese Statistik wurde auf Basis des Datenobjekts `data_separated_filtered` berechnet,
+vgl. [das Target dieses Objekts in der Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L170).
+
+
+
+
+## Days since last visit
+
+### Insgesamt
+
+#### idvisit
+```{r}
+time_visit_wday |>
+  head(30)
+```
+
+
+```{r days-since-last-visit}
+time_since_last_visit <-
+  time_since_last_visit |>
+  mutate(dayssincelastvisit = as.numeric(dayssincelastvisit)) |>
+  distinct(idvisit, .keep_all = TRUE)
+
+time_since_last_visit |>
+  datawizard::describe_distribution(dayssincelastvisit) |>
+  knitr::kable(digits = 2)
+
+time_since_last_visit |>
+  ggplot(aes(x = dayssincelastvisit)) +
+  geom_density() +
+  labs(
+    title = "If visitor return, they return mostly not later than a few days."
+  )
+```
+
+
+:::{.callout-important}
+Die Nutzer nutzen die Seite in Abständen von wenigen Tagen?
+:::
+
+
+#### fingerprint unique
+
+```{r}
+time_visit_wday_fingerprint |> head()
+```
+
+
+```{r days-since-last-visit_finggerprint}
+time_since_last_visit_fingerprint <-
+  time_since_last_visit |>
+  mutate(dayssincelastvisit = as.numeric(dayssincelastvisit)) |>
+  distinct(fingerprint, .keep_all = TRUE)
+
+time_since_last_visit |>
+  datawizard::describe_distribution(dayssincelastvisit) |>
+  knitr::kable(digits = 2)
+
+time_since_last_visit |>
+  ggplot(aes(x = dayssincelastvisit)) +
+  geom_density() +
+  labs(
+    title = "If visitor return, they return mostly not later than a few days."
+  )
+```
+
+
+
+
+### Nach Lehrveranstaltungen
+
+
+
+```{r time_since_last_visit_per_course}
+time_since_last_visit_per_course <-
+  time_since_last_visit |>
+  left_join(course_and_uni_per_visit) |>
+  drop_na()
+```
+
+
+```{r time_since_last_visit_per_course_summary}
+time_since_last_visit_per_course_summary <-
+  time_since_last_visit_per_course |>
+  group_by(course) |>
+  summarise(
+    dayssincelastvisit_mean = mean(dayssincelastvisit),
+    dayssincelastvisit_sd = sd(dayssincelastvisit),
+    dayssincelastvisit_n = n()
+  ) |>
+  mutate(
+    dayssincelastvisit_n_log = log(dayssincelastvisit_n, base = 10) + 0.001
+  )
+```
+
+
+```{r time_since_last_visit_per_course_summary-print}
+time_since_last_visit_per_course_summary
+```
+
+
+```{r time_since_last_visit_per_course_summary-plot}
+time_since_last_visit_per_course_summary |>
+  ggplot(aes(
+    y = reorder(course, dayssincelastvisit_mean),
+    x = dayssincelastvisit_mean
+  )) +
+  geom_errorbar(aes(
+    xmin = dayssincelastvisit_mean - dayssincelastvisit_sd,
+    xmax = dayssincelastvisit_mean + dayssincelastvisit_sd
+  )) +
+  geom_point(aes(alpha = log(dayssincelastvisit_n)), show.legend = FALSE) +
+  labs(
+    x = "Days since last visit (mean±sd)",
+    y = "course",
+    title = "In some courses, users use HaNS frequently.",
+    caption = "Grey saturation of the mean dots refers to the log10 of the sample size (N)"
+  ) +
+  geom_text(
+    aes(label = round(dayssincelastvisit_n)),
+    x = Inf,
+    hjust = 1.2,
+    size = 2
+  ) +
+  annotate(
+    x = Inf,
+    y = Inf,
+    label = "N",
+    geom = "label",
+    hjust = 1,
+    vjust = 1
+  ) +
+  scale_y_discrete(expand = expansion(mult = 0.1)) +
+  theme_minimal()
+```
+
+
+
+
+## Visits im Zeitverlauf
+
+Wie viele Visits (von Hans) gab es?
+
+
+### Pro Monat
+
+#### idivisit
+
+```{r time_visit_wday_summary}
+time_visit_wday_summary <-
+  time_visit_wday |>
+  ungroup() |>
+  mutate(month_start = floor_date(date_time, "month")) |>
+  mutate(
+    month_name = lubridate::month(date_time, label = TRUE, abbr = FALSE),
+    month_num = lubridate::month(date_time, label = FALSE),
+    year_num = lubridate::year(date_time)
+  )
+```
+
+
+```{r time_visit_wday_summary-table}
+time_visit_wday_summary |>
+  group_by(year_num, month_num) |>
+  summarise(n = n()) |>
+  gt()
+```
+
+
+
+
+```{r time_visit_wday_summary2-plot}
+time_visit_wday_summary |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = month_start, y = n)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    title = "The number of visits reflect the teaching periods of the semesters.",
+    x = "month/year"
+  )
+```
+
+#### fingerprint
+
+
+```{r time_visit_wday_summary_2}
+time_visit_wday_summary_fingerprint <-
+  time_visit_wday_fingerprint |>
+  ungroup() |>
+  mutate(month_start = floor_date(date_time, "month")) |>
+  mutate(
+    month_name = lubridate::month(date_time, label = TRUE, abbr = FALSE),
+    month_num = lubridate::month(date_time),
+    year_num = lubridate::year(date_time)
+  )
+```
+
+
+```{r time_visit_wday_summary-table_3}
+time_visit_wday_summary_fingerprint |>
+  group_by(year_num, month_num) |>
+  summarise(n = n()) |>
+  gt()
+```
+
+
+
+
+```{r time_visit_wday_summary2-plot_2}
+time_visit_wday_summary_fingerprint |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = month_start, y = n)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    title = "The number of visits reflect the teaching periods of the semesters.",
+    x = "month/year"
+  )
+```
+
+
+
+#### fingerprint unique
+
+
+```{r time_visit_wday_summary_3}
+time_visit_wday_summary_fingerprint_unique <-
+  time_visit_wday_fingerprint |>
+  ungroup() |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  mutate(month_start = floor_date(date_time, "month")) |>
+  mutate(
+    month_name = lubridate::month(date_time, label = TRUE, abbr = FALSE),
+    month_num = lubridate::month(date_time),
+    year_num = lubridate::year(date_time)
+  )
+```
+
+
+```{r time_visit_wday_summary-table_2}
+time_visit_wday_summary_fingerprint_unique |>
+  group_by(year_num, month_num) |>
+  summarise(n = n()) |>
+  gt()
+```
+
+
+
+
+```{r time_visit_wday_summary2-plot_3}
+time_visit_wday_summary_fingerprint_unique |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = month_start, y = n)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    title = "The number of visits reflect the teaching periods of the semesters.",
+    x = "month/year"
+  )
+```
+
+
+
+### Pro Woche
+
+
+```{r time_visit_wday_summary_week}
+time_visit_wday_summary_week <-
+  time_visit_wday |>
+  ungroup() |>
+  mutate(week_start = floor_date(date_time, "week")) |>
+  mutate(week_num = week(date_time), year_num = year(date_time))
+```
+
+
+
+```{r time_visit_wday_summary_week_summarized}
+time_visit_wday_summary_week_summarized <-
+  time_visit_wday_summary_week |>
+  group_by(year_num, week_num) |>
+  summarise(n = n())
+
+time_visit_wday_summary_week_summarized
+```
+
+
+
+```{r time_visit_wday_summary_week_summarized_dateformat}
+time_visit_wday_summary_week_summarized_dateformat <-
+  time_visit_wday_summary_week |>
+  group_by(week_start) |>
+  summarise(n = n())
+```
+
+
+```{r time_visit_wday_summary_week_summarized_dateformat-plot}
+time_visit_wday_summary_week_summarized_dateformat |>
+  ggplot(aes(x = week_start, y = n)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  geom_smooth(method = "gam", se = FALSE, color = "blue") +
+  labs(
+    title = "The number of visits is increasing and reflects the teaching periods of the semesters.",
+    x = "week number/year"
+  )
+```
+
+
+:::{.callout-important}
+The number of visits has increased over time.
+:::
+
+
+### Akkumulierte Seitenaufrufe im Zeitverlauf
+
+#### Monat - idvisit
+
+
+```{r time_visit_wday_summary-plot}
+time_visit_wday_summary |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ungroup() |>
+  mutate(n_cumsum = cumsum(n)) |>
+  ggplot(aes(x = month_start, y = n_cumsum)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  theme_minimal() +
+  geom_smooth(method = "lm") +
+  labs(title = "Visits have increased linearly over time.", x = "month/year")
+```
+
+
+#### Monat - fingerprint
+
+
+```{r time_visit_wday_summary-plot_2}
+time_visit_wday_summary_fingerprint |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ungroup() |>
+  mutate(n_cumsum = cumsum(n)) |>
+  ggplot(aes(x = month_start, y = n_cumsum)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  theme_minimal() +
+  geom_smooth(method = "lm") +
+  labs(title = "Visits have increased linearly over time.", x = "month/year")
+```
+
+
+#### Monat - fingerprint unique
+
+
+```{r time_visit_wday_summary-plot_2_2}
+time_visit_wday_summary_fingerprint_unique |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ungroup() |>
+  mutate(n_cumsum = cumsum(n)) |>
+  ggplot(aes(x = month_start, y = n_cumsum)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  theme_minimal() +
+  geom_smooth(method = "lm") +
+  labs(title = "Visits have increased linearly over time.", x = "month/year")
+```
+
+#### Woche
+
+
+```{r}
+time_visit_wday_summary_week |>
+  group_by(year_num, week_start) |>
+  summarise(n = n()) |>
+  ungroup() |>
+  mutate(n_cumsum = cumsum(n)) |>
+  ggplot(aes(x = week_start, y = n_cumsum)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  theme_minimal() +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Visits have increased approx. linearly over time.",
+    x = "week/year"
+  )
+```
+
+
+## Statistiken
+
+Die folgenden Statistiken beruhen auf dem Datensatz `data_separated_filtered`:
+
+### idivisit
+
+```{r}
+glimpse(data_separated_filtered)
+```
+
+`nr` fasst die Nummer der Aktion innerhalb eines bestimmten Visits.
+
+### fingerprint unique
+
+```{r}
+data_separated_filtered |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  glimpse()
+```
+
+
+## Mit allen Daten (den 499er-Daten)
+
+### idvisit 
+
+```{r tbl_n_action}
+tbl_n_action <-
+  n_action |>
+  describe_distribution(nr_max, centrality = c("median", "mean"))
+
+tbl_n_action
+```
+
+
+
+
+![](tbl_count_action.png)
+
+
+
+`nr_max` gibt den Maximalwert von `nr` zurück, sagt also, wie viele Aktionen maximal während eines Vitis ausgeführt wurden.
+
+Betrachtet man die Anzahl der Aktionen pro Visit näher, so fällt auf, dass der Maximalwert (499) sehr häufig vorkommt:
+
+```{r count-action-plot}
+n_action |>
+  count(nr_max) |>
+  ggplot(aes(x = nr_max, y = n)) +
+  geom_col() +
+  geom_vline(
+    xintercept = tbl_n_action$Median,
+    color = "blue",
+    linetype = "dashed"
+  ) +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many."
+  )
+
+```
+
+
+:::{.callout-important}
+Die meisten Nutzer machen nur wenige Aktionen pro Visit,
+aber einige machen sehr viele.
+:::
+
+Hier noch in einer anderen Darstellung:
+
+```{r count-action-plot2}
+n_action |>
+  count(nr_max) |>
+  ggplot(aes(x = nr_max, y = n)) +
+  geom_point()
+```
+
+Der Maximalwert ist einfach auffällig häufig:
+
+
+```{r n-action-table}
+n_action |>
+  count(nr_max == 499) |>
+  gt()
+```
+
+
+Es erscheint plausibel, dass der Maximalwert alle "gekappten" (*zensierten*, abgeschnittenen) Werte fasst, 
+also viele Werte, die eigentlich größer wären (aber dann zensiert wurden).
+
+
+### fingerprint
+
+```{r tbl_n_action_2}
+tbl_n_action_fingerprint <-
+  n_action_fingerprint |>
+  describe_distribution(nr_max, centrality = c("median", "mean"))
+
+tbl_n_action_fingerprint
+```
+
+
+
+```{r count-action-plot-fingerprint}
+n_action_fingerprint |>
+  count(nr_max) |>
+  ggplot(aes(x = nr_max, y = n)) +
+  geom_col() +
+  geom_vline(
+    xintercept = tbl_n_action_fingerprint$Median,
+    color = "blue",
+    linetype = "dashed"
+  ) +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many."
+  )
+
+```
+
+
+### fingerprint unique
+
+```{r tbl_n_action_2_2}
+tbl_n_action_fingerprint_unique <-
+  n_action_fingerprint |>
+  distinct(fingerprint, .keep_all = TRUE)
+
+tbl_n_action_fingerprint_unique |>
+  describe_distribution(nr_max, centrality = c("median", "mean"))
+
+```
+
+
+
+```{r count-action-plot-fingerprint_2}
+tbl_n_action_fingerprint_unique |>
+  count(nr_max) |>
+  ggplot(aes(x = nr_max, y = n)) +
+  geom_col() +
+  geom_vline(
+    xintercept = tbl_n_action_fingerprint_unique$Median,
+    color = "blue",
+    linetype = "dashed"
+  ) +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many."
+  )
+
+```
+
+
+## Nur Visitors, für die weniger als 500 Aktionen protokolliert sind
+
+
+### idvisit
+
+```{r count-action-tbl2}
+n_action_lt_500 <-
+  n_action |>
+  filter(nr_max != 499)
+
+n_action_lt_500 |>
+  describe_distribution(nr_max) |>
+  gt() |>
+  fmt_number(columns = where(is.numeric), decimals = 2)
+```
+
+
+### fingerprint
+
+
+```{r count-action-tbl2-fingerpint}
+n_action_lt_500_fingerprint <-
+  n_action_fingerprint |>
+  filter(nr_max != 499)
+
+n_action_lt_500_fingerprint |>
+  describe_distribution(nr_max) |>
+  gt() |>
+  fmt_number(columns = where(is.numeric), decimals = 2)
+```
+
+### fingerprint unique
+
+
+```{r count-action-tbl2-fingerpint_2}
+n_action_lt_500_fingerprint_unique <-
+  n_action_fingerprint |>
+  filter(nr_max != 499) |>
+  distinct(fingerprint, .keep_all = TRUE)
+
+n_action_lt_500_fingerprint_unique |>
+  describe_distribution(nr_max) |>
+  gt() |>
+  fmt_number(columns = where(is.numeric), decimals = 2)
+```
+
+
+
+## An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?
+
+### Setup
+
+#### idvisit
+
+```{r setup-dates}
+# Define a vector with the names of the days of the week
+# Note: Adjust the start of the week (Sunday or Monday) as per your requirement
+days_of_week <- c(
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+)
+
+# Replace numbers with day names
+time_visit_wday$dow2 <- factor(
+  days_of_week[time_visit_wday$dow],
+  levels = days_of_week
+)
+```
+
+#### fingerprint
+```{r setup-dates-fin}
+# Define a vector with the names of the days of the week
+# Note: Adjust the start of the week (Sunday or Monday) as per your requirement
+days_of_week <- c(
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+)
+
+# Replace numbers with day names
+time_visit_wday_fingerprint$dow2 <- factor(
+  days_of_week[time_visit_wday_fingerprint$dow],
+  levels = days_of_week
+)
+```
+
+### HaNS-Login nach Uhrzeit
+
+#### idvisit
+```{r vis-hans-login-hour}
+time_visit_wday |>
+  as_tibble() |>
+  count(hour) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "HaNS-Nutzer sind keine Frühaufsteher",
+    x = "Uhrzeit",
+    y = "Anteil"
+  )
+# coord_polar()
+```
+
+#### fingerprint unique
+
+```{r vis-hans-login-hour-fi}
+time_visit_wday_summary_fingerprint |>
+  as_tibble() |>
+  distinct(hour, .keep_all = TRUE) |>
+  count(hour) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "HaNS-Nutzer sind keine Frühaufsteher",
+    x = "Uhrzeit",
+    y = "Anteil"
+  )
+# coord_polar()
+```
+
+
+```{r vis-hans-login-hour-polar}
+time_visit_wday |>
+  as_tibble() |>
+  count(hour) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  coord_polar()
+```
+
+
+
+### Verteilung der HaNS-Besuche nach Wochentagen
+
+
+#### idvisit
+
+```{r vis-hans-login-wday-bar}
+time_visit_wday |>
+  as_tibble() |>
+  count(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = dow2, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen",
+    x = "Wochentag",
+    y = "Anteil"
+  )
+# coord_polar()
+```
+
+
+
+
+```{r vis-hans-login-wday-polar-fi}
+time_visit_wday |>
+  as_tibble() |>
+  count(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = dow2, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen",
+    x = "Wochentag",
+    y = "Anteil"
+  ) +
+  coord_polar()
+```
+
+##### fingerprint
+
+
+```{r vis-hans-login-wday-bar-fi}
+time_visit_wday_fingerprint |>
+  as_tibble() |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  count(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = dow2, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen",
+    x = "Wochentag",
+    y = "Anteil"
+  )
+# coord_polar()
+```
+
+
+
+
+```{r vis-hans-login-wday-polar}
+time_visit_wday_fingerprint |>
+  as_tibble() |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  count(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = dow2, y = prop)) +
+  geom_col() +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen",
+    x = "Wochentag",
+    y = "Anteil"
+  ) +
+  coord_polar()
+```
+
+
+#### HaNS-Login nach Wochentagen Uhrzeit
+
+##### idvisit
+
+```{r vis-hans-login-wday-hour}
+time_visit_wday |>
+  as_tibble() |>
+  count(dow2, hour) |>
+  group_by(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  facet_wrap(~dow2) +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten",
+    x = "Wochentag",
+    y = "Anteil"
+  )
+# coord_polar()
+```
+
+
+
+```{r vis-hans-login-wday-hour-polar}
+#| fig-width: 9
+#| fig-asp: 1.5
+time_visit_wday |>
+  as_tibble() |>
+  count(dow2, hour) |>
+  group_by(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  facet_wrap(~dow2) +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten",
+    x = "Wochentag",
+    y = "Anteil"
+  ) +
+  coord_polar()
+```
+
+##### fingerprint
+
+
+```{r vis-hans-login-wday-hour_2}
+time_visit_wday_fingerprint |>
+  as_tibble() |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  count(dow2, hour) |>
+  group_by(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  facet_wrap(~dow2) +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten",
+    x = "Wochentag",
+    y = "Anteil"
+  )
+# coord_polar()
+```
+
+
+
+```{r vis-hans-login-wday-hour-polar_2}
+#| fig-width: 9
+#| fig-asp: 1.5
+time_visit_wday_fingerprint |>
+  as_tibble() |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  count(dow2, hour) |>
+  group_by(dow2) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = hour, y = prop)) +
+  geom_col() +
+  facet_wrap(~dow2) +
+  theme_minimal() +
+  labs(
+    title = "Verteilung der HaNS-Logins nach Wochentagen und Uhrzeiten",
+    x = "Wochentag",
+    y = "Anteil"
+  ) +
+  coord_polar()
+```
+
+
+### Anzahl der Visits nach Datum (Tagen) und Uhrzeit (bin2d)
+
+#### idvisit
+
+```{r}
+time2 <-
+  time_visit_wday |>
+  ungroup() |>
+  mutate(date = as.Date(date_time)) |>
+  mutate(month_start = floor_date(date_time, "month"))
+
+time2 |>
+  ggplot(aes(x = date, y = hour)) +
+  geom_bin2d(binwidth = c(1, 1)) + # (1 day, 1 hour)
+  scale_x_date(date_breaks = "1 month") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(caption = "Each x-bin maps to one week") +
+  scale_x_date(breaks = breaks_pretty())
+
+```
+
+#### fingerprint unique
+
+```{r}
+time2_fingerprint <-
+  time_visit_wday_fingerprint |>
+  ungroup() |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  mutate(date = as.Date(date_time)) |>
+  mutate(month_start = floor_date(date_time, "month"))
+
+time2_fingerprint |>
+  ggplot(aes(x = date, y = hour)) +
+  geom_bin2d(binwidth = c(1, 1)) + # (1 day, 1 hour)
+  scale_x_date(date_breaks = "1 month") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(caption = "Each x-bin maps to one week") +
+  scale_x_date(breaks = breaks_pretty())
+
+```
+
+### Anzahl der Visits nach Datum (Wochen) und Uhrzeit (bin2d)
+
+#### idvisit
+
+```{r}
+time2 |>
+  ggplot(aes(x = date, y = hour)) +
+  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(
+    x = "Week number in 2023/2024",
+    caption = "Each x-bin maps to one week"
+  ) +
+  scale_x_date(breaks = breaks_pretty())
+```
+
+#### fingerprint
+
+
+```{r}
+time2_fingerprint |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  ggplot(aes(x = date, y = hour)) +
+  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(
+    x = "Week number in 2023/2024",
+    caption = "Each x-bin maps to one week"
+  ) +
+  scale_x_date(breaks = breaks_pretty())
+```
+
+
+### Anzahl der Visits nach Datum (Wochen) und Wochentag (bin2d)
+
+
+#### idvisit
+
+
+```{r p-visits-day-wday}
+time2 |>
+  ggplot(aes(x = date, y = dow)) +
+  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(
+    x = "Week number in 2023/2024",
+    caption = "Each x-bin maps to one week",
+    y = "Day of Week"
+  ) +
+  scale_y_continuous(breaks = 1:7) +
+  scale_x_date(breaks = breaks_pretty())
+```
+
+#### fingerprint
+
+```{r p-visits-day-wday_2}
+time2_fingerprint |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  ggplot(aes(x = date, y = dow)) +
+  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
+  scale_x_date(date_breaks = "1 week", date_labels = "%W") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis_c() +
+  labs(
+    x = "Week number in 2023/2024",
+    caption = "Each x-bin maps to one week",
+    y = "Day of Week"
+  ) +
+  scale_y_continuous(breaks = 1:7) +
+  scale_x_date(breaks = breaks_pretty())
+```
+

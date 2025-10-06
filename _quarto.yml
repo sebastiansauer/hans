@@ -1,0 +1,40 @@
+project:
+  type: book
+
+
+book:
+  title: "Analyse der HaNS-Matomo-Daten"
+  author: Sebastian Sauer
+  chapters:
+    - index.qmd
+    - 10-nutzereigenschaften.qmd
+    - 20-nutzungszeiten.qmd
+    - 30-nutzungsdauer.qmd
+    - 40-nutzungsarten.qmd
+    - 50-video.qmd
+    - 60-llm.qmd
+
+toc: true
+number-sections: true
+
+format: 
+  html:
+    theme: lumen
+    embed-resources: true
+    toc: true
+    toc-location: right
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    code-summary: "Show the code"
+    code-tools: true
+    df-print: paged
+lightbox: true
+
+execute: 
+  warning: false
+  cache: true
+  freeze: auto
+  
+params:
+   recompute_gt: false
