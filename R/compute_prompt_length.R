@@ -1,4 +1,4 @@
-compute_prompt_length <- function(data) {
+compute_prompt_length <- function(data, no_prompt_text = TRUE) {
   #' Compute the length of a prompt in characters
   #' This function computes the length of a given prompt in terms of number of characters.
   #' It takes a single argument 'prompt', which is expected to be a string.
@@ -17,8 +17,12 @@ compute_prompt_length <- function(data) {
   prompts <-
     llm_interactions |>
     mutate(prompt = str_extract(value, '(?<=Action: \\"\").*?(?=\\"\\")')) |>
-    mutate(token_length = lengths(tokenize_words(prompt))) |> 
-    select(-prompt, -value)
+    mutate(token_length = lengths(tokenize_words(prompt))) 
+  
+
+  if (no_prompt_text) {
+    prompts <- prompts |> select(-prompt)
+  }
 
   return(prompts)
 }
