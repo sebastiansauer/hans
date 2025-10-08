@@ -307,6 +307,7 @@ data_separated_filtered_date_uni_course_top5_uni |>
  
 
 ```{r}
+#| fig-asp: 1.5
 data_separated_filtered_date_uni_course_top5_uni |>
   # --- Visualization ---
   ggplot(aes(
