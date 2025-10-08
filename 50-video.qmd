@@ -91,9 +91,10 @@ glotzdauer_prepped <-
 glotzdauer_tbl <-
   glotzdauer_prepped |>
   select(time_diff_abs_sec, time_diff_abs_min) |>
-  describe_distribution() |> print_md()
+  describe_distribution()
 
-glotzdauer_tbl
+glotzdauer_tbl |>
+  print_md()
 ```
 
 ```{r glotzdauer_tbl-ggtexttable}
@@ -109,7 +110,7 @@ glotzdauer_tbl |>
 ```{r glotzdauer_prepped_tbl}
 glotzdauer_prepped_tbl <-
   glotzdauer_prepped |>
-  mutate(first_of_month = floor_date(date, unit = "month")) |>
+  mutate(first_of_month = floor_date(first_play, unit = "month")) |>
   group_by(first_of_month) |>
   summarise(time_diff_mean = mean(time_diff, na.rm = TRUE))
 
@@ -124,10 +125,3 @@ glotzdauer_prepped_tbl |>
   theme_minimal()
 ```
 
-
-## Veränderung der Videonutzung im Zeitverlauf
-
-
-```{r}
-#todo
-```
