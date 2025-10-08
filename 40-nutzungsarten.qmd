@@ -1,5 +1,5 @@
 
-# Was machen die User?
+# Nutzungsarten
 
 ## Setup
 
@@ -319,7 +319,7 @@ data_separated_filtered_date_uni_course_top5_uni |>
   geom_col() +
 
   # Separate plot for each university
-  facet_wrap(~university, scales = "free_y") +
+  facet_wrap(~university, scales = "free_y", ncol = 1) +
 
   # Flip coordinates for better readability of long category names
   coord_flip() +
