@@ -26,17 +26,22 @@ source("_common.r")
 
 
 ```{r load-targets}
-tar_load(c(
-  ai_transcript_clicks_per_month,
-  data_long,
-  data_separated_distinct_slice,
-  data_separated_filtered,
-  idvisit_has_llm,
-  llm_response_text,
-  n_mc_answers_selected,
-  mc_answers_with_timestamps,
-  prompt_length
-))
+tar_load(
+  c(
+    ai_transcript_clicks_per_month,
+    data_long,
+    data_separated_distinct_slice,
+    data_separated_filtered,
+    idvisit_has_llm,
+    llm_response_text,
+    n_mc_answers_selected,
+    mc_answers_with_timestamps,
+    prompt_length,
+    prompt_length_date_uni_course,
+    time_spent_w_course_university,
+    llm_response_text_date_course_uni
+  )
+)
 ```
 
 
@@ -357,7 +362,7 @@ d_n_interactions_w_llm |>
 ```
 
 
-```{r d_n_interactions_w_llm-plot}
+```{r d_n_interactions_w_llm-plot2}
 d_n_interactions_w_llm |>
   ggplot(aes(x = n_interactions_w_llm)) +
   geom_histogram()
@@ -385,7 +390,7 @@ d_n_interactions_w_llm_course_date_course_uni <-
   )
 ```
 
-```{r d_n_interactions_w_llm-describe-distro}
+```{r d_n_interactions_w_llm-describe-distro2}
 d_n_interactions_w_llm_course_date_course_uni |>
   # select(n_interactions_w_llm) |>
   group_by(university, course) |>
@@ -407,9 +412,85 @@ d_n_interactions_w_llm_course_date_course_uni |>
   summarise(n = n()) |>
   ggplot(aes(x = floor_date_month, y = n)) +
   geom_line()
+#todo
+
 ```
 
+```{r}
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tibble) # Needed for the tibble function
 
+# --- 1. Prepare Data ---
+# Your original data processing for the plot
+plot_data <- d_n_interactions_w_llm_course_date_course_uni |>
+  group_by(floor_date_month) |>
+  summarise(n = n()) |>
+  ungroup() # Ungroup after summarise for easier use with ggplot
+
+# --- 2. Determine Plot Range for Rectangles ---
+# Find the min/max year and n-count from your *processed* plot_data
+min_date <- min(plot_data$floor_date_month, na.rm = TRUE)
+max_date <- max(plot_data$floor_date_month, na.rm = TRUE)
+min_year <- year(min_date)
+max_year <- year(max_date)
+
+# Determine the Y-axis bounds for the rectangles
+y_min <- min(plot_data$n, na.rm = TRUE)
+y_max <- max(plot_data$n, na.rm = TRUE)
+
+# --- 3. Calculate the Rectangle Coordinates (rect_data) ---
+
+# Generate years for the rectangles, ensuring we cover the full range
+# including potentially starting a "winter" semester in the min_year-1
+# and ending in max_year+1
+rect_years <- seq(min_year - 1, max_year + 1)
+
+# Summer semester: March 1 (Y) to July 1 (Y)
+summer_rects <- tibble(year = rect_years) |>
+  mutate(
+    xmin = ymd(paste0(year, "-03-01")),
+    xmax = ymd(paste0(year, "-07-01"))
+  )
+
+# Winter semester: October 1 (Y) to February 1 (Y+1)
+winter_rects <- tibble(year = rect_years) |>
+  mutate(
+    xmin = ymd(paste0(year, "-10-01")),
+    xmax = ymd(paste0(year + 1, "-02-01"))
+  )
+
+# Combine, set Y bounds, and filter to the actual plot area
+rect_data <- bind_rows(summer_rects, winter_rects) |>
+  mutate(ymin = y_min, ymax = y_max) |>
+  # Only keep rectangles that are fully or partially within the plot's X range
+  filter(
+    xmin <= max_date,
+    xmax >= min_date
+  )
+
+# --- 4. Generate the Final Plot ---
+plot_data |>
+  ggplot(aes(x = floor_date_month, y = n)) +
+  # Add the transparent grey rectangles first
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  ) +
+  # Then plot the lines and points on top
+  geom_line() +
+  geom_point() + # Added point layer for clarity at each month
+  theme_minimal() +
+  labs(
+    title = "Number of Interactions with LLM per Course Date per University",
+    x = "Month",
+    y = "Number of Interactions"
+  )
+```
 
 ## Klick auf ein Wort im Transkript
 
@@ -695,10 +776,62 @@ llm_response_text |>
 
 ```{r}
 llm_response_text |>
+  describe_distribution(select = "tokens_n") |>
+  print_md()
+```
+
+### Anzahl der Token nach Universitäten
+
+```{r}
+llm_response_text_date_course_uni |>
+  group_by(university) |>
   describe_distribution(select = "tokens_n")
 ```
 
+```{r}
+llm_response_text_date_course_uni |>
+  ggviolin(
+    x = "university",
+    y = "tokens_n",
+    add = "mean_se"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Number of tokens in LLM responses by university",
+    x = "University",
+    y = "Number of tokens",
+    caption = "The dots represent the mean and the error bars the standard error of the mean."
+  ) +
+  coord_flip()
+```
 
+### Anzahl der Token nach Kursen
+
+```{r}
+llm_response_text_date_course_uni |>
+  group_by(course) |>
+  describe_distribution(select = "tokens_n") |>
+  print_md()
+
+```
+
+
+```{r}
+llm_response_text_date_course_uni |>
+  ggviolin(
+    x = "course",
+    y = "tokens_n",
+    add = "mean_se"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Number of tokens in LLM responses by course",
+    x = "Course",
+    y = "Number of tokens",
+    caption = "The dots represent the mean and the error bars the standard error of the mean."
+  ) +
+  coord_flip()
+```
 
 ### Anzahl vorab existierender Fragen
 
@@ -815,7 +948,7 @@ Nein, beide Methoden liefern *nicht* die gleiche Zahl.
 
 ####  "Multiple choice answer selected" im Zeitverlauf
 
-```{r}
+```{r mc_answers_with_timestamps}
 mc_answers_with_timestamps <-
   mc_answers_with_timestamps |>
   mutate(month_start = floor_date(timestamp, "month")) |>

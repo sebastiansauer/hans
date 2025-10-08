@@ -54,8 +54,8 @@ Die Definition [der Funktion glotzdauer.R](https://github.com/sebastiansauer/han
 
 ```{r}
 as_tibble(data_separated_distinct_slice) |>
-  drop_na() |> 
-  filter(first_play != Inf) |> 
+  drop_na() |>
+  filter(first_play != Inf) |>
   head(30)
 ```
 
@@ -129,5 +129,5 @@ glotzdauer_prepped_tbl |>
 
 
 ```{r}
-n_
+#todo
 ```
