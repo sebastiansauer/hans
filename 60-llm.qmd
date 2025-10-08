@@ -242,7 +242,7 @@ idvisit_has_llm |>
 ```
 
 
-## Länge der Prompts
+## Länge der Prompts (Input an das LLM)
 
 ```{r}
 prompt_length_no_prompts <-
@@ -250,6 +250,12 @@ prompt_length_no_prompts <-
   select(-any_of(c("prompt", "value", "type")))
 ```
 
+
+```{r}
+prompt_length_no_prompts |>
+  describe_distribution(token_length) |>
+  print_md()
+```
 
 ```{r}
 prompt_length_no_prompts |>
@@ -461,7 +467,110 @@ ai_transcript_clicks_per_month_count |>
   labs(title = "Number of AI transcript clicks per month", x = "date [months]")
 ```
 
+```{r ai_transcript_clicks_per_month_count-plot_with_semesters}
+# --- 1. Prepare Data and Determine Year Range ---
+# We assign the processed data to a temporary variable to calculate the year range.
+ai_clicks_data <- ai_transcript_clicks_per_month_count |>
+  mutate(date = ymd(paste0(year_month, "-01")))
 
+# --- 2. Calculate the Vertical Line Intercept Dates ---
+# Find the min/max year in the data
+min_year <- min(year(ai_clicks_data$date), na.rm = TRUE)
+max_year <- max(year(ai_clicks_data$date), na.rm = TRUE)
+years <- seq(min_year, max_year)
+
+# Define the target months: February (2), March (3), July (7), October (10)
+vline_dates <- expand.grid(
+  year = years,
+  month = c(2, 3, 7, 10)
+) |>
+  mutate(
+    date_str = paste0(year, "-", month, "-01"),
+    vline_date = ymd(date_str)
+  ) |>
+  # Filter to only include dates within the actual data range for plotting
+  filter(
+    vline_date >= min(ai_clicks_data$date) &
+      vline_date <= max(ai_clicks_data$date)
+  ) |>
+  pull(vline_date) |>
+  as.Date()
+
+# --- 3. Generate the Final Plot ---
+ai_clicks_data |>
+  ggplot(aes(x = date, y = n)) +
+  # Add the vertical lines
+  geom_vline(
+    xintercept = vline_dates,
+    color = "darkred",
+    linetype = "dashed",
+    alpha = 0.6
+  ) +
+  geom_line(group = 1) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Number of AI transcript clicks per month", x = "date [months]")
+```
+
+```{r ai_transcript_clicks_per_month_count-plot_with_semesters_shaded}
+
+# --- 1. Prepare Data and Determine Year Range ---
+# We assign the processed data to a temporary variable to calculate the year range.
+ai_clicks_data <- ai_transcript_clicks_per_month_count |>
+  mutate(date = ymd(paste0(year_month, "-01")))
+
+# Find the min/max year and n-count in the data
+min_year <- min(year(ai_clicks_data$date), na.rm = TRUE)
+max_year <- max(year(ai_clicks_data$date), na.rm = TRUE)
+years <- seq(min_year, max_year)
+
+# Determine the Y-axis bounds for the rectangles
+y_min <- min(ai_clicks_data$n, na.rm = TRUE)
+y_max <- max(ai_clicks_data$n, na.rm = TRUE)
+
+# --- 2. Calculate the Rectangle Coordinates (rect_data) ---
+
+# Period 1: March 1 (Y) to July 1 (Y)
+rect_data_mar_jul <- tibble(year = years) |>
+  mutate(
+    xmin = ymd(paste0(year, "-03-01")),
+    xmax = ymd(paste0(year, "-07-01"))
+  )
+
+# Period 2: October 1 (Y) to February 1 (Y+1)
+# We need to include max_year + 1 in the sequence to capture the end dates
+rect_data_oct_feb <- tibble(year = seq(min_year, max_year)) |>
+  mutate(
+    xmin = ymd(paste0(year, "-10-01")),
+    xmax = ymd(paste0(year + 1, "-02-01"))
+  )
+
+# Combine, set Y bounds, and filter to the actual plot area
+rect_data <- bind_rows(rect_data_mar_jul, rect_data_oct_feb) |>
+  mutate(ymin = y_min, ymax = y_max) |>
+  # Only keep rectangles that are fully or partially within the plot's X range
+  filter(
+    xmin <= max(ai_clicks_data$date, na.rm = TRUE),
+    xmax >= min(ai_clicks_data$date, na.rm = TRUE)
+  )
+
+# --- 3. Generate the Final Plot ---
+ai_clicks_data |>
+  ggplot(aes(x = date, y = n)) +
+  # Add the transparent grey rectangles first
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  ) +
+  # Then plot the lines and points on top
+  geom_line(group = 1) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Number of AI transcript clicks per month", x = "date [months]")
+```
 
 ## Output des LLMs: `llm_response` - Tokens und Tokenlänge
 
