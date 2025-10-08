@@ -14,12 +14,13 @@ compute_glotzdauer <- function(data_separated) {
 
   d_filtered_tibble |>
     filter(type != "eventation") |>
-    mutate(time_stamp = as_date(value)) |>
+    mutate(time_stamp = as_datetime(as.character(value))) |>
     group_by(idvisit) |>
     summarise(
       first_play = min(time_stamp, na.rm = TRUE),
       last_pause = max(time_stamp, na.rm = TRUE)
-    )
+    ) |>
+    mutate(time_diff = difftime(last_pause, first_play, units = "secs"))
 
   # Compute by group
   # d_glotzdauer_dt <- d_filtered[,

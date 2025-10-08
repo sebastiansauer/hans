@@ -91,7 +91,7 @@ glotzdauer_prepped <-
 glotzdauer_tbl <-
   glotzdauer_prepped |>
   select(time_diff_abs_sec, time_diff_abs_min) |>
-  describe_distribution()
+  describe_distribution() |> print_md()
 
 glotzdauer_tbl
 ```
