@@ -291,6 +291,80 @@ time_visit_wday_summary_fingerprint |>
 ```
 
 
+```{r}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+time_visit_wday_summary_fingerprint |>
+  group_by(year_num, month_start) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = month_start, y = n)) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+
+  # --- Your data lines ---
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    title = "The number of visits reflect the teaching periods of the semesters.",
+    x = "month/year"
+  ) +
+  theme_minimal()
+
+```
+
 
 #### fingerprint unique
 
@@ -400,7 +474,58 @@ time_visit_wday_summary |>
   geom_point() +
   theme_minimal() +
   geom_smooth(method = "lm") +
-  labs(title = "Visits have increased linearly over time.", x = "month/year")
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  )
 ```
 
 
@@ -418,7 +543,59 @@ time_visit_wday_summary_fingerprint |>
   geom_point() +
   theme_minimal() +
   geom_smooth(method = "lm") +
-  labs(title = "Visits have increased linearly over time.", x = "month/year")
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  )
 ```
 
 
@@ -436,7 +613,59 @@ time_visit_wday_summary_fingerprint_unique |>
   geom_point() +
   theme_minimal() +
   geom_smooth(method = "lm") +
-  labs(title = "Visits have increased linearly over time.", x = "month/year")
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  )
 ```
 
 #### Woche
@@ -456,6 +685,58 @@ time_visit_wday_summary_week |>
   labs(
     title = "Visits have increased approx. linearly over time.",
     x = "week/year"
+  ) +
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
   )
 ```
 
@@ -934,7 +1215,7 @@ time_visit_wday_fingerprint |>
 
 #### idvisit
 
-```{r}
+```{r time2-plot-heatmap}
 time2 <-
   time_visit_wday |>
   ungroup() |>
@@ -954,7 +1235,7 @@ time2 |>
 
 #### fingerprint unique
 
-```{r}
+```{r time2_fingerprint-plot-heatmap}
 time2_fingerprint <-
   time_visit_wday_fingerprint |>
   ungroup() |>
@@ -964,22 +1245,74 @@ time2_fingerprint <-
 
 time2_fingerprint |>
   ggplot(aes(x = date, y = hour)) +
-  geom_bin2d(binwidth = c(1, 1)) + # (1 day, 1 hour)
   scale_x_date(date_breaks = "1 month") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
   labs(caption = "Each x-bin maps to one week") +
-  scale_x_date(breaks = breaks_pretty())
+  scale_x_date(breaks = breaks_pretty()) +
+  labs(title = "Visits have increased linearly over time.", x = "month/year") +
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
 
-```
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
 
-### Anzahl der Visits nach Datum (Wochen) und Uhrzeit (bin2d)
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  geom_bin2d(binwidth = c(1, 1))  # (1 day, 1 hour)
 
-#### idvisit
-
-```{r}
-time2 |>
-  ggplot(aes(x = date, y = hour)) +
+``` 
+  
+  ### Anzahl der Visits nach Datum (Wochen) und Uhrzeit (bin2d)
+  
+  #### idvisit
+  
+```{r time2-heatmap-week}
+  time2 |>
+    ggplot(aes(x = date, y = hour)) +
   geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
   scale_x_date(date_breaks = "1 week", date_labels = "%W") +
   theme(legend.position = "bottom") +
@@ -990,11 +1323,11 @@ time2 |>
   ) +
   scale_x_date(breaks = breaks_pretty())
 ```
-
+ime 
 #### fingerprint
 
 
-```{r}
+```{r time2-heatmap-week-fingerprint}
 time2_fingerprint |>
   distinct(fingerprint, .keep_all = TRUE) |>
   ggplot(aes(x = date, y = hour)) +
