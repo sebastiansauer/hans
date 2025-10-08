@@ -262,7 +262,7 @@ prompt_length_no_prompts |>
   print_md()
 ```
 
-```{r}
+```{r prompt_length_no_prompts-plot}
 prompt_length_no_prompts |>
   ggplot(aes(x = token_length)) +
   geom_histogram(binwidth = 10) +
@@ -292,7 +292,7 @@ prompt_length_date_uni_course |>
   describe_distribution(token_length)
 ```
 
-```{r}
+```{r prompt_length_date_uni_course-ggviolin}
 ggviolin(
   prompt_length_date_uni_course,
   x = "university",
@@ -317,10 +317,11 @@ ggviolin(
 ```{r}
 prompt_length_date_uni_course |>
   group_by(course) |>
-  describe_distribution(token_length)
+  describe_distribution(token_length) |> 
+  print_md()
 ```
 
-```{r}
+```{r prompt_length_date_uni_course-ggviolin-per-course}
 ggviolin(
   prompt_length_date_uni_course,
   x = "course",
@@ -399,14 +400,19 @@ d_n_interactions_w_llm_course_date_course_uni |>
 
 
 ```{r d_n_interactions_w_llm-plot}
-d_n_interactions_w_llm |>
-  ggplot(aes(x = n_interactions_w_llm)) +
-  geom_histogram()
+d_n_interactions_w_llm_course_date_course_uni |>
+  # select(n_interactions_w_llm) |>
+  group_by(university, course) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = reorder(course, n), y = n)) +
+  geom_col() +
+  coord_flip()
+#facet_wrap(~ university, scales = "free_y")
 ```
 
 ### Interaktionen mit dem LLM - im Zeitverlauf
 
-```{r}
+```{r d_n_interactions_w_llm_course_date_course_uni-plot}
 d_n_interactions_w_llm_course_date_course_uni |>
   group_by(floor_date_month) |>
   summarise(n = n()) |>
@@ -416,7 +422,7 @@ d_n_interactions_w_llm_course_date_course_uni |>
 
 ```
 
-```{r}
+```{r d_n_interactions_w_llm_course_date_course_uni-plot_with_semesters_shaded}
 library(dplyr)
 library(lubridate)
 library(ggplot2)
