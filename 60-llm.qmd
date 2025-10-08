@@ -147,6 +147,17 @@ data_separated_filtered_llm_interact_fingerprint |>
 ```
 
 
+### Anteil der Visitors, die mit dem LLM interagieren nach Kursen
+
+```{r}
+# TODO
+idvisit_has_llm |>
+  left_join(
+    time_spent_w_course_university |> mutate(idvisit = as.integer(idvisit)),
+    by = "idvisit"
+  )
+```
+
 
 
 ### ... Im Zeitverlauf
@@ -240,6 +251,8 @@ idvisit_has_llm |>
   ) +
   scale_x_date(breaks = pretty_breaks())
 ```
+
+
 
 
 ## Länge der Prompts (Input an das LLM)

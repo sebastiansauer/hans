@@ -268,12 +268,12 @@ list(
 
 
   tar_target(
+    # TODO
     prompt_length_date_uni_course, 
     time_spent_w_course_university |> 
       mutate(idvisit = as.integer(idvisit)) |>
       left_join(prompt_length, by = "idvisit") |>
-      select(-any_of(c("type", "value"))) |>
-      mutate(date_time = floor_date(actiondetails_0_timestamp)),
+      select(-any_of(c("type", "value"))),
     packages = c("dplyr", "lubridate")
   ),
 
