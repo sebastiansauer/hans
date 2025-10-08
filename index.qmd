@@ -63,7 +63,20 @@ Die Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion [slim
 ```{r tar-obs}
 targets::tar_manifest() |>
   select(name) |> 
-  print(n = Inf) |>
+  #print(n = Inf) |>
   knitr::kable()
 ```
 
+# Pipeline-Graph
+
+
+```{r}
+tar_visnetwork(targets_only = TRUE, 
+               outdated = TRUE)
+```
+
+
+
+```{r}
+tar_glimpse()
+```
