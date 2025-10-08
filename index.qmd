@@ -62,6 +62,7 @@ Die Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion [slim
 
 ```{r tar-obs}
 targets::tar_manifest() |>
+  select(name) |> 
   print(n = Inf) |>
   knitr::kable()
 ```

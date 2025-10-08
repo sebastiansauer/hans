@@ -26,6 +26,7 @@ book:
     - 40-nutzungsarten.qmd
     - 50-video.qmd
     - 60-llm.qmd
+    - 70-unis-kurse.qmd
 
 format: 
   html:
