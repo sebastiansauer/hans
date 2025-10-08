@@ -1,6 +1,6 @@
 # sources funs:
 list.files("R", full.names = TRUE) |>
-  walk(source)
+  purrr::walk(source)
 
 
 ## Optionen setzen:

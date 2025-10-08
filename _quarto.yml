@@ -3,6 +3,7 @@ project:
   resources:
     - "!**/Icon*"
   output-dir: docs
+  pre-render: _common.R
 
 license: "MIT"
   

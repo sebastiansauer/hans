@@ -230,6 +230,15 @@ list(
       get_llm_response_text(),
     packages = c("tokenizers")
   ),
+  # add date, course, university to LLM responses:
+  tar_target(
+    llm_response_text_date_course_uni,
+    time_spent_w_course_university |> 
+      mutate(idvisit = as.integer(idvisit)) |>
+      left_join(llm_response_text, by = "idvisit") |>
+      select(-any_of(c("type", "value"))),
+  ),
+
 
   # count AI transcripts:
   tar_target(
@@ -274,6 +283,16 @@ list(
       select(-any_of(c("type", "value"))),
     packages = c("dplyr", "lubridate")
   ),
+
+  tar_target(
+    prompts_texts_date_course_uni,
+    data_separated_filtered |>
+      compute_prompt_length(no_prompt_text = FALSE) |> 
+      left_join(time_spent_w_course_university |> mutate(idvisit = as.integer(idvisit)), 
+        by = "idvisit"),        
+    packages = c("tokenizers", "stringr")
+  ),
+
 
   ## Glotzdauer --------------------------------------------------------------
   # compute time while watching vidoes:
