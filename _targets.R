@@ -200,7 +200,7 @@ list(
   ),
 
   tar_target(n_action_type_per_month,
-    add_dates_to_n_action_type(data = n_action_type, data_time = time_visit_wday),
+    add_dates_to_n_action_type(data = n_action_type),
     packages  = c("lubridate", "data.table", "dplyr")
   ),
 
@@ -278,7 +278,7 @@ list(
     data_separated_distinct_slice,
     data_separated |>
       compute_glotzdauer(),
-    packages = c("data.table", "dplyr")
+    packages = c("data.table", "dplyr", "lubridate")
   )
 
   # END OF PIPELINE ---------------------------------------------------------
