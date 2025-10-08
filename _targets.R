@@ -199,7 +199,7 @@ list(
 
   tar_target(
     n_action_type_per_month,
-    add_dates_to_n_action_type(data = n_action_type),
+    add_dates_to_n_action_type(data = n_action_type, data_time = time_spent_w_course_university),
     packages = c("lubridate", "data.table", "dplyr")
   ),
 
