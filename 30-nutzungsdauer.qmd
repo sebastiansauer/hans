@@ -31,7 +31,7 @@ tar_load(c(
 
 ## Berechnungsgrundlage der Verweildauer
 
-Die Verweildauer wurde berechnet als Differenz zwischen kleinstem und größtem Datumszeitwert (POSixct) eines Visits (also pro Wert der Variablen `idvisit`), vgl. [Funktion `diff_time](https://github.com/sebastiansauer/hans/blob/main/funs/diff_time.R).
+Die Verweildauer wurde berechnet als Differenz zwischen kleinstem und größtem Datumszeitwert (POSixct) eines Visits (also pro Wert der Variablen `idvisit`), vgl. [Funktion `diff_time`](https://github.com/sebastiansauer/hans/blob/main/funs/diff_time.R).
 Diese Variable heißt `time_diff` im Objekt `time_spent`.
 
 Dabei wird das Objekt `data_separated_filtered` herangezogen, vgl. [die Definition es Targets "time_spent" in der Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L205).

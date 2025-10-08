@@ -365,14 +365,14 @@ data_separated_filtered_date_uni_course_top5_uni |>
 #### Pro Kurs
 
 
-```{r}
+```{r data_separated_filtered_date_uni_course_top5_course}
 data_separated_filtered_date_uni_course_top5_course <-
   data_separated_filtered_date_uni_course |>
   compute_prop_eventcategory_per_uni_course(group_var = course)
 ```
 
 
-```{r}
+```{r data_separated_filtered_date_uni_course_top5_course-plot}
 data_separated_filtered_date_uni_course_top5_course |>
   # --- Visualization ---
   mutate(value = fct_lump(value, 5)) |>
@@ -383,21 +383,20 @@ data_separated_filtered_date_uni_course_top5_course |>
   )) +
 
   # Bar chart
-  geom_col(position = "fill")
-
-
+  geom_col(position = "fill") +
+  coord_flip()
 ```
 
 #### Jahr
 
-```{r}
+```{r data_separated_filtered_date_uni_course_top5_date}
 data_separated_filtered_date_uni_course_top5_date <-
   data_separated_filtered_date_uni_course |>
   compute_prop_eventcategory_per_uni_course(group_var = month)
 ```
 
 
-```{r}
+```{r data_separated_filtered_date_uni_course_top5_date-plot}
 data_separated_filtered_date_uni_course_top5_date |>
   # --- Visualization ---
   mutate(value = fct_lump(value, 5)) |>
@@ -454,7 +453,7 @@ data_separated_filtered_date_uni_course_top5_date |>
 Was ist die Hauptaktivität pro User? - Verteilung
 
 #### idvisit
-```{r}
+```{r n_action_type_distro}
 n_action_type_distro <-
   n_action_type |>
   group_by(idvisit) |>
@@ -473,7 +472,7 @@ n_action_type_distro |>
 
 #### fingerprint
 
-```{r}
+```{r n_action_type_distro_fingerpr}
 n_action_type_distro_fingerpr <-
   n_action_type |>
   group_by(fingerprint) |>
@@ -492,7 +491,7 @@ n_action_type_distro_fingerpr |>
 
 ## Verteilung der Nutzer-Aktionen 
 
-```{r}
+```{r n_action_type_counted}
 n_action_type_counted <-
   n_action_type |>
   count(category, sort = TRUE)
