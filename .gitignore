@@ -1,17 +1,32 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-.Rdata
-.httr-oauth
-.DS_Store
-.quarto
-
-
-# cache:
+# Quarto intermediate render files
 *_cache/
 *_files/
 
+# Quarto publishing artifacts
+.quarto/
+_publish/
+
+# Jupyter/knitr caches (if used in .qmd)
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.ipynb_checkpoints/
+__pycache__/
+.httr-oauth
+.DS_Store
+
+# Temporary/editor/system files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+*.bak
+
+# VS Code / Positron
+.vscode/
+.possitron/
+.idea/
 
 # data:
 *.rda
@@ -20,10 +35,6 @@
 _targets/
 *.csv
 data*/
-
-
-
-
 
 # debugging:
 test*.R
@@ -37,5 +48,3 @@ reports/
 
 
 
-
-/.quarto/
