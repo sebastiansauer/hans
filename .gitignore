@@ -46,7 +46,9 @@ final_report_*/
 reports/
 
 
+*_cache/
+*_files/
 
 
 
-/.quarto/
+
