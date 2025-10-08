@@ -211,7 +211,7 @@ time_since_last_visit_per_course_summary |>
 Wie viele Visits (von Hans) gab es?
 
 
-### Pro Monat
+### Visits im Zeitverlauf - üro Monat
 
 #### idivisit
 
@@ -334,7 +334,7 @@ time_visit_wday_summary_fingerprint_unique |>
 
 
 
-### Pro Woche
+### Visits im Zeitverlauf - pro Woche
 
 
 ```{r time_visit_wday_summary_week}

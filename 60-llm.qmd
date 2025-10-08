@@ -110,9 +110,9 @@ gghistogram(
 
 
 
-### Anteil Visitors, die mit dem LLM interagieren
+## Anteil Visitors, die mit dem LLM interagieren
 
-#### idvisit
+### idvisit
 ```{r data_separated_filtered_llm_interact}
 data_separated_filtered_llm_interact <-
   data_separated_filtered |>
@@ -131,7 +131,7 @@ data_separated_filtered_llm_interact |>
   ggtexttable()
 ```
 
-#### fingerprint unique
+### fingerprint unique
 
 ```{r data_separated_filtered_llm_interact_fingerprint}
 data_separated_filtered_llm_interact_fingerprint <-
@@ -339,7 +339,43 @@ ggviolin(
 ```
 
 
+### Token-Länge im Zeitverlauf
 
+```{r prompt_length_date_uni_course_date}
+prompt_length_date_uni_course |> 
+  group_by(floor_date_month) |>
+  describe_distribution(token_length) |>
+  print_md()
+```
+
+
+```{r}
+# Calculate limits properly
+filtered_data <- prompt_length_date_uni_course |> 
+  filter(!is.na(floor_date_month)) |>
+  mutate(floor_date_month_date = as.Date(floor_date_month))
+
+lim <- c(
+  min(filtered_data$floor_date_month_date, na.rm = TRUE),
+  max(filtered_data$floor_date_month_date, na.rm = TRUE)
+)
+
+# Now create the plot
+filtered_data |> 
+  ggplot(aes(x = floor_date_month_date, y = token_length)) +
+  geom_violin(aes(group = floor_date_month_date)) +
+  stat_summary(fun = "mean", geom = "point") +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.2) +
+  theme_minimal() +
+  labs(
+    title = "Prompt length over time",
+    x = "Month", 
+    y = "Prompt length (in tokens)",
+    caption = "The dots represent the mean and the error bars the standard error of the mean."
+  ) + 
+  scale_x_date(limits = lim, labels = scales::label_date_short())
+
+```
 
 
 ## Anzahl der Interaktionen bei den Usern, die mit dem LLM interagieren
