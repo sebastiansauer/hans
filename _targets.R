@@ -125,7 +125,7 @@ list(
   # count number of actions per visit and adds date of visit:
   tar_target(
     n_action_w_date,
-    data_separated_filtered |>
+    data_separated_filtered |>  # one row is one visit
       count_action_w_date()
   ),
   tar_target(
@@ -135,14 +135,14 @@ list(
   ),
 
   # compute how much time was spent per visit:
-  tar_target(time_spent, 
-    data_separated_filtered |> diff_time()),
+  tar_target(time_spent, data_separated_filtered |> diff_time()),
   tar_target(
     time_spent_fingerprint,
     data_separated_filtered |> diff_time(idvar = fingerprint)
   ),
 
-  # compute how much time was spent per course/per university:
+  # compute how much time was spent per course/per university and date:
+  # one row is one visit
   tar_target(
     time_spent_w_course_university,
     compute_time_per_course_uni(
@@ -171,8 +171,7 @@ list(
   ),
 
   # compute when the site was visited:
-  tar_target(time_visit_wday, 
-    data_separated_filtered |> when_visited()),
+  tar_target(time_visit_wday, data_separated_filtered |> when_visited()),
   tar_target(
     time_visit_wday_fingerprint,
     when_visited_fingerprint(data = data_separated_filtered)
@@ -186,8 +185,7 @@ list(
   ),
 
   # count the type of things users did:
-  tar_target(n_action_type, 
-    count_user_action_type(data_separated_filtered)),
+  tar_target(n_action_type, count_user_action_type(data_separated_filtered)),
 
   # get timestamps for each idvisits:
   tar_target(
@@ -199,9 +197,10 @@ list(
     data_separated_filtered |> idvar_timestamp(idvar = fingerprint)
   ),
 
-  tar_target(n_action_type_per_month,
+  tar_target(
+    n_action_type_per_month,
     add_dates_to_n_action_type(data = n_action_type),
-    packages  = c("lubridate", "data.table", "dplyr")
+    packages = c("lubridate", "data.table", "dplyr")
   ),
 
   # count "Multiple choice answer selected" (only for idvisits, not for fingerprints):
@@ -256,6 +255,9 @@ list(
     data_separated_filtered |>
       count_visitor_interaction_with_llm(idvar = fingerprint)
   ),
+
+  # compute prompt length in tokens:
+  # token itself is not saved, only length
   tar_target(
     prompt_length,
     data_separated_filtered |>
@@ -263,9 +265,13 @@ list(
     packages = c("tokenizers", "stringr")
   ),
 
+
+
   tar_target(
-    prompt_length_date_uni_course,
-    prompt_length |>
+    prompt_length_date_uni_course, 
+    time_spent_w_course_university |> 
+      mutate(idvisit = as.integer(idvisit)) |>
+      left_join(prompt_length, by = "idvisit") |>
       select(-any_of(c("type", "value"))) |>
       mutate(date_time = floor_date(actiondetails_0_timestamp)),
     packages = c("dplyr", "lubridate")
