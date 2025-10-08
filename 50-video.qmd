@@ -52,7 +52,9 @@ Daher ist diese Analyse nur vorsichtig zu interpretieren.
 Die Definition [der Funktion glotzdauer.R](https://github.com/sebastiansauer/hans/blob/main/funs/glotzdauer.R) ist online dokumentiert.
 
 ```{r}
-data_separated_distinct_slice |>
+as_tibble(data_separated_distinct_slice) |>
+  drop_na() |> 
+  filter(first_play != Inf) |> 
   head(30)
 ```
 
