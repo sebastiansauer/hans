@@ -188,8 +188,7 @@ list(
   tar_target(n_action_type, count_user_action_type(data_separated_filtered)),
 
   # get timestamps for each idvisits:
-  tar_target(
-    timestamps_added_to_idvisits,
+  tar_target(timestamps_added_to_idvisits,
     data_separated_filtered |> idvar_timestamp()
   ),
   tar_target(
@@ -203,6 +202,8 @@ list(
     packages = c("lubridate", "data.table", "dplyr")
   ),
 
+
+  ## MC answers and LLM -----------------------------------------------------
   # count "Multiple choice answer selected" (only for idvisits, not for fingerprints):
   tar_target(
     n_mc_answers_selected,
@@ -256,6 +257,7 @@ list(
       count_visitor_interaction_with_llm(idvar = fingerprint)
   ),
 
+  ## prompt length ----------------------------------------------------------
   # compute prompt length in tokens:
   # token itself is not saved, only length
   tar_target(
@@ -264,11 +266,7 @@ list(
       compute_prompt_length(),
     packages = c("tokenizers", "stringr")
   ),
-
-
-
   tar_target(
-    # TODO
     prompt_length_date_uni_course, 
     time_spent_w_course_university |> 
       mutate(idvisit = as.integer(idvisit)) |>

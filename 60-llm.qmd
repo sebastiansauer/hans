@@ -146,20 +146,6 @@ data_separated_filtered_llm_interact_fingerprint |>
   ggtexttable()
 ```
 
-
-### Anteil der Visitors, die mit dem LLM interagieren nach Kursen
-
-```{r}
-# TODO
-idvisit_has_llm |>
-  left_join(
-    time_spent_w_course_university |> mutate(idvisit = as.integer(idvisit)),
-    by = "idvisit"
-  )
-```
-
-
-
 ### ... Im Zeitverlauf
 
 
@@ -257,6 +243,7 @@ idvisit_has_llm |>
 
 ## Länge der Prompts (Input an das LLM)
 
+### Überblick
 ```{r}
 prompt_length_no_prompts <-
   prompt_length |>
@@ -292,7 +279,66 @@ describe_distribution(
 
 
 
+### Token-Länge nach Universitäten
+
+```{r}
+prompt_length_date_uni_course |>
+  group_by(university) |>
+  describe_distribution(token_length)
+```
+
+```{r}
+ggviolin(
+  prompt_length_date_uni_course,
+  x = "university",
+  y = "token_length",
+  add = "mean_se",
+) +
+  theme_minimal() +
+  labs(
+    title = "Prompt length by university",
+    x = "University",
+    y = "Prompt length (in tokens)",
+    caption = "The dots represent the mean and the error bars the standard error of the mean."
+  ) +
+  coord_flip()
+```
+
+
+
+### Token-Länge nach Kursen
+
+
+```{r}
+prompt_length_date_uni_course |>
+  group_by(course) |>
+  describe_distribution(token_length)
+```
+
+```{r}
+ggviolin(
+  prompt_length_date_uni_course,
+  x = "course",
+  y = "token_length",
+  add = "mean_se",
+) +
+  theme_minimal() +
+  labs(
+    title = "Prompt length by course",
+    x = "University",
+    y = "Prompt length (in tokens)",
+    caption = "The dots represent the mean and the error bars the standard error of the mean."
+  ) +
+  coord_flip()
+```
+
+
+
+
+
 ## Anzahl der Interaktionen bei den Usern, die mit dem LLM interagieren
+
+### Insgesamt
 
 ```{r d_n_interactions_w_llm}
 d_n_interactions_w_llm <-
@@ -316,6 +362,53 @@ d_n_interactions_w_llm |>
   ggplot(aes(x = n_interactions_w_llm)) +
   geom_histogram()
 ```
+
+
+
+
+### Interaktionen mit dem LLM - pro Kurs und pro Uni
+
+
+```{r d_n_interactions_w_llm_course}
+d_n_interactions_w_llm_course <-
+  data_separated_filtered |>
+  filter(type == "eventcategory") |>
+  filter(str_detect(value, "llm")) |>
+  group_by(idvisit) |>
+  slice_head(n = 1)
+
+d_n_interactions_w_llm_course_date_course_uni <-
+  d_n_interactions_w_llm_course |>
+  left_join(
+    time_spent_w_course_university |> mutate(idvisit = as.integer(idvisit)),
+    by = "idvisit"
+  )
+```
+
+```{r d_n_interactions_w_llm-describe-distro}
+d_n_interactions_w_llm_course_date_course_uni |>
+  # select(n_interactions_w_llm) |>
+  group_by(university, course) |>
+  summarise(n = n())
+```
+
+
+```{r d_n_interactions_w_llm-plot}
+d_n_interactions_w_llm |>
+  ggplot(aes(x = n_interactions_w_llm)) +
+  geom_histogram()
+```
+
+### Interaktionen mit dem LLM - im Zeitverlauf
+
+```{r}
+d_n_interactions_w_llm_course_date_course_uni |>
+  group_by(floor_date_month) |>
+  summarise(n = n()) |>
+  ggplot(aes(x = floor_date_month, y = n)) +
+  geom_line()
+```
+
 
 
 ## Klick auf ein Wort im Transkript
