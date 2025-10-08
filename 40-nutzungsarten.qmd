@@ -90,7 +90,7 @@ n_action_type_per_month <-
 n_action_type_per_month
 ```
 
-### Nur die Top3-Kategorien
+### Nur die Top3-Kategorien im Zeitverlauf
 
 #### idvisit
 
@@ -205,7 +205,7 @@ n_action_type_per_month_top3_fingerprint |>
 
 ### Top3 - Pro Kurs
 
-
+#### Alle Kurse
 
 ```{r  n_action_type_course_uni}
 n_action_type_course_uni <-
@@ -232,6 +232,29 @@ n_action_type_per_month_top3_per_course |>
   scale_x_date(date_labels = "%b %Y")
 ```
 
+#### CTA1 und GESOA
+
+```{r}
+n_action_type_per_month_top3_per_course |> 
+  filter(course %in% c("cta1", "gesoa")) |> 
+  ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  facet_wrap(~course, ncol = 3, scales = "free_y") +
+  geom_line() +
+  theme(legend.position = "bottom") +
+  scale_x_date(date_labels = "%b %Y")
+```
+
+
+```{r}
+n_action_type_per_month_top3_per_course |> 
+  filter(course %in% c("cta1", "gesoa")) |> 
+  ggplot(aes(x = month_start, y = n, fill = category, group = category)) +
+  facet_wrap(~course, ncol = 3, scales = "free_y") +
+  geom_area(position = "fill") +
+  theme(legend.position = "bottom") +
+  scale_x_date(date_labels = "%b %Y") +
+  scale_y_continuous(labels = scales::label_percent()) 
+```
 
 
 ### `eventcategory`
@@ -466,7 +489,7 @@ n_action_type_distro_fingerpr |>
   geom_col()
 ```
 
-## Verteilung
+## Verteilung der Nutzer-Aktionen 
 
 ```{r}
 n_action_type_counted <-
