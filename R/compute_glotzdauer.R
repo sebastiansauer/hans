@@ -1,6 +1,6 @@
 compute_glotzdauer <- function(d) {
   
-  setDT(d)
+  d <- as.data.table(d)
 
   # Filter relevant rows first
   d_events <- d[
@@ -9,21 +9,18 @@ compute_glotzdauer <- function(d) {
       (value %in% c("play", "pause") | type == "timestamp")
   ]
 
-  # Convert timestamps once
-  d_events[type == "timestamp", timestamp := as.POSIXct(value)]
+  d_filtered <- d_events[idvisit %in% idvisit[type == "eventaction"]]
+
 
   # Compute by group
-  d_glotzdauer_dt <- d_events[,
+  d_glotzdauer_dt <- d_filtered[,
     .(
       
-      first_play = min(timestamp[type == "eventaction" & value == "play"], na.rm = TRUE),
-      last_pause = max(timestamp[type == "eventaction" & value == "pause"], na.rm = TRUE),
-      date = as.Date(min(timestamp, na.rm = TRUE))
+      first_play = min(timestamp, na.rm = TRUE),
+      last_pause = max(timestamp, na.rm = TRUE)
     ),
     by = idvisit
-  ]
+  ][, time_diff := difftime(last_pause, first_play)]
 
-  d_glotzdauer_dt[, time_diff := difftime(last_pause, first_play)]
-
-  return(d_glotzdauer_dt)
+  d_glotzdauer <- as_tibble(d_glotzdauer_dt)
 }
