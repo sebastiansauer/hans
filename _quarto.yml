@@ -2,6 +2,7 @@ project:
   type: book
   resources:
     - "!**/Icon*"
+  output-dir: docs
 
 license: "MIT"
   
