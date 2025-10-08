@@ -135,7 +135,8 @@ list(
   ),
 
   # compute how much time was spent per visit:
-  tar_target(time_spent, data_separated_filtered |> diff_time()),
+  tar_target(time_spent, 
+    data_separated_filtered |> diff_time()),
   tar_target(
     time_spent_fingerprint,
     data_separated_filtered |> diff_time(idvar = fingerprint)
@@ -170,7 +171,8 @@ list(
   ),
 
   # compute when the site was visited:
-  tar_target(time_visit_wday, data_separated_filtered |> when_visited()),
+  tar_target(time_visit_wday, 
+    data_separated_filtered |> when_visited()),
   tar_target(
     time_visit_wday_fingerprint,
     when_visited_fingerprint(data = data_separated_filtered)
@@ -184,7 +186,8 @@ list(
   ),
 
   # count the type of things users did:
-  tar_target(n_action_type, count_user_action_type(data_separated_filtered)),
+  tar_target(n_action_type, 
+    count_user_action_type(data_separated_filtered)),
 
   # get timestamps for each idvisits:
   tar_target(
@@ -194,6 +197,11 @@ list(
   tar_target(
     timestamps_added_to_fingerprints,
     data_separated_filtered |> idvar_timestamp(idvar = fingerprint)
+  ),
+
+  tar_target(n_action_type_per_month,
+    add_dates_to_n_action_type(data = n_action_type, data_time = time_visit_wday),
+    packages  = c("lubridate", "data.table", "dplyr")
   ),
 
   # count "Multiple choice answer selected" (only for idvisits, not for fingerprints):
