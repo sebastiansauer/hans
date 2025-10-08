@@ -349,7 +349,7 @@ prompt_length_date_uni_course |>
 ```
 
 
-```{r}
+```{r prompt_length_date_uni_course-plot-timeline}
 # Calculate limits properly
 filtered_data <- prompt_length_date_uni_course |> 
   filter(!is.na(floor_date_month)) |>
