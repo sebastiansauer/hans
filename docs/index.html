@@ -5345,6 +5345,12 @@ window.onload = function() {
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">KI-Gebrauch</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./70-unis-kurse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Effekte von Lehrveranstaltungen und Hochschulen</span></span></a>
+  </div>
+</li>
     </ul>
 </div>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
@@ -5430,120 +5436,178 @@ window.onload = function() {
 <span class="header-section-number">6</span> Targets-Objekte</h1>
 <div class="cell">
 <details class="code-fold"><summary>Show the code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">targets</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/targets/reference/tar_manifest.html">tar_manifest</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">name</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 39 × 2
-   name                                       command                           
-   &lt;chr&gt;                                      &lt;chr&gt;                             
- 1 config_file                                "\"config.yaml\""                 
- 2 config                                     "read_yaml(config_file)"          
- 3 data_files_list                            "find_data_files(config)"         
- 4 data_files_dupes_excluded                  "exclude_dupes(data_files_list)"  
- 5 data_imported                              "import_and_bind_data(data_files_…
- 6 data_prepped                               "prep_data(data_imported)"        
- 7 data_all_fct                               "mutate(data_prepped, across(ever…
- 8 test_unique_idvisit                        "check_unique_ids(data_prepped)"  
- 9 time_since_last_visit                      "select(data_all_fct, idvisit, fi…
-10 data_wide_slim                             "get_vars(data_all_fct, vars = c(…
-11 data_long                                  "longify_data(data_all_fct)"      
-12 time_duration                              "data_all_fct %&gt;% select(idvisit,…
-13 course_and_uni_per_visit                   "extract_course_role_university_o…
-14 data_separated                             "slimify_nona_data(data_long)"    
-15 data_separated_filtered                    "filter_column_type(data_separate…
-16 data_separated_distinct_slice              "compute_glotzdauer(data_separate…
-17 n_action                                   "summarise(group_by(data_separate…
-18 n_action_w_date                            "count_action_w_date(data_separat…
-19 n_action_fingerprint                       "summarise(group_by(data_separate…
-20 timestamps_added_to_idvisits               "idvar_timestamp(data_separated_f…
-21 data_separated_filtered_date_uni_course    "add_date_uni_course_to_long_data…
-22 time_spent_fingerprint                     "diff_time(data_separated_filtere…
-23 n_action_type                              "count_user_action_type(data_sepa…
-24 ai_llm_per_months                          "count_llm_interactions(data_sepa…
-25 timestamps_added_to_fingerprints           "idvar_timestamp(data_separated_f…
-26 n_action_w_date_fingerprint                "count_action_w_date(data_separat…
-27 prompt_length                              "compute_prompt_length(data_separ…
-28 n_mc_answers_selected                      "count(group_by(count_mc_answers(…
-29 time_spent                                 "diff_time(data_separated_filtere…
-30 time_visit_wday_fingerprint                "when_visited_fingerprint(data = …
-31 ai_transcript_clicks_per_month             "count_ai_transcripts_per_month(d…
-32 idvisit_has_llm_fingerprint                "count_visitor_interaction_with_l…
-33 idvisit_has_llm                            "count_visitor_interaction_with_l…
-34 time_visit_wday                            "when_visited(data_separated_filt…
-35 time_spent_w_course_university_fingerprint "compute_time_per_course_uni(data…
-36 llm_response_text                          "get_llm_response_text(n_action_t…
-37 prompt_length_date_uni_course              "mutate(select(prompt_length, -an…
-38 mc_answers_with_timestamps                 "select(drop_na(left_join(select(…
-39 time_spent_w_course_university             "compute_time_per_course_uni(data…</code></pre>
+<pre><code># A tibble: 39 × 1
+   name                                      
+   &lt;chr&gt;                                     
+ 1 config_file                               
+ 2 config                                    
+ 3 data_files_list                           
+ 4 data_files_dupes_excluded                 
+ 5 data_imported                             
+ 6 data_prepped                              
+ 7 data_all_fct                              
+ 8 test_unique_idvisit                       
+ 9 time_since_last_visit                     
+10 data_wide_slim                            
+11 data_long                                 
+12 time_duration                             
+13 course_and_uni_per_visit                  
+14 data_separated                            
+15 data_separated_filtered                   
+16 data_separated_distinct_slice             
+17 n_action                                  
+18 n_action_w_date                           
+19 n_action_fingerprint                      
+20 timestamps_added_to_idvisits              
+21 data_separated_filtered_date_uni_course   
+22 time_spent_fingerprint                    
+23 n_action_type                             
+24 ai_llm_per_months                         
+25 timestamps_added_to_fingerprints          
+26 n_action_w_date_fingerprint               
+27 prompt_length                             
+28 n_mc_answers_selected                     
+29 time_spent                                
+30 time_visit_wday_fingerprint               
+31 ai_transcript_clicks_per_month            
+32 idvisit_has_llm_fingerprint               
+33 idvisit_has_llm                           
+34 time_visit_wday                           
+35 time_spent_w_course_university_fingerprint
+36 llm_response_text                         
+37 prompt_length_date_uni_course             
+38 mc_answers_with_timestamps                
+39 time_spent_w_course_university            </code></pre>
 </div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
-<colgroup>
-<col style="width: 21%">
-<col style="width: 78%">
-</colgroup>
 <thead><tr class="header">
 <th style="text-align: left;">name</th>
-<th style="text-align: left;">command</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">config_file</td>
-<td style="text-align: left;">“config.yaml”</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">config</td>
-<td style="text-align: left;">read_yaml(config_file)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">data_files_list</td>
-<td style="text-align: left;">find_data_files(config)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">data_files_dupes_excluded</td>
-<td style="text-align: left;">exclude_dupes(data_files_list)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">data_imported</td>
-<td style="text-align: left;">import_and_bind_data(data_files_dupes_excluded)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">data_prepped</td>
-<td style="text-align: left;">prep_data(data_imported)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">data_all_fct</td>
-<td style="text-align: left;">mutate(data_prepped, across(everything(), as.factor))</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">test_unique_idvisit</td>
-<td style="text-align: left;">check_unique_ids(data_prepped)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">time_since_last_visit</td>
-<td style="text-align: left;">select(data_all_fct, idvisit, fingerprint, dayssincelastvisit)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">data_wide_slim</td>
-<td style="text-align: left;">get_vars(data_all_fct, vars = c(“idvisit”, “fingerprint”,</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">grep(“actiondetails_”, names(data_all_fct), value = TRUE)))</td>
-<td style="text-align: left;"></td>
+<td style="text-align: left;">data_long</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">data_long</td>
-<td style="text-align: left;">longify_data(data_all_fct)</td>
+<td style="text-align: left;">time_duration</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">time_duration</td>
-<td style="text-align: left;">data_all_fct %&gt;% select(idvisit, fingerprint, visitduration) %&gt;%</td>
+<td style="text-align: left;">course_and_uni_per_visit</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">data_separated</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">data_separated_filtered</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">data_separated_distinct_slice</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">n_action</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">n_action_w_date</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">n_action_fingerprint</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">timestamps_added_to_idvisits</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">data_separated_filtered_date_uni_course</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time_spent_fingerprint</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">n_action_type</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ai_llm_per_months</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">timestamps_added_to_fingerprints</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">n_action_w_date_fingerprint</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">prompt_length</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">n_mc_answers_selected</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time_spent</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time_visit_wday_fingerprint</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ai_transcript_clicks_per_month</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">idvisit_has_llm_fingerprint</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">idvisit_has_llm</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time_visit_wday</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time_spent_w_course_university_fingerprint</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">llm_response_text</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">prompt_length_date_uni_course</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mc_answers_with_timestamps</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time_spent_w_course_university</td>
 </tr>
 </tbody>
 </table>
-<pre><code> mutate(visitduration_sec = as.numeric(visitduration)) %&gt;% 
- select(-visitduration)  |</code></pre>
-<p>|course_and_uni_per_visit |extract_course_role_university_of_visit(data_wide_slim) | |data_separated |slimify_nona_data(data_long) | |data_separated_filtered |filter_column_type(data_separated) | |data_separated_distinct_slice |compute_glotzdauer(data_separated) | |n_action |summarise(group_by(data_separated_filtered, idvisit), nr_max = max(nr)) | |n_action_w_date |count_action_w_date(data_separated_filtered) | |n_action_fingerprint |summarise(group_by(data_separated_filtered, fingerprint), nr_max = max(nr)) | |timestamps_added_to_idvisits |idvar_timestamp(data_separated_filtered) | |data_separated_filtered_date_uni_course |add_date_uni_course_to_long_data(data_separated_filtered, course_and_uni_per_visit) | |time_spent_fingerprint |diff_time(data_separated_filtered, idvar = fingerprint) | |n_action_type |count_user_action_type(data_separated_filtered) | |ai_llm_per_months |count_llm_interactions(data_separated_filtered) | |timestamps_added_to_fingerprints |idvar_timestamp(data_separated_filtered, idvar = fingerprint) | |n_action_w_date_fingerprint |count_action_w_date(data_separated_filtered, idvar = fingerprint) | |prompt_length |compute_prompt_length(data_separated_filtered) | |n_mc_answers_selected |count(group_by(count_mc_answers(data_separated_filtered), idvisit)) | |time_spent |diff_time(data_separated_filtered) | |time_visit_wday_fingerprint |when_visited_fingerprint(data = data_separated_filtered) | |ai_transcript_clicks_per_month |count_ai_transcripts_per_month(data_separated_filtered) | |idvisit_has_llm_fingerprint |count_visitor_interaction_with_llm(data_separated_filtered, idvar = fingerprint) | |idvisit_has_llm |count_visitor_interaction_with_llm(data_separated_filtered) | |time_visit_wday |when_visited(data_separated_filtered) | |time_spent_w_course_university_fingerprint |compute_time_per_course_uni(data = time_spent_fingerprint, course_and_uni = course_and_uni_per_visit, idvar = fingerprint) | |llm_response_text |get_llm_response_text(n_action_type) | |prompt_length_date_uni_course |mutate(select(prompt_length, -any_of(c(“type”, “value”))), date_time = floor_date(actiondetails_0_timestamp)) | |mc_answers_with_timestamps |select(drop_na(left_join(select(timestamps_added_to_idvisits, idvisit, timestamp), n_mc_answers_selected, by = “idvisit”)), idvisit, timestamp, n) | |time_spent_w_course_university |compute_time_per_course_uni(data = time_spent, course_and_uni = course_and_uni_per_visit, idvar = idvisit) |</p>
 </div>
 </div>
 
@@ -6020,73 +6084,74 @@ window.onload = function() {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Quellcode</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Hintergrund</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>Dieser Arbeitsbericht schildert das technische Vorgehen im Rahmen der Analyse der Matomo-Daten des BMBF-Projekt "HaNS".</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu"># Vorgehen</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>Die Matomo-Klickdaten aller Semester der Projektlaufzeit wurden für diese Analyse verarbeitet. Mit Hilfe einer R-Pipeline wurden eine Reihe von Forschungsfragen analysiert.</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>Der komplette Code ist online dokumentiert unter <span class="ot">&lt;https://github.com/sebastiansauer/hans&gt;</span>.</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>Aus Datenschutzgründen sind online keine Daten eingestellt.</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>Die zentrale Analyse-Pipeline-Datei ist <span class="ot">&lt;https://github.com/sebastiansauer/hans/blob/main/_targets.R&gt;</span>.</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># Forschungsfragen</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Wie viele Nutzer gibt es und in welchem Zeitraum?</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>In welcher Frequenz wird HaNS aufgesucht? Wie groß sind die zeitlichen Zwischenräume zwischen der Benutzung der Plattform?</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Wie oft wird HaNS pro Zeitraum (z.B. Monat) besucht?</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Wie verändert sich die Nutzung im Zeitverlauf?</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Wie viele Aktionen bringt ein Visit mit sich? Wie ist die statistische Verteilung der Aktionen pro Visit?</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Wie lang verweilen die Nutzer pro Visit?</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>W</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>ie verändert sich die Nutzungsdauer pro Visit im Zeitverlauf?</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>Welche Aktionen führen die Nutzer auf Hans aus?</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>Wie verändern sich die Verteilungen der Aktionshäufigkeiten im Zeitverlauf?</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="ss">11. </span>Wie häufig und in welcher Art inteagieren die Nutzer mit dem LLM in HaNS?</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="ss">12. </span>Wie groß ist der Anteil der Nutzer, die mit dem LLM interagieren?</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ss">13. </span>Wie verändert sich der Anteil der Nutzer, die mit dem LLM interagieren, im Zeitverlauf?</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ss">14. </span>Wie oft wird auf ein Wort im Transkript des LLM geklickt?</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="ss">15. </span>Wie oft wird ein Transkript-Dienst in HaNS in Anspruch genommen?</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="ss">16. </span>Wie verändert sich die Nutzung der Transkript-Dienste in HaNS im Zeitverlauf?</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="ss">17. </span>Wie lange werden Videos angeschaut?</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="ss">18. </span>Wie verändert sich die Betrachtungsdauer im Zeitverlauf?</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="fu"># Targets-Pipeline stellt Überblick aller Analyseschritte dar</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>Die Analyse wird im Rahmen einer <span class="co">[</span><span class="ot">Targets-Pipeline</span><span class="co">](https://github.com/sebastiansauer/hans/blob/main/_targets.R)</span> beschrieben und ist offen auf Github einsehbar. </span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># Langformat</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>Aufgrund des "rechts flatternden" Datenformat (d.h. unterschiedliche Zeilenlängen) wurden die Daten in ein Langformat überführt, zwecks besserer/einfacherer Analyse.</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>Dazu wurden (neben den ID-Variablen, v.a. <span class="in">`idvisit`</span>) die <span class="in">`actionDetails_`</span>-Variablen verwendet.</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>Der Code des Pivotierens in das Langformat ist in der Funktion <span class="co">[</span><span class="ot">longify-data.R</span><span class="co">](https://github.com/sebastiansauer/hans/blob/main/funs/longify-data.R)</span> einsehbar.</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>Die Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion <span class="co">[</span><span class="ot">slimify-data.R</span><span class="co">](https://github.com/sebastiansauer/hans/blob/main/funs/slimify_data.R)</span>.</span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Targets-Objekte</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r tar-obs}</span></span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>targets<span class="sc">::</span><span class="fu">tar_manifest</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Hintergrund</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Dieser Arbeitsbericht schildert das technische Vorgehen im Rahmen der Analyse der Matomo-Daten des BMBF-Projekt "HaNS".</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu"># Vorgehen</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>Die Matomo-Klickdaten aller Semester der Projektlaufzeit wurden für diese Analyse verarbeitet. Mit Hilfe einer R-Pipeline wurden eine Reihe von Forschungsfragen analysiert.</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>Der komplette Code ist online dokumentiert unter <span class="ot">&lt;https://github.com/sebastiansauer/hans&gt;</span>.</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>Aus Datenschutzgründen sind online keine Daten eingestellt.</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>Die zentrale Analyse-Pipeline-Datei ist <span class="ot">&lt;https://github.com/sebastiansauer/hans/blob/main/_targets.R&gt;</span>.</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># Forschungsfragen</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Wie viele Nutzer gibt es und in welchem Zeitraum?</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>In welcher Frequenz wird HaNS aufgesucht? Wie groß sind die zeitlichen Zwischenräume zwischen der Benutzung der Plattform?</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Wie oft wird HaNS pro Zeitraum (z.B. Monat) besucht?</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Wie verändert sich die Nutzung im Zeitverlauf?</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Wie viele Aktionen bringt ein Visit mit sich? Wie ist die statistische Verteilung der Aktionen pro Visit?</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Wie lang verweilen die Nutzer pro Visit?</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>W</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>ie verändert sich die Nutzungsdauer pro Visit im Zeitverlauf?</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>Welche Aktionen führen die Nutzer auf Hans aus?</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="ss">9. </span>Wie verändern sich die Verteilungen der Aktionshäufigkeiten im Zeitverlauf?</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="ss">10. </span>An welchen Tagen und zu welcher Zeit kommen die User zu HaNS?</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="ss">11. </span>Wie häufig und in welcher Art inteagieren die Nutzer mit dem LLM in HaNS?</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="ss">12. </span>Wie groß ist der Anteil der Nutzer, die mit dem LLM interagieren?</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="ss">13. </span>Wie verändert sich der Anteil der Nutzer, die mit dem LLM interagieren, im Zeitverlauf?</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="ss">14. </span>Wie oft wird auf ein Wort im Transkript des LLM geklickt?</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="ss">15. </span>Wie oft wird ein Transkript-Dienst in HaNS in Anspruch genommen?</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="ss">16. </span>Wie verändert sich die Nutzung der Transkript-Dienste in HaNS im Zeitverlauf?</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="ss">17. </span>Wie lange werden Videos angeschaut?</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="ss">18. </span>Wie verändert sich die Betrachtungsdauer im Zeitverlauf?</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="fu"># Targets-Pipeline stellt Überblick aller Analyseschritte dar</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>Die Analyse wird im Rahmen einer <span class="co">[</span><span class="ot">Targets-Pipeline</span><span class="co">](https://github.com/sebastiansauer/hans/blob/main/_targets.R)</span> beschrieben und ist offen auf Github einsehbar. </span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># Langformat</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>Aufgrund des "rechts flatternden" Datenformat (d.h. unterschiedliche Zeilenlängen) wurden die Daten in ein Langformat überführt, zwecks besserer/einfacherer Analyse.</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>Dazu wurden (neben den ID-Variablen, v.a. <span class="in">`idvisit`</span>) die <span class="in">`actionDetails_`</span>-Variablen verwendet.</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>Der Code des Pivotierens in das Langformat ist in der Funktion <span class="co">[</span><span class="ot">longify-data.R</span><span class="co">](https://github.com/sebastiansauer/hans/blob/main/funs/longify-data.R)</span> einsehbar.</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>Die Daten im Langformat wurden dann noch etwas aufbereitet mt der Funktion <span class="co">[</span><span class="ot">slimify-data.R</span><span class="co">](https://github.com/sebastiansauer/hans/blob/main/funs/slimify_data.R)</span>.</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Targets-Objekte</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r tar-obs}</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>targets<span class="sc">::</span><span class="fu">tar_manifest</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(name) <span class="sc">|&gt;</span> </span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

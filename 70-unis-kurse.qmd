@@ -1,9 +1,33 @@
 
 # Effekte von Lehrveranstaltungen und Hochschulen 
 
+## Setup
 
-```{r}
+```{r libs}
+library(tidyverse)
+#library(lubridate)
+#library(gt)
+library(targets)
+#library(ggpubr)
+#library(scales)
+# library(ggfittext)
+library(easystats)
+#library(data.table)
+#library(tinytable)
+# library(ggokabeito)
+```
+
+
+```{r source-common-start}
 source("_common.r")
+```
+
+
+```{r load-targets}
+tar_load(c(
+  course_and_uni_per_visit,
+  time_spent_w_course_university
+))
 ```
 
 
