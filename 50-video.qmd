@@ -24,7 +24,8 @@ source("_common.r")
 ```{r load-targets}
 tar_load(c(
   data_separated_distinct_slice,
-  n_action_type_per_month
+  n_action_type_per_month,
+  glotzdauer_prepped,
 ))
 ```
 
@@ -80,14 +81,6 @@ data_separated_distinct_slice |>
 
 
 ```{r glotzdauer-stats}
-glotzdauer_prepped <-
-  data_separated_distinct_slice |>
-  # we will assume that negative glotzdauer is the as positive glotzdauer:
-  mutate(time_diff_abs_sec = abs(as.numeric(time_diff, units = "secs"))) |>
-  # without glotzdauer smaller than 10 minutes:
-  filter(time_diff_abs_sec < 60 * 10) |>
-  mutate(time_diff_abs_min = time_diff_abs_sec / 60)
-
 glotzdauer_tbl <-
   glotzdauer_prepped |>
   select(time_diff_abs_sec, time_diff_abs_min) |>
@@ -121,6 +114,57 @@ glotzdauer_prepped_tbl
 ```{r glotzdauer_prepped_plot}
 glotzdauer_prepped_tbl |>
   ggplot(aes(x = first_of_month, y = time_diff_mean)) +
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
   geom_line() +
   theme_minimal()
 ```

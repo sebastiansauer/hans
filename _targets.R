@@ -301,6 +301,13 @@ list(
     packages = c("tokenizers", "stringr")
   ),
 
+  tar_target(
+    n_interactions_w_llm_course_date_course_uni,
+    count_llm_interactions_add_context(
+      data_separated_filtered,
+      time_spent_w_course_university)
+  ),
+
 
   ## Glotzdauer --------------------------------------------------------------
   # compute time while watching vidoes:
@@ -310,6 +317,10 @@ list(
     data_separated |>
       compute_glotzdauer(),
     packages = c("data.table", "dplyr", "lubridate")
+  ),
+
+  tar_target(glotzdauer_prepped,
+    prep_glotzdauer(data_separated_distinct_slice)
   )
 
   # END OF PIPELINE ---------------------------------------------------------
