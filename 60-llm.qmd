@@ -540,10 +540,22 @@ n_interactions_w_llm_course_date_course_uni |>
 ### Interaktionen mit dem LLM - im Zeitverlauf
 
 ```{r n_interactions_w_llm_course_date_course_uni-plot}
+rect_data <- comp_semester_rects(
+  n_interactions_w_llm_course_date_course_uni,
+  col_date = "floor_date_month"
+)
+
 n_interactions_w_llm_course_date_course_uni |>
   group_by(floor_date_month) |>
   summarise(n = n()) |>
   ggplot(aes(x = floor_date_month, y = n)) +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  ) +
   geom_line()
 #todo
 

@@ -19,8 +19,6 @@ library(ggokabeito)
 source("_common.r")
 ```
 
-
-
 ```{r load-targets}
 tar_load(c(
   course_and_uni_per_visit,
@@ -495,7 +493,7 @@ ggplot(n_action_lt_500) +
 
 #### fingerprint
 
-```{r n_action_lt_500_fingerprint}
+```{r}
 n_action_lt_500_fingerprint <-
   n_action_lt_500_fingerprint |>
   mutate(

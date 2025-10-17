@@ -3,25 +3,41 @@ comp_semester_rects <- function(plot_data, col_date, ymin = 0, ymax = Inf) {
   library(dplyr)
   library(tibble)
 
+  #' Extract and parse dates for semester rectangle plotting
+  #' #' This function extracts dates from the specified column of the input data,
+  #' parses them into date
+  #' params plot_data A data frame containing the date column.
+  #' params col_date The name of the column containing date information - date format, use eg lubridate::ymd(paste0(year, "-01-01"))) # MAKE Date class
+
   x <- plot_data[[col_date]]
-  if (is.factor(x)) x <- as.character(x)
+  if (is.factor(x)) {
+    x <- as.character(x)
+  }
 
   parse_dates <- function(x) {
     # handle NA-only
-    if (all(is.na(x))) return(as.POSIXct(NA))
+    if (all(is.na(x))) {
+      return(as.POSIXct(NA))
+    }
     # year-month like "2023-1" or "2023-01"
     if (all(grepl("^\\d{4}-\\d{1,2}$", x[!is.na(x)]))) {
       return(ymd(paste0(x, "-01")))
     }
     # try common lubridate parsers (datetime -> date)
     out <- suppressWarnings(ymd_hms(x))
-    if (!all(is.na(out))) return(out)
+    if (!all(is.na(out))) {
+      return(out)
+    }
     out <- suppressWarnings(ymd(x))
-    if (!all(is.na(out))) return(out)
+    if (!all(is.na(out))) {
+      return(out)
+    }
     # fallback to as.POSIXct for other formats
     out <- suppressWarnings(as.POSIXct(x, tz = "UTC"))
-    if (!all(is.na(out))) return(out)
-        stop("comp_semester_rects: could not parse dates in column ", col_date)
+    if (!all(is.na(out))) {
+      return(out)
+    }
+    stop("comp_semester_rects: could not parse dates in column ", col_date)
   }
 
   dates <- parse_dates(x)

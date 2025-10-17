@@ -312,8 +312,8 @@ time_visit_wday_summary |>
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
   ) +
-  theme_minimal()
-
+  theme_minimal() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 ```
 
@@ -415,7 +415,8 @@ time_visit_wday_summary_fingerprint |>
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 ```
 
@@ -490,7 +491,8 @@ time_visit_wday_summary_fingerprint |>
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 ```
 
@@ -585,7 +587,8 @@ time_visit_wday_summary_fingerprint_unique |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  ) 
+  )   +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 ```
 
@@ -685,7 +688,8 @@ time_visit_wday_summary_week_summarized_dateformat |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  ) 
+  )   +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 ```
 
@@ -762,7 +766,8 @@ time_visit_wday_summary |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  )
+   ) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 ```
 
 
@@ -902,7 +907,8 @@ time_visit_wday_summary_fingerprint_unique |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  )
+  ) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 ```
 
 #### Woche
@@ -974,7 +980,8 @@ time_visit_wday_summary_week |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  )
+  ) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 ```
 
 
@@ -1031,7 +1038,7 @@ n_action |>
   ) +
   labs(
     caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many.",
+    title = "Most users do only a few actions, but some do many.",
     x = "Number of actions per visit",
     y = "Number of visits"
   )
@@ -1513,7 +1520,8 @@ time2 |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  ) 
+  )  +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 
 ```
@@ -1587,7 +1595,8 @@ time2_fingerprint |>
     alpha = 0.2,
     fill = "orange"
   ) +
-  geom_bin2d(binwidth = c(1, 1))  # (1 day, 1 hour)
+  geom_bin2d(binwidth = c(1, 1))  + # (1 day, 1 hour) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 
 ``` 
   
@@ -1665,8 +1674,8 @@ time2_fingerprint |>
     alpha = 0.2,
     fill = "orange"
   )+
-  geom_bin2d(binwidth = c(7, 1))  # 1 week, 1 hour
-
+  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 ```
 
 #### fingerprint
@@ -1743,6 +1752,7 @@ time2_fingerprint |>
     alpha = 0.2,
     fill = "orange"
   ) + 
+  geom_smooth(method = "loess", se = FALSE, color = "blue")+ 
   geom_bin2d(binwidth = c(7, 1))  # 1 week, 1 hour
 ```
 
@@ -1845,7 +1855,7 @@ time2_fingerprint |>
     fill = "orange"
   )  +
 
-  geom_bin2d(binwidth = c(7, 1))  # 1 week, 1 hour
-
+  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 ```
 

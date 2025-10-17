@@ -2,7 +2,7 @@
 # Verweildauer pro Visit 
 
 
-# Setup
+## Setup
 
 ```{r load-libs}
 library(tidyverse)
@@ -321,12 +321,6 @@ time_spent_by_month_name <-
 time_spent_by_month_name |>
   ggplot(aes(x = month_start, y = time_spent_month_avg)) +
   geom_line(group = 1, color = "grey60") +
-  labs(
-    caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many.",
-    x = "Number of actions per visit",
-    y = "Number of visits"
-  ) +
 
   # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
   annotate(
@@ -408,70 +402,25 @@ time_spent_by_year
 
 
 ```{r}
+time_spent_by_year <-
+  time_spent_by_year |>
+  mutate(year_date = lubridate::ymd(paste0(year, "-01-01"))) # MAKE Date class
+
+rect_data <- comp_semester_rects(time_spent_by_year, col_date = "year_date")
+
 time_spent_by_year |>
-  ggplot(aes(x = year, y = time_spent_avg)) +
+  ggplot(aes(x = year_date, y = time_spent_avg)) +
+  scale_x_date(date_labels = "%Y") +
   geom_line(group = 1, color = "grey60") +
-  geom_point() +
-  labs(
-    caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many.",
-    x = "Number of actions per visit",
-    y = "Number of visits"
-  ) +
-
-  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
-  annotate(
-    "rect",
-    xmin = as.Date("2023-03-01"),
-    xmax = as.Date("2023-07-31"),
-    ymin = -Inf,
-    ymax = Inf,
+  geom_rect(
+    data = rect_data |> mutate(xmin = as.Date(xmin), xmax = as.Date(xmax)), # ensure Date
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
     alpha = 0.2,
-    fill = "skyblue"
+    inherit.aes = FALSE
   ) +
-
-  annotate(
-    "rect",
-    xmin = as.Date("2024-03-01"),
-    xmax = as.Date("2024-07-31"),
-    ymin = -Inf,
-    ymax = Inf,
-    alpha = 0.2,
-    fill = "skyblue"
-  ) +
-  annotate(
-    "rect",
-    xmin = as.Date("2025-03-01"),
-    xmax = as.Date("2025-07-31"),
-    ymin = -Inf,
-    ymax = Inf,
-    alpha = 0.2,
-    fill = "skyblue"
-  ) +
-
-  # --- Highlight October–February (semester break or 2nd term) ---
-  annotate(
-    "rect",
-    xmin = as.Date("2023-10-01"),
-    xmax = as.Date("2024-02-28"),
-    ymin = -Inf,
-    ymax = Inf,
-    alpha = 0.2,
-    fill = "orange"
-  ) +
-  # annotate("rect",
-  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
-  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
-  annotate(
-    "rect",
-    xmin = as.Date("2024-10-01"),
-    xmax = as.Date("2025-02-28"),
-    ymin = -Inf,
-    ymax = Inf,
-    alpha = 0.2,
-    fill = "orange"
-  )
-
+  geom_point()
+# ...existing code...
 ```
 
 
@@ -556,7 +505,8 @@ time_spent_by_week_name |>
     fill = "orange"
   ) +
   geom_line(group = 1, color = "grey60") +
-  geom_point()
+  geom_point() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue")
 ```
 
 
@@ -572,7 +522,7 @@ time_spent_w_course_university_summary <-
     distinct_courses_n = n_distinct(course),
     diff_time_mean = mean(time_diff, na.rm = TRUE),
     n = n()
- )
+  )
 
 time_spent_w_course_university_summary
 ```
