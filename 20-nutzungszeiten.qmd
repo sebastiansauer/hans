@@ -251,7 +251,70 @@ time_visit_wday_summary |>
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
   ) +
-    
+  
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+
+  # --- Your data lines ---
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    title = "The number of visits reflect the teaching periods of the semesters.",
+    x = "month/year"
+  ) +
+  theme_minimal()
+
+
 ```
 
 #### fingerprint
@@ -290,7 +353,70 @@ time_visit_wday_summary_fingerprint |>
   labs(
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
-  )
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+
+  # --- Your data lines ---
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    title = "The number of visits reflect the teaching periods of the semesters.",
+    x = "month/year"
+  ) +
+  theme_minimal()
+
 ```
 
 
@@ -406,7 +532,61 @@ time_visit_wday_summary_fingerprint_unique |>
   labs(
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
-  )
+  ) +
+    
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) 
+
 ```
 
 
@@ -452,7 +632,61 @@ time_visit_wday_summary_week_summarized_dateformat |>
   labs(
     title = "The number of visits is increasing and reflects the teaching periods of the semesters.",
     x = "week number/year"
-  )
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) 
+
 ```
 
 
@@ -780,9 +1014,6 @@ tbl_n_action
 
 
 
-![](tbl_count_action.png)
-
-
 
 `nr_max` gibt den Maximalwert von `nr` zurück, sagt also, wie viele Aktionen maximal während eines Vitis ausgeführt wurden.
 
@@ -800,7 +1031,9 @@ n_action |>
   ) +
   labs(
     caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many."
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
   )
 
 ```
@@ -858,7 +1091,9 @@ n_action_fingerprint |>
   ) +
   labs(
     caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many."
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
   )
 
 ```
@@ -887,12 +1122,7 @@ tbl_n_action_fingerprint_unique |>
     xintercept = tbl_n_action_fingerprint_unique$Median,
     color = "blue",
     linetype = "dashed"
-  ) +
-  labs(
-    caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many."
-  )
-
+  ) 
 ```
 
 
@@ -1224,7 +1454,67 @@ time2 |>
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
   labs(caption = "Each x-bin maps to one week") +
-  scale_x_date(breaks = breaks_pretty())
+  scale_x_date(breaks = breaks_pretty()) +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) 
+
 
 ```
 
@@ -1308,7 +1598,6 @@ time2_fingerprint |>
 ```{r time2-heatmap-week}
   time2 |>
     ggplot(aes(x = date, y = hour)) +
-  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
   scale_x_date(date_breaks = "1 week", date_labels = "%W") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
@@ -1316,9 +1605,70 @@ time2_fingerprint |>
     x = "Week number in 2023/2024",
     caption = "Each x-bin maps to one week"
   ) +
-  scale_x_date(breaks = breaks_pretty())
+  scale_x_date(breaks = breaks_pretty())+
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  )+
+  geom_bin2d(binwidth = c(7, 1))  # 1 week, 1 hour
+
 ```
-ime 
+
 #### fingerprint
 
 
@@ -1326,7 +1676,6 @@ ime
 time2_fingerprint |>
   distinct(fingerprint, .keep_all = TRUE) |>
   ggplot(aes(x = date, y = hour)) +
-  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
   scale_x_date(date_breaks = "1 week", date_labels = "%W") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
@@ -1334,7 +1683,67 @@ time2_fingerprint |>
     x = "Week number in 2023/2024",
     caption = "Each x-bin maps to one week"
   ) +
-  scale_x_date(breaks = breaks_pretty())
+  scale_x_date(breaks = breaks_pretty())+
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) + 
+  geom_bin2d(binwidth = c(7, 1))  # 1 week, 1 hour
 ```
 
 
@@ -1366,7 +1775,6 @@ time2 |>
 time2_fingerprint |>
   distinct(fingerprint, .keep_all = TRUE) |>
   ggplot(aes(x = date, y = dow)) +
-  geom_bin2d(binwidth = c(7, 1)) + # 1 week, 1 hour
   scale_x_date(date_breaks = "1 week", date_labels = "%W") +
   theme(legend.position = "bottom") +
   scale_fill_viridis_c() +
@@ -1376,6 +1784,68 @@ time2_fingerprint |>
     y = "Day of Week"
   ) +
   scale_y_continuous(breaks = 1:7) +
-  scale_x_date(breaks = breaks_pretty())
+  scale_x_date(breaks = breaks_pretty()) +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  )  +
+
+  geom_bin2d(binwidth = c(7, 1))  # 1 week, 1 hour
+
 ```
 
