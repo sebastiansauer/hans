@@ -5,6 +5,10 @@
 # Quarto publishing artifacts
 .quarto/
 _publish/
+docs/
+_site/
+_book/
+
 
 # Jupyter/knitr caches (if used in .qmd)
 .Rproj.user/
