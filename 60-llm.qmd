@@ -436,7 +436,7 @@ ggviolin(
   theme_minimal() +
   labs(
     title = "Prompt length by course",
-    x = "University",
+    x = "Course",
     y = "Prompt length (in tokens)",
     caption = "The dots represent the mean and the error bars the standard error of the mean."
   ) +
@@ -1021,7 +1021,7 @@ verify_option_summary <- as_tibble(verify_option_summary)
 
 
 
-```{r verify_option_summary}
+```{r verify_option_summary_3}
 #| eval: false
 verify_option_summary <-
   data_separated_filtered |>
