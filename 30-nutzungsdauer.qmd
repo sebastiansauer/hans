@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Verweildauer pro Visit 
 
@@ -548,3 +549,601 @@ time_spent_w_course_university_summary |>
   geom_point() +
   labs(y = "No. of visits per month", x = "No. of distinct courses per month")
 ```
+||||||| c11380f
+=======
+
+# Verweildauer pro Visit 
+
+
+# Setup
+
+```{r load-libs}
+library(tidyverse)
+library(lubridate)
+library(gt)
+library(targets)
+library(ggpubr)
+library(scales)
+```
+
+```{r}
+source("_common.r")
+```
+
+
+
+```{r load-targets}
+tar_load(c(
+  data_separated_filtered,
+  time_duration,
+  time_spent,
+  time_spent_w_course_university,
+  time_spent_fingerprint
+))
+```
+
+## Berechnungsgrundlage der Verweildauer
+
+Die Verweildauer wurde berechnet als Differenz zwischen kleinstem und größtem Datumszeitwert (POSixct) eines Visits (also pro Wert der Variablen `idvisit`), vgl. [Funktion `diff_time`](https://github.com/sebastiansauer/hans/blob/main/funs/diff_time.R).
+Diese Variable heißt `time_diff` im Objekt `time_spent`.
+
+Dabei wird das Objekt `data_separated_filtered` herangezogen, vgl. [die Definition es Targets "time_spent" in der Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L205).
+
+
+
+
+## Vorverarbeitung
+
+Die Visit-Zeit wurde auf 600 Min. trunkiert/begrenzt.
+
+### idvisit
+
+```{r}
+time_spent |>
+  head(30)
+```
+
+
+```{r load-time-spent}
+time_spent <-
+  time_spent |>
+  # compute time (t) in minutes (min):
+  mutate(t_minutes = as.numeric(time_diff, units = "mins")) |>
+  filter(t_minutes < 600)
+```
+
+### fingerprint
+
+```{r}
+time_spent_fingerprint |>
+  head(30)
+```
+
+
+```{r load-time-spent_2}
+time_spent_fingerprint <-
+  time_spent_fingerprint |>
+  # compute time (t) in minutes (min):
+  mutate(t_minutes = as.numeric(time_diff, units = "mins")) |>
+  filter(t_minutes < 600)
+```
+
+### fingerprint unqiue
+
+```{r}
+time_spent_fingerprint |>
+  head(30)
+```
+
+
+```{r load-time-spent_2_2}
+time_spent_fingerprint_unique <-
+  time_spent_fingerprint |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  # compute time (t) in minutes (min):
+  mutate(t_minutes = as.numeric(time_diff, units = "mins")) |>
+  filter(t_minutes < 600)
+```
+
+
+## Verweildauer-Statistiken in Sekunden 
+
+Die Verweildauer ist im Folgenden dargestellt auf Grundlage oben dargestellter Berechnungsgrundlage (in Sekunden).
+
+### idvisit
+
+```{r comp-diff-time-stats}
+time_spent |>
+  summarise(
+    mean_time_diff = round(mean(time_diff), 2),
+    sd_time_diff = sd(time_diff),
+    min_time_diff = min(time_diff), # shortest duration
+    max_time_diff = max(time_diff) # longest
+  )
+```
+
+### fingerprint
+
+```{r comp-diff-time-stats_2}
+time_spent_fingerprint |>
+  summarise(
+    mean_time_diff = round(mean(time_diff), 2),
+    sd_time_diff = sd(time_diff),
+    min_time_diff = min(time_diff), # shortest duration
+    max_time_diff = max(time_diff) # longest
+  )
+```
+
+
+### fingerprint unqiue
+
+```{r comp-diff-time-stats_2_2}
+time_spent_fingerprint_unique |>
+  summarise(
+    mean_time_diff = round(mean(time_diff), 2),
+    sd_time_diff = sd(time_diff),
+    min_time_diff = min(time_diff), # shortest duration
+    max_time_diff = max(time_diff) # longest
+  )
+```
+
+
+## Verweildauer auf Basis der Variable `visitduration`
+
+### Für alle Daten
+
+Alternativ zur Berechnung der Verweildauer steht eine Variable, `visitduration` zur Verfügung, die (offenbar) die Dauer des Visits misst bzw. messen soll.
+
+Allerdings resultieren substanziell andere Werte,
+wenn man diese Variable heranzieht zur Berechnung der Verweildauer,
+vgl. [Target `time_duration` in der Targets-Pipeline](https://github.com/sebastiansauer/hans/blob/main/_targets.R#L211).
+
+
+```{r}
+time_duration |>
+  head(30)
+```
+
+
+
+```{r time-duration}
+time_duration |>
+  summarise(duration_sec_avg = mean(visitduration_sec, na.rm = TRUE)) |>
+  mutate(duration_min_avg = duration_sec_avg / 60)
+```
+
+### Für unique idvisits 
+
+```{r time-duration_2}
+time_duration |>
+  distinct(idvisit, .keep_all = TRUE) |>
+  summarise(duration_sec_avg = mean(visitduration_sec, na.rm = TRUE)) |>
+  mutate(duration_min_avg = duration_sec_avg / 60)
+```
+
+### Für unique fingerprints
+
+```{r time-duration-fingerprint}
+time_duration |>
+  distinct(fingerprint, .keep_all = TRUE) |>
+  summarise(duration_sec_avg = mean(visitduration_sec, na.rm = TRUE)) |>
+  mutate(duration_min_avg = duration_sec_avg / 60)
+```
+
+
+
+## Verweildauer-Statistiken in Minuten
+
+```{r time-spent-tbl}
+time_spent |>
+  mutate(time_diff_minutes = time_length(time_diff, unit = "minute")) |>
+  summarise(
+    mean_time_diff = round(mean(time_diff_minutes), 2),
+    sd_time_diff = sd(time_diff_minutes),
+    min_time_diff = min(time_diff_minutes), # shortest duration
+    max_time_diff = max(time_diff_minutes) # longest
+  )
+```
+
+
+```{r}
+small_padding_theme <- ggpubr::ttheme(
+  tbody.style = tbody_style(size = 8), # Smaller font size can help
+  colnames.style = colnames_style(size = 9, face = "bold"),
+  padding = unit(c(2, 2), "mm") # Reduce horizontal and vertical padding
+)
+```
+
+
+```{r}
+#| eval: false
+ggpubr::ggtexttable(
+  time_spent_summary,
+  rows = NULL,
+  theme = small_padding_theme
+)
+```
+
+
+## Visualisierung der Verweildauer
+
+### Binwidth=10 Minutes
+
+```{r plot-time-spent1}
+time_spent |>
+  mutate(time_diff_minutes = time_diff / 60) |>
+  ggplot(aes(x = time_diff_minutes)) + # minutes
+  geom_histogram(binwidth = 10) +
+  #scale_x_time() +
+  theme_minimal() +
+  labs(y = "n", x = "Verweildauer in HaNS pro Visit in d:h:m") +
+  scale_x_time(breaks = pretty_breaks())
+```
+
+
+
+### Bin width= 20 Minutes
+
+```{r plot-time-spent2}
+time_spent |>
+  mutate(time_diff_minutes = time_diff / 60) |>
+  ggplot(aes(x = time_diff_minutes)) + # minutes
+  geom_histogram(binwidth = 20) +
+  theme_minimal() +
+  labs(
+    y = "n",
+    x = "Verweildauer",
+    title = "Verweildauer in HaNS pro Visit in d:h:m"
+  ) +
+  scale_x_time(breaks = pretty_breaks())
+```
+
+### Zeitdauer begrenzt auf 1-120 Min.
+
+```{r plot-time-spent3}
+time_spent2 <-
+  time_spent |>
+  filter(time_diff > 1, time_diff < 120)
+
+time_spent2 |>
+  ggplot(aes(x = time_diff)) +
+  geom_histogram(binwidth = 10) +
+  theme_minimal() +
+  labs(
+    y = "n",
+    x = "Verweildauer in HaNS pro Visit in Minuten",
+    title = "Verweildauer begrenzt auf 1-120 Minuten",
+    caption = "bindwidth = 10 Min."
+  )
+```
+
+
+
+### Veränderung der Verweildauer im Zeitverlauf
+
+#### Monat
+
+Die Einheit von `time_spent` ist Sekunden.
+
+```{r}
+time_spent_by_month <-
+  time_spent |>
+  mutate(month_start = floor_date(time_min, "month")) |>
+  mutate(
+    month_name = lubridate::month(month_start, label = TRUE, abbr = FALSE),
+    month_num = lubridate::month(month_start, label = FALSE),
+    year = lubridate::year(month_start)
+  ) |>
+  group_by(month_num, year) |>
+  summarise(
+    time_spent_month_avg = mean(time_diff, na.rm = TRUE),
+    time_spent_month_sd = sd(time_diff, na.rm = TRUE)
+  ) |>
+  arrange(year, month_num)
+
+time_spent_by_month
+```
+
+
+```{r time_spent_by_month}
+time_spent_by_month |>
+  mutate(
+    time_spent_month_avg = round(time_spent_month_avg, 2),
+    time_spent_month_sd = round(time_spent_month_sd, 2)
+  ) |>
+  ggtexttable()
+```
+
+
+
+```{r time_spent_by_month_name}
+time_spent_by_month_name <-
+  time_spent |>
+  mutate(month_start = lubridate::floor_date(time_min, "month")) |>
+  mutate(
+    month_name = lubridate::month(month_start, label = TRUE, abbr = FALSE),
+    month_num = lubridate::month(month_start, label = FALSE),
+    year = lubridate::year(month_start)
+  ) |>
+  group_by(month_start, year) |>
+  summarise(
+    time_spent_month_avg = mean(time_diff, na.rm = TRUE),
+    time_spent_month_sd = sd(time_diff, na.rm = TRUE)
+  )
+
+time_spent_by_month_name |>
+  ggplot(aes(x = month_start, y = time_spent_month_avg)) +
+  geom_line(group = 1, color = "grey60") +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+
+  geom_point()
+```
+
+
+#### Jahr
+
+```{r}
+time_spent_by_year <-
+  time_spent |>
+  mutate(month_start = lubridate::floor_date(time_min, "month")) |>
+  mutate(
+    month_name = lubridate::month(month_start, label = TRUE, abbr = FALSE),
+    month_num = lubridate::month(month_start, label = FALSE),
+    year = year(month_start)
+  ) |>
+  group_by(year) |>
+  summarise(
+    time_spent_avg = mean(time_diff, na.rm = TRUE),
+    time_spent_sd = sd(time_diff, na.rm = TRUE)
+  )
+
+time_spent_by_year
+```
+
+
+
+```{r}
+time_spent_by_year |>
+  ggplot(aes(x = year, y = time_spent_avg)) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point() +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  )
+
+```
+
+
+
+#### Woche
+
+
+
+
+
+```{r time_spent_by_week_name}
+
+time_spent_by_week_name <-
+  time_spent |>
+  mutate(week_start = lubridate::floor_date(time_min, "week")) |>
+  mutate(week_num = lubridate::week(week_start), year = year(week_start)) |>
+  group_by(week_start, year) |>
+  summarise(
+    time_spent_week_avg = mean(time_diff, na.rm = TRUE),
+    time_spent_week_sd = sd(time_diff, na.rm = TRUE)
+  )
+
+time_spent_by_week_name |>
+  ggplot(aes(x = week_start, y = time_spent_week_avg)) +
+  labs(
+    caption = "Vertical dashed lines shows the median.",
+    title = "Most users to only a few actions, but some do many.",
+    x = "Number of actions per visit",
+    y = "Number of visits"
+  ) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  geom_line(group = 1, color = "grey60") +
+  geom_point()
+```
+
+
+## Zusammenhang von Lehrveranstaltung und Verweildauer
+
+
+
+```{r}
+time_spent_w_course_university_summary <-
+  time_spent_w_course_university |>
+  group_by(floor_date_month) |>
+  summarise(
+    distinct_courses_n = n_distinct(course),
+    diff_time_mean = mean(time_diff, na.rm = TRUE),
+    n = n()
+ )
+
+time_spent_w_course_university_summary
+```
+
+
+
+```{r}
+time_spent_w_course_university_summary |>
+  ggplot(aes(x = distinct_courses_n, y = diff_time_mean)) +
+  geom_point()
+```
+
+## Zusammenhang von Lehrveranstaltung und Anzahl Visits
+
+```{r}
+time_spent_w_course_university_summary |>
+  ggplot(aes(x = distinct_courses_n, y = n)) +
+  geom_point() +
+  labs(y = "No. of visits per month", x = "No. of distinct courses per month")
+```
+>>>>>>> ca6ac8851ca90663db878f923442b0def3ef78e8
