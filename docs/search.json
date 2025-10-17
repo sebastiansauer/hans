@@ -234,7 +234,7 @@
     "href": "30-nutzungsdauer.html#zusammenhang-von-lehrveranstaltung-und-verweildauer",
     "title": "\n4  Verweildauer pro Visit\n",
     "section": "\n5.7 Zusammenhang von Lehrveranstaltung und Verweildauer",
-    "text": "5.7 Zusammenhang von Lehrveranstaltung und Verweildauer\n\nShow the codetime_spent_w_course_university_summary &lt;-\n  time_spent_w_course_university |&gt;\n  group_by(floor_date_month) |&gt;\n  summarise(\n    distinct_courses_n = n_distinct(course),\n    diff_time_mean = mean(time_diff, na.rm = TRUE),\n    n = n()\n  )\n\ntime_spent_w_course_university_summary\n\n\n  \n\n\n\n\nShow the codetime_spent_w_course_university_summary |&gt;\n  ggplot(aes(x = distinct_courses_n, y = diff_time_mean)) +\n  geom_point()",
+    "text": "5.7 Zusammenhang von Lehrveranstaltung und Verweildauer\n\nShow the codetime_spent_w_course_university_summary &lt;-\n  time_spent_w_course_university |&gt;\n  group_by(floor_date_month) |&gt;\n  summarise(\n    distinct_courses_n = n_distinct(course),\n    diff_time_mean = mean(time_diff, na.rm = TRUE),\n    n = n()\n )\n\ntime_spent_w_course_university_summary\n\n\n  \n\n\n\n\nShow the codetime_spent_w_course_university_summary |&gt;\n  ggplot(aes(x = distinct_courses_n, y = diff_time_mean)) +\n  geom_point()",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Verweildauer pro Visit</span>"
     ]

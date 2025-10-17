@@ -122,6 +122,59 @@ n_action_type_per_month_top3
 ```{r n_action_type_per_month_top3-ggplot}
 n_action_type_per_month_top3 |>
   ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
   geom_line()
 ```
 
@@ -178,6 +231,59 @@ n_action_type_per_month_top3_fingerprint
 ```{r n_action_type_per_month_top3-ggplot_2}
 n_action_type_per_month_top3_fingerprint |>
   ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) + 
+
   geom_line()
 ```
 
@@ -227,6 +333,58 @@ n_action_type_per_month_top3_per_course <-
 n_action_type_per_month_top3_per_course |>
   ggplot(aes(x = month_start, y = n, color = category, group = category)) +
   facet_wrap(~course, ncol = 3, scales = "free_y") +
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) + 
   geom_line() +
   theme(legend.position = "bottom") +
   scale_x_date(date_labels = "%b %Y")
@@ -238,6 +396,58 @@ n_action_type_per_month_top3_per_course |>
 n_action_type_per_month_top3_per_course |> 
   filter(course %in% c("cta1", "gesoa")) |> 
   ggplot(aes(x = month_start, y = n, color = category, group = category)) +
+  # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-03-01"),
+    xmax = as.Date("2023-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  annotate(
+    "rect",
+    xmin = as.Date("2024-03-01"),
+    xmax = as.Date("2024-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+  annotate(
+    "rect",
+    xmin = as.Date("2025-03-01"),
+    xmax = as.Date("2025-07-31"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "skyblue"
+  ) +
+
+  # --- Highlight October–February (semester break or 2nd term) ---
+  annotate(
+    "rect",
+    xmin = as.Date("2023-10-01"),
+    xmax = as.Date("2024-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) +
+  # annotate("rect",
+  #          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),
+  #          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +
+  annotate(
+    "rect",
+    xmin = as.Date("2024-10-01"),
+    xmax = as.Date("2025-02-28"),
+    ymin = -Inf,
+    ymax = Inf,
+    alpha = 0.2,
+    fill = "orange"
+  ) + 
   facet_wrap(~course, ncol = 3, scales = "free_y") +
   geom_line() +
   theme(legend.position = "bottom") +
@@ -524,7 +734,7 @@ n_action_type_counted |>
   geom_col() +
   geom_bar_text() +
   labs(
-    x = "Anazhl der User-Aktionen",
+    x = "Anzahl der User-Aktionen",
     y = "Aktion",
     title = "Anzahl der User-Aktionen nach Kategorie",
     caption = "Log10-Skala"
