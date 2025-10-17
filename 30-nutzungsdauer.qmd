@@ -321,7 +321,8 @@ time_spent_by_month_name <-
 time_spent_by_month_name |>
   ggplot(aes(x = month_start, y = time_spent_month_avg)) +
   geom_line(group = 1, color = "grey60") +
-
+  scale_y_time(labels = scales::time_format("%H:%M:%S")) +
+  labs(x = "Datum", y = "Durchschnittliche Verweildauer pro Visit (in h:m:s)") +
   # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
   annotate(
     "rect",
@@ -445,12 +446,8 @@ time_spent_by_week_name <-
 
 time_spent_by_week_name |>
   ggplot(aes(x = week_start, y = time_spent_week_avg)) +
-  labs(
-    caption = "Vertical dashed lines shows the median.",
-    title = "Most users to only a few actions, but some do many.",
-    x = "Number of actions per visit",
-    y = "Number of visits"
-  ) +
+  scale_y_time(labels = scales::time_format("%H:%M")) +
+  labs(x = "Datum", y = "Durchschnittliche Verweildauer pro Woche (h:m)") +
 
   # --- Highlight March–July (approx 1 Mar to 31 Jul) ---
   annotate(
