@@ -244,7 +244,7 @@ idvisit_has_llm |>
     ymax = Inf,
     alpha = 0.2,
     fill = "orange"
-  ) + 
+  ) +
   geom_point() +
   geom_line(aes(group = uses_llm)) +
   labs(
@@ -422,7 +422,7 @@ ggviolin(
 ```{r}
 prompt_length_date_uni_course |>
   group_by(course) |>
-  describe_distribution(token_length) |> 
+  describe_distribution(token_length) |>
   print_md()
 ```
 
@@ -447,7 +447,7 @@ ggviolin(
 ### Token-Länge im Zeitverlauf
 
 ```{r prompt_length_date_uni_course_date}
-prompt_length_date_uni_course |> 
+prompt_length_date_uni_course |>
   group_by(floor_date_month) |>
   describe_distribution(token_length) |>
   print_md()
@@ -456,7 +456,7 @@ prompt_length_date_uni_course |>
 
 ```{r prompt_length_date_uni_course-plot-timeline}
 # Calculate limits properly
-filtered_data <- prompt_length_date_uni_course |> 
+filtered_data <- prompt_length_date_uni_course |>
   filter(!is.na(floor_date_month)) |>
   mutate(floor_date_month_date = as.Date(floor_date_month))
 
@@ -466,7 +466,7 @@ lim <- c(
 )
 
 # Now create the plot
-filtered_data |> 
+filtered_data |>
   ggplot(aes(x = floor_date_month_date, y = token_length)) +
   geom_violin(aes(group = floor_date_month_date)) +
   stat_summary(fun = "mean", geom = "point") +
@@ -474,10 +474,10 @@ filtered_data |>
   theme_minimal() +
   labs(
     title = "Prompt length over time",
-    x = "Month", 
+    x = "Month",
     y = "Prompt length (in tokens)",
     caption = "The dots represent the mean and the error bars the standard error of the mean."
-  ) + 
+  ) +
   scale_x_date(limits = lim, labels = scales::label_date_short())
 
 ```
@@ -668,8 +668,10 @@ click_transcript_word_per_month
 
 
 ```{r click_transcript_word_per_month_plot}
-rect_data_word_per_month <- comp_semester_rects(click_transcript_word_per_month, 
-col_date = "month_visit")
+rect_data_word_per_month <- comp_semester_rects(
+  click_transcript_word_per_month,
+  col_date = "month_visit"
+)
 
 click_transcript_word_per_month |>
   ggplot(aes(x = month_visit, y = n)) +
@@ -795,8 +797,11 @@ ai_transcript_clicks_per_month_count |>
 
 
 ```{r ai_transcript_clicks_per_month_count-plot}
-rect_data <- comp_semester_rects(ai_transcript_clicks_per_month_count, col_date = "year_month")
-
+rect_data <- comp_semester_rects(
+  ai_transcript_clicks_per_month_count,
+  col_date = "year_month"
+)
+# try common lubridate parsers (datetime -> date)
 
 ai_transcript_clicks_per_month_count |>
   mutate(date = ymd(paste0(year_month, "-01"))) |>
@@ -817,7 +822,8 @@ ai_transcript_clicks_per_month_count |>
 ```{r ai_transcript_clicks_per_month_count-plot_with_semesters}
 # --- 1. Prepare Data and Determine Year Range ---
 # We assign the processed data to a temporary variable to calculate the year range.
-ai_clicks_data <- ai_transcript_clicks_per_month_count |>
+ai_clicks_data <-
+  ai_transcript_clicks_per_month_count |>
   mutate(date = ymd(paste0(year_month, "-01")))
 
 # --- 2. Calculate the Vertical Line Intercept Dates ---
@@ -1075,7 +1081,7 @@ verify_option_summary_fingerprint |>
 
 #### Anzahl `verify_option_wrong` verify_option_div_by_4 - geteilt durch 4
 
-```{r}
+```{r verify_option_summary}
 verify_option_summary <-
   verify_option_summary |>
   mutate(verify_option_div_by_4 = verify_option / 4)
@@ -1093,7 +1099,7 @@ verify_option_summary |>
 
 #### Anzahl "Multiple choice answer selected"
 
-```{r}
+```{r check_if_both_methods_give_same_number}
 check_if_both_methods_give_same_number <-
   n_mc_answers_selected |>
   full_join(verify_option_summary)
@@ -1118,13 +1124,22 @@ mc_answers_with_timestamps <-
   mutate(date = as.Date(timestamp))
 
 lim <- c(
-  min(mc_answers_with_timestamps$date),
+  floor_date(min(mc_answers_with_timestamps$date), unit = "year"),
   max(mc_answers_with_timestamps$date)
 )
+
+rect_data <- comp_semester_rects(mc_answers_with_timestamps, col_date = "date")
 
 mc_answers_with_timestamps |>
   ggplot(aes(x = date, y = n_cumulated)) +
   scale_x_date(limits = lim, labels = scales::label_date_short()) +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  ) +
   geom_point() +
   geom_line()
 ```
