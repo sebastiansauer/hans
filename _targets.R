@@ -121,6 +121,14 @@ list(
       group_by(fingerprint) |>
       summarise(nr_max = max(nr))
   ),
+  tar_target(n_action_lt_500,
+  n_action |>
+  filter(nr_max != 499)),
+
+  tar_target(n_action_lt_500_fingerprint,
+  n_action_fingerprint |>
+  filter(nr_max != 499)),
+
 
   # count number of actions per visit and adds date of visit:
   tar_target(

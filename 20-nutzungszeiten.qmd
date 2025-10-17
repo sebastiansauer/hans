@@ -30,7 +30,9 @@ tar_load(c(
   time_visit_wday,
   n_action_fingerprint,
   time_visit_wday_fingerprint,
-  data_separated_filtered
+  data_separated_filtered,
+  n_action_lt_500,
+  n_action_lt_500_fingerprint
 ))
 
 ```
@@ -248,7 +250,8 @@ time_visit_wday_summary |>
   labs(
     title = "The number of visits reflect the teaching periods of the semesters.",
     x = "month/year"
-  )
+  ) +
+    
 ```
 
 #### fingerprint
@@ -899,10 +902,6 @@ tbl_n_action_fingerprint_unique |>
 ### idvisit
 
 ```{r count-action-tbl2}
-n_action_lt_500 <-
-  n_action |>
-  filter(nr_max != 499)
-
 n_action_lt_500 |>
   describe_distribution(nr_max) |>
   gt() |>
@@ -914,10 +913,6 @@ n_action_lt_500 |>
 
 
 ```{r count-action-tbl2-fingerpint}
-n_action_lt_500_fingerprint <-
-  n_action_fingerprint |>
-  filter(nr_max != 499)
-
 n_action_lt_500_fingerprint |>
   describe_distribution(nr_max) |>
   gt() |>

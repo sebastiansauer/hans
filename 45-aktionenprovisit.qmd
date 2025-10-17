@@ -30,7 +30,10 @@ tar_load(c(
   time_visit_wday,
   time_visit_wday_fingerprint,
   data_separated_filtered_date_uni_course,
-  n_action_fingerprint
+  n_action_fingerprint,
+  n_action_w_date_fingerprint,
+  n_action_lt_500,
+  n_action_lt_500_fingerprint
 ))
 ```
 
@@ -492,7 +495,7 @@ ggplot(n_action_lt_500) +
 
 #### fingerprint
 
-```{r}
+```{r n_action_lt_500_fingerprint}
 n_action_lt_500_fingerprint <-
   n_action_lt_500_fingerprint |>
   mutate(
