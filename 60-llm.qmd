@@ -828,7 +828,11 @@ ai_transcript_clicks_per_month_count |>
   geom_line(group = 1) +
   geom_point() +
   theme_minimal() +
-  labs(title = "Number of AI transcript clicks per month", x = "date [months]")
+  labs(
+    title = "Number of AI transcript clicks per month",
+    x = "date [months]"
+  ) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue", alpha = 0.2)
 ```
 
 ```{r ai_transcript_clicks_per_month_count-plot_with_semesters}

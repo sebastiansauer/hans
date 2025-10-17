@@ -46,7 +46,7 @@ comp_semester_rects <- function(plot_data, col_date, ymin = 0, ymax = Inf) {
   min_year <- year(min_date)
   max_year <- year(max_date)
 
-  rect_years <- seq(min_year - 1, max_year + 1)
+  rect_years <- seq(min_year, max_year + 1)
 
   summer_rects <- tibble(year = rect_years) |>
     mutate(
