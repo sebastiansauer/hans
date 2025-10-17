@@ -359,6 +359,11 @@ n_action_w_date_fingerprint_unique <-
   n_action_w_date_fingerprint |>
   distinct(fingerprint, .keep_all = TRUE)
 
+rect_data <- comp_semester_rects(
+  n_action_w_date_fingerprint_unique,
+  col_date = "month_date"
+)
+
 n_action_w_date_fingerprint_unique |>
   ggplot(aes(x = month_date, y = nr_max)) +
   stat_summary(fun = mean, geom = "point", size = 2) +
@@ -369,7 +374,14 @@ n_action_w_date_fingerprint_unique |>
     width = 0.2
   ) +
   geom_smooth(method = "lm") +
-  labs(title = "The number of actions per visit has incresed over time")
+  labs(title = "The number of actions per visit has incresed over time") +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  )
 ```
 
 
@@ -422,7 +434,15 @@ n_action_w_date_fingerprint |>
   stat_summary(fun = mean, geom = "point", size = 2) +
   stat_summary(fun.data = mean_sdl, geom = "errorbar", width = 0.2) +
   geom_smooth(method = "lm") +
-  labs(title = "The number of actions per fingerprint has incresed over time")
+  labs(title = "The number of actions per fingerprint has incresed over time") +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  )
+
 ```
 
 #### fingerprint unique
@@ -437,7 +457,14 @@ n_action_w_date_fingerprint_unique |>
   stat_summary(fun = mean, geom = "point", size = 2) +
   stat_summary(fun.data = mean_sdl, geom = "errorbar", width = 0.2) +
   geom_smooth(method = "lm") +
-  labs(title = "The number of actions per fingerprint has incresed over time")
+  labs(title = "The number of actions per fingerprint has incresed over time") +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  )
 ```
 
 
@@ -568,7 +595,14 @@ n_action_w_date |>
     group = n_actions_type
   )) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  )
 ```
 
 
@@ -639,7 +673,14 @@ n_action_w_date_fingerprint |>
     group = n_actions_type
   )) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  )
 ```
 
 ### fingerprint unique
@@ -663,7 +704,14 @@ n_action_w_date_fingerprint_unique |>
     group = n_actions_type
   )) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  geom_rect(
+    data = rect_data,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    fill = "grey",
+    alpha = 0.2,
+    inherit.aes = FALSE # Essential to use the rect_data columns
+  )
 ```
 
 

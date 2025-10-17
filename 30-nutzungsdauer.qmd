@@ -420,7 +420,9 @@ time_spent_by_year |>
     alpha = 0.2,
     inherit.aes = FALSE
   ) +
-  geom_point()
+  geom_point() +
+  scale_y_time(labels = scales::time_format("%H:%M")) +
+  labs(x = "Jahr", y = "Durchschnittliche Verweildauer pro Jahr (h:m)")
 # ...existing code...
 ```
 
@@ -529,7 +531,13 @@ time_spent_w_course_university_summary
 ```{r}
 time_spent_w_course_university_summary |>
   ggplot(aes(x = distinct_courses_n, y = diff_time_mean)) +
-  geom_point()
+  geom_point() +
+  scale_y_time(labels = scales::time_format("%M:%S")) +
+  labs(
+    y = "Average visit duration (m:s)",
+    x = "No. of distinct courses per month"
+  )
+
 ```
 
 ## Zusammenhang von Lehrveranstaltung und Anzahl Visits

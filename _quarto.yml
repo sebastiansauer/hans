@@ -35,7 +35,7 @@ format:
     theme:
       light: lumen
       dark: darkly
-    embed-resources: true
+    embed-resources: false 
     toc: true
     toc-location: right
     toc-depth: 3
@@ -45,7 +45,9 @@ format:
     code-tools: true
     code-link: true
     df-print: paged
-lightbox: true
+    fig-width: 6 # Adjust width (in inches)
+    fig-height: 4 # Adjust height (in inches)
+    lightbox: true
 
 execute: 
   warning: false
