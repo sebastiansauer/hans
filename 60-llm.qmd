@@ -429,6 +429,8 @@ prompt_length_date_uni_course |>
 ```
 
 ```{r prompt_length_date_uni_course-ggviolin-per-course}
+#| fig-asp: 1
+ 
 ggboxplot(
   prompt_length_date_uni_course,
   x = "course",
