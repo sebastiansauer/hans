@@ -411,8 +411,7 @@ ggboxplot(
   labs(
     title = "Prompt length by university",
     x = "University",
-    y = "Prompt length (in tokens)",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Prompt length (in tokens)"
   ) +
   coord_flip()
 ```
@@ -440,8 +439,7 @@ ggboxplot(
   labs(
     title = "Prompt length by course",
     x = "Course",
-    y = "Prompt length (in tokens)",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Prompt length (in tokens)"
   ) +
   coord_flip()
 ```
@@ -984,8 +982,7 @@ llm_response_text_date_course_uni |>
   labs(
     title = "Number of tokens in LLM responses by university",
     x = "University",
-    y = "Number of tokens",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Number of tokens"
   ) +
   coord_flip()
 ```
@@ -1012,8 +1009,7 @@ llm_response_text_date_course_uni |>
   labs(
     title = "Number of tokens in LLM responses by course",
     x = "Course",
-    y = "Number of tokens",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Number of tokens"
   ) +
   coord_flip()
 ```
@@ -1255,7 +1251,6 @@ prior_existing_questions_summary |>
 prompt_length |>
   head()
 ```
-
 ```{r}
 prompt_length |>
   describe_distribution(token_length)
