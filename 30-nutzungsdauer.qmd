@@ -182,6 +182,7 @@ time_duration |>
 ## Verweildauer-Statistiken in Minuten
 
 ```{r time-spent-tbl}
+time_spent_summary <- 
 time_spent |>
   mutate(time_diff_minutes = time_length(time_diff, unit = "minute")) |>
   summarise(
@@ -190,6 +191,9 @@ time_spent |>
     min_time_diff = min(time_diff_minutes), # shortest duration
     max_time_diff = max(time_diff_minutes) # longest
   )
+
+time_spent_summary |> 
+  gt()
 ```
 
 
@@ -224,7 +228,10 @@ time_spent |>
   #scale_x_time() +
   theme_minimal() +
   labs(y = "n", x = "Verweildauer in HaNS pro Visit in d:h:m") +
-  scale_x_time(breaks = pretty_breaks())
+  scale_x_time(breaks = pretty_breaks()) +
+  geom_vline(xintercept = median(time_spent$time_diff) / 60, color = "blue", linetype = "dashed") +
+  annotate("label", x = median(time_spent$time_diff) / 60, 
+           y = Inf, label = "Median", vjust = 1.5, color = "blue")
 ```
 
 
@@ -242,7 +249,9 @@ time_spent |>
     x = "Verweildauer",
     title = "Verweildauer in HaNS pro Visit in d:h:m"
   ) +
-  scale_x_time(breaks = pretty_breaks())
+  scale_x_time(breaks = pretty_breaks()) +
+  annotate("label", x = median(time_spent$time_diff) / 60, 
+           y = Inf, label = "Median", vjust = 1.5, color = "blue")
 ```
 
 ### Zeitdauer begrenzt auf 1-120 Min.
@@ -261,7 +270,9 @@ time_spent2 |>
     x = "Verweildauer in HaNS pro Visit in Minuten",
     title = "Verweildauer begrenzt auf 1-120 Minuten",
     caption = "bindwidth = 10 Min."
-  )
+  ) +
+  annotate("label", x = median(time_spent$time_diff) / 60, 
+           y = Inf, label = "Median", vjust = 1.5, color = "blue")
 ```
 
 
@@ -468,6 +479,7 @@ time_spent_by_week_name |>
     xmax = as.Date("2024-07-31"),
     ymin = -Inf,
     ymax = Inf,
+
     alpha = 0.2,
     fill = "skyblue"
   ) +

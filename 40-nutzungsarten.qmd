@@ -10,6 +10,7 @@ library(gt)
 library(targets)
 library(ggpubr)
 library(scales)
+library(knitr)
 library(ggfittext)
 ```
 
@@ -506,13 +507,15 @@ data_separated_filtered_count |>
 
 #### Pro Universität 
 
+Sortiert nach Häufigkeiten pro Hochschule
+
 ```{r}
 data_separated_filtered_date_uni_course_top5_uni <-
   data_separated_filtered_date_uni_course |>
   compute_prop_eventcategory_per_uni_course()
 
 data_separated_filtered_date_uni_course_top5_uni |>
-  gt::gt()
+  kable(digits = 2)
 ```
  
 
