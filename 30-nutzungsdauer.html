@@ -643,19 +643,482 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section></section><section id="verweildauer-statistiken-in-minuten" class="level2" data-number="4.6"><h2 data-number="4.6" class="anchored" data-anchor-id="verweildauer-statistiken-in-minuten">
 <span class="header-section-number">4.6</span> Verweildauer-Statistiken in Minuten</h2>
 <div class="cell">
-<details class="code-fold"><summary>Show the code</summary><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">time_spent</span> <span class="op">|&gt;</span></span>
+<details class="code-fold"><summary>Show the code</summary><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">time_spent_summary</span> <span class="op">&lt;-</span> </span>
+<span><span class="va">time_spent</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>time_diff_minutes <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/time_length.html">time_length</a></span><span class="op">(</span><span class="va">time_diff</span>, unit <span class="op">=</span> <span class="st">"minute"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span></span>
 <span>    mean_time_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">time_diff_minutes</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span>    sd_time_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">time_diff_minutes</span><span class="op">)</span>,</span>
 <span>    min_time_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">time_diff_minutes</span><span class="op">)</span>, <span class="co"># shortest duration</span></span>
 <span>    max_time_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">time_diff_minutes</span><span class="op">)</span> <span class="co"># longest</span></span>
-<span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">time_spent_summary</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://gt.rstudio.com/reference/gt.html">gt</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["mean_time_diff"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["sd_time_diff"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["min_time_diff"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["max_time_diff"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"29.86","2":"39.92699","3":"0","4":"476.15"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
+<div id="dxmlhtegew" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#dxmlhtegew table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#dxmlhtegew thead, #dxmlhtegew tbody, #dxmlhtegew tfoot, #dxmlhtegew tr, #dxmlhtegew td, #dxmlhtegew th {
+  border-style: none;
+}
+
+#dxmlhtegew p {
+  margin: 0;
+  padding: 0;
+}
+
+#dxmlhtegew .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#dxmlhtegew .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dxmlhtegew .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dxmlhtegew .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dxmlhtegew .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dxmlhtegew .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dxmlhtegew .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dxmlhtegew .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dxmlhtegew .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#dxmlhtegew .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#dxmlhtegew .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dxmlhtegew .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dxmlhtegew .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dxmlhtegew .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dxmlhtegew .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dxmlhtegew .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#dxmlhtegew .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#dxmlhtegew .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#dxmlhtegew .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dxmlhtegew .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#dxmlhtegew .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dxmlhtegew .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dxmlhtegew .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dxmlhtegew .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dxmlhtegew .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dxmlhtegew .gt_left {
+  text-align: left;
+}
+
+#dxmlhtegew .gt_center {
+  text-align: center;
+}
+
+#dxmlhtegew .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dxmlhtegew .gt_font_normal {
+  font-weight: normal;
+}
+
+#dxmlhtegew .gt_font_bold {
+  font-weight: bold;
+}
+
+#dxmlhtegew .gt_font_italic {
+  font-style: italic;
+}
+
+#dxmlhtegew .gt_super {
+  font-size: 65%;
+}
+
+#dxmlhtegew .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#dxmlhtegew .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#dxmlhtegew .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#dxmlhtegew .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#dxmlhtegew .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#dxmlhtegew .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#dxmlhtegew .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#dxmlhtegew .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#dxmlhtegew div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead><tr class="gt_col_headings header">
+<th id="mean_time_diff" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">mean_time_diff</th>
+<th id="sd_time_diff" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">sd_time_diff</th>
+<th id="min_time_diff" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">min_time_diff</th>
+<th id="max_time_diff" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">max_time_diff</th>
+</tr></thead>
+<tbody class="gt_table_body"><tr class="odd">
+<td class="gt_row gt_right" headers="mean_time_diff">29.86</td>
+<td class="gt_row gt_right" headers="sd_time_diff">39.92699</td>
+<td class="gt_row gt_right" headers="min_time_diff">0</td>
+<td class="gt_row gt_right" headers="max_time_diff">476.15</td>
+</tr></tbody>
+</table>
 </div>
 </div>
 </div>
@@ -687,7 +1150,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>  <span class="co">#scale_x_time() +</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"n"</span>, x <span class="op">=</span> <span class="st">"Verweildauer in HaNS pro Visit in d:h:m"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_time</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/pretty_breaks.html">pretty_breaks</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_time</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/pretty_breaks.html">pretty_breaks</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">time_spent</span><span class="op">$</span><span class="va">time_diff</span><span class="op">)</span> <span class="op">/</span> <span class="fl">60</span>, color <span class="op">=</span> <span class="st">"blue"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"label"</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">time_spent</span><span class="op">$</span><span class="va">time_diff</span><span class="op">)</span> <span class="op">/</span> <span class="fl">60</span>, </span>
+<span>           y <span class="op">=</span> <span class="cn">Inf</span>, label <span class="op">=</span> <span class="st">"Median"</span>, vjust <span class="op">=</span> <span class="fl">1.5</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <div>
 <figure class="figure"><p><a href="30-nutzungsdauer_files/figure-html/plot-time-spent1-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="30-nutzungsdauer_files/figure-html/plot-time-spent1-1.png" class="img-fluid figure-img" width="576"></a></p>
@@ -708,7 +1174,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>    x <span class="op">=</span> <span class="st">"Verweildauer"</span>,</span>
 <span>    title <span class="op">=</span> <span class="st">"Verweildauer in HaNS pro Visit in d:h:m"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_time</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/pretty_breaks.html">pretty_breaks</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_date.html">scale_x_time</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="fu"><a href="https://scales.r-lib.org/reference/pretty_breaks.html">pretty_breaks</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"label"</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">time_spent</span><span class="op">$</span><span class="va">time_diff</span><span class="op">)</span> <span class="op">/</span> <span class="fl">60</span>, </span>
+<span>           y <span class="op">=</span> <span class="cn">Inf</span>, label <span class="op">=</span> <span class="st">"Median"</span>, vjust <span class="op">=</span> <span class="fl">1.5</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <div>
 <figure class="figure"><p><a href="30-nutzungsdauer_files/figure-html/plot-time-spent2-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="30-nutzungsdauer_files/figure-html/plot-time-spent2-1.png" class="img-fluid figure-img" width="576"></a></p>
@@ -732,7 +1200,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>    x <span class="op">=</span> <span class="st">"Verweildauer in HaNS pro Visit in Minuten"</span>,</span>
 <span>    title <span class="op">=</span> <span class="st">"Verweildauer begrenzt auf 1-120 Minuten"</span>,</span>
 <span>    caption <span class="op">=</span> <span class="st">"bindwidth = 10 Min."</span></span>
-<span>  <span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html">annotate</a></span><span class="op">(</span><span class="st">"label"</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html">median</a></span><span class="op">(</span><span class="va">time_spent</span><span class="op">$</span><span class="va">time_diff</span><span class="op">)</span> <span class="op">/</span> <span class="fl">60</span>, </span>
+<span>           y <span class="op">=</span> <span class="cn">Inf</span>, label <span class="op">=</span> <span class="st">"Median"</span>, vjust <span class="op">=</span> <span class="fl">1.5</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span></span></code><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output-display">
 <div>
 <figure class="figure"><p><a href="30-nutzungsdauer_files/figure-html/plot-time-spent3-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="30-nutzungsdauer_files/figure-html/plot-time-spent3-1.png" class="img-fluid figure-img" width="576"></a></p>
@@ -956,6 +1426,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span>    xmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="st">"2024-07-31"</span><span class="op">)</span>,</span>
 <span>    ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
 <span>    ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span></span>
 <span>    alpha <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"skyblue"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
@@ -1712,372 +2183,384 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb33-191"><a href="#cb33-191" aria-hidden="true" tabindex="-1"></a><span class="fu">## Verweildauer-Statistiken in Minuten</span></span>
 <span id="cb33-192"><a href="#cb33-192" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-193"><a href="#cb33-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time-spent-tbl}</span></span>
-<span id="cb33-194"><a href="#cb33-194" aria-hidden="true" tabindex="-1"></a>time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-195"><a href="#cb33-195" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_diff_minutes =</span> <span class="fu">time_length</span>(time_diff, <span class="at">unit =</span> <span class="st">"minute"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb33-196"><a href="#cb33-196" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb33-197"><a href="#cb33-197" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_time_diff =</span> <span class="fu">round</span>(<span class="fu">mean</span>(time_diff_minutes), <span class="dv">2</span>),</span>
-<span id="cb33-198"><a href="#cb33-198" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_time_diff =</span> <span class="fu">sd</span>(time_diff_minutes),</span>
-<span id="cb33-199"><a href="#cb33-199" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_time_diff =</span> <span class="fu">min</span>(time_diff_minutes), <span class="co"># shortest duration</span></span>
-<span id="cb33-200"><a href="#cb33-200" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_time_diff =</span> <span class="fu">max</span>(time_diff_minutes) <span class="co"># longest</span></span>
-<span id="cb33-201"><a href="#cb33-201" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-202"><a href="#cb33-202" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-194"><a href="#cb33-194" aria-hidden="true" tabindex="-1"></a>time_spent_summary <span class="ot">&lt;-</span> </span>
+<span id="cb33-195"><a href="#cb33-195" aria-hidden="true" tabindex="-1"></a>time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-196"><a href="#cb33-196" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_diff_minutes =</span> <span class="fu">time_length</span>(time_diff, <span class="at">unit =</span> <span class="st">"minute"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-197"><a href="#cb33-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-198"><a href="#cb33-198" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_time_diff =</span> <span class="fu">round</span>(<span class="fu">mean</span>(time_diff_minutes), <span class="dv">2</span>),</span>
+<span id="cb33-199"><a href="#cb33-199" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_time_diff =</span> <span class="fu">sd</span>(time_diff_minutes),</span>
+<span id="cb33-200"><a href="#cb33-200" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_time_diff =</span> <span class="fu">min</span>(time_diff_minutes), <span class="co"># shortest duration</span></span>
+<span id="cb33-201"><a href="#cb33-201" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_time_diff =</span> <span class="fu">max</span>(time_diff_minutes) <span class="co"># longest</span></span>
+<span id="cb33-202"><a href="#cb33-202" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb33-203"><a href="#cb33-203" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-204"><a href="#cb33-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-207"><a href="#cb33-207" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-208"><a href="#cb33-208" aria-hidden="true" tabindex="-1"></a>small_padding_theme <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ttheme</span>(</span>
-<span id="cb33-209"><a href="#cb33-209" aria-hidden="true" tabindex="-1"></a>  <span class="at">tbody.style =</span> <span class="fu">tbody_style</span>(<span class="at">size =</span> <span class="dv">8</span>), <span class="co"># Smaller font size can help</span></span>
-<span id="cb33-210"><a href="#cb33-210" aria-hidden="true" tabindex="-1"></a>  <span class="at">colnames.style =</span> <span class="fu">colnames_style</span>(<span class="at">size =</span> <span class="dv">9</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb33-211"><a href="#cb33-211" aria-hidden="true" tabindex="-1"></a>  <span class="at">padding =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>), <span class="st">"mm"</span>) <span class="co"># Reduce horizontal and vertical padding</span></span>
-<span id="cb33-212"><a href="#cb33-212" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb33-213"><a href="#cb33-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-214"><a href="#cb33-214" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-215"><a href="#cb33-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-218"><a href="#cb33-218" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-219"><a href="#cb33-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb33-220"><a href="#cb33-220" aria-hidden="true" tabindex="-1"></a>ggpubr<span class="sc">::</span><span class="fu">ggtexttable</span>(</span>
-<span id="cb33-221"><a href="#cb33-221" aria-hidden="true" tabindex="-1"></a>  time_spent_summary,</span>
-<span id="cb33-222"><a href="#cb33-222" aria-hidden="true" tabindex="-1"></a>  <span class="at">rows =</span> <span class="cn">NULL</span>,</span>
-<span id="cb33-223"><a href="#cb33-223" aria-hidden="true" tabindex="-1"></a>  <span class="at">theme =</span> small_padding_theme</span>
-<span id="cb33-224"><a href="#cb33-224" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb33-225"><a href="#cb33-225" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-226"><a href="#cb33-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-227"><a href="#cb33-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-228"><a href="#cb33-228" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visualisierung der Verweildauer</span></span>
-<span id="cb33-229"><a href="#cb33-229" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-230"><a href="#cb33-230" aria-hidden="true" tabindex="-1"></a><span class="fu">### Binwidth=10 Minutes</span></span>
+<span id="cb33-204"><a href="#cb33-204" aria-hidden="true" tabindex="-1"></a>time_spent_summary <span class="sc">|&gt;</span> </span>
+<span id="cb33-205"><a href="#cb33-205" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span>
+<span id="cb33-206"><a href="#cb33-206" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-207"><a href="#cb33-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-208"><a href="#cb33-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-211"><a href="#cb33-211" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-212"><a href="#cb33-212" aria-hidden="true" tabindex="-1"></a>small_padding_theme <span class="ot">&lt;-</span> ggpubr<span class="sc">::</span><span class="fu">ttheme</span>(</span>
+<span id="cb33-213"><a href="#cb33-213" aria-hidden="true" tabindex="-1"></a>  <span class="at">tbody.style =</span> <span class="fu">tbody_style</span>(<span class="at">size =</span> <span class="dv">8</span>), <span class="co"># Smaller font size can help</span></span>
+<span id="cb33-214"><a href="#cb33-214" aria-hidden="true" tabindex="-1"></a>  <span class="at">colnames.style =</span> <span class="fu">colnames_style</span>(<span class="at">size =</span> <span class="dv">9</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb33-215"><a href="#cb33-215" aria-hidden="true" tabindex="-1"></a>  <span class="at">padding =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>), <span class="st">"mm"</span>) <span class="co"># Reduce horizontal and vertical padding</span></span>
+<span id="cb33-216"><a href="#cb33-216" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-217"><a href="#cb33-217" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-218"><a href="#cb33-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-219"><a href="#cb33-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-222"><a href="#cb33-222" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-223"><a href="#cb33-223" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb33-224"><a href="#cb33-224" aria-hidden="true" tabindex="-1"></a>ggpubr<span class="sc">::</span><span class="fu">ggtexttable</span>(</span>
+<span id="cb33-225"><a href="#cb33-225" aria-hidden="true" tabindex="-1"></a>  time_spent_summary,</span>
+<span id="cb33-226"><a href="#cb33-226" aria-hidden="true" tabindex="-1"></a>  <span class="at">rows =</span> <span class="cn">NULL</span>,</span>
+<span id="cb33-227"><a href="#cb33-227" aria-hidden="true" tabindex="-1"></a>  <span class="at">theme =</span> small_padding_theme</span>
+<span id="cb33-228"><a href="#cb33-228" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-229"><a href="#cb33-229" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-230"><a href="#cb33-230" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-231"><a href="#cb33-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-232"><a href="#cb33-232" aria-hidden="true" tabindex="-1"></a><span class="in">```{r plot-time-spent1}</span></span>
-<span id="cb33-233"><a href="#cb33-233" aria-hidden="true" tabindex="-1"></a>time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-234"><a href="#cb33-234" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_diff_minutes =</span> time_diff <span class="sc">/</span> <span class="dv">60</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-235"><a href="#cb33-235" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_diff_minutes)) <span class="sc">+</span> <span class="co"># minutes</span></span>
-<span id="cb33-236"><a href="#cb33-236" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb33-237"><a href="#cb33-237" aria-hidden="true" tabindex="-1"></a>  <span class="co">#scale_x_time() +</span></span>
-<span id="cb33-238"><a href="#cb33-238" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb33-239"><a href="#cb33-239" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"n"</span>, <span class="at">x =</span> <span class="st">"Verweildauer in HaNS pro Visit in d:h:m"</span>) <span class="sc">+</span></span>
-<span id="cb33-240"><a href="#cb33-240" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_time</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>())</span>
-<span id="cb33-241"><a href="#cb33-241" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-242"><a href="#cb33-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-243"><a href="#cb33-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-244"><a href="#cb33-244" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-245"><a href="#cb33-245" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bin width= 20 Minutes</span></span>
-<span id="cb33-246"><a href="#cb33-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-247"><a href="#cb33-247" aria-hidden="true" tabindex="-1"></a><span class="in">```{r plot-time-spent2}</span></span>
-<span id="cb33-248"><a href="#cb33-248" aria-hidden="true" tabindex="-1"></a>time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-249"><a href="#cb33-249" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_diff_minutes =</span> time_diff <span class="sc">/</span> <span class="dv">60</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-250"><a href="#cb33-250" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_diff_minutes)) <span class="sc">+</span> <span class="co"># minutes</span></span>
-<span id="cb33-251"><a href="#cb33-251" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">20</span>) <span class="sc">+</span></span>
-<span id="cb33-252"><a href="#cb33-252" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb33-253"><a href="#cb33-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb33-254"><a href="#cb33-254" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"n"</span>,</span>
-<span id="cb33-255"><a href="#cb33-255" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Verweildauer"</span>,</span>
-<span id="cb33-256"><a href="#cb33-256" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Verweildauer in HaNS pro Visit in d:h:m"</span></span>
-<span id="cb33-257"><a href="#cb33-257" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-258"><a href="#cb33-258" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_time</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>())</span>
-<span id="cb33-259"><a href="#cb33-259" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-260"><a href="#cb33-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-261"><a href="#cb33-261" aria-hidden="true" tabindex="-1"></a><span class="fu">### Zeitdauer begrenzt auf 1-120 Min.</span></span>
-<span id="cb33-262"><a href="#cb33-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-263"><a href="#cb33-263" aria-hidden="true" tabindex="-1"></a><span class="in">```{r plot-time-spent3}</span></span>
-<span id="cb33-264"><a href="#cb33-264" aria-hidden="true" tabindex="-1"></a>time_spent2 <span class="ot">&lt;-</span></span>
-<span id="cb33-265"><a href="#cb33-265" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-266"><a href="#cb33-266" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_diff <span class="sc">&gt;</span> <span class="dv">1</span>, time_diff <span class="sc">&lt;</span> <span class="dv">120</span>)</span>
-<span id="cb33-267"><a href="#cb33-267" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-268"><a href="#cb33-268" aria-hidden="true" tabindex="-1"></a>time_spent2 <span class="sc">|&gt;</span></span>
-<span id="cb33-269"><a href="#cb33-269" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_diff)) <span class="sc">+</span></span>
-<span id="cb33-270"><a href="#cb33-270" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb33-271"><a href="#cb33-271" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb33-272"><a href="#cb33-272" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb33-273"><a href="#cb33-273" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"n"</span>,</span>
-<span id="cb33-274"><a href="#cb33-274" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Verweildauer in HaNS pro Visit in Minuten"</span>,</span>
-<span id="cb33-275"><a href="#cb33-275" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Verweildauer begrenzt auf 1-120 Minuten"</span>,</span>
-<span id="cb33-276"><a href="#cb33-276" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"bindwidth = 10 Min."</span></span>
-<span id="cb33-277"><a href="#cb33-277" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-278"><a href="#cb33-278" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-279"><a href="#cb33-279" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-280"><a href="#cb33-280" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-281"><a href="#cb33-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-282"><a href="#cb33-282" aria-hidden="true" tabindex="-1"></a><span class="fu">### Veränderung der Verweildauer im Zeitverlauf</span></span>
-<span id="cb33-283"><a href="#cb33-283" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-284"><a href="#cb33-284" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Monat</span></span>
-<span id="cb33-285"><a href="#cb33-285" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-286"><a href="#cb33-286" aria-hidden="true" tabindex="-1"></a>Die Einheit von <span class="in">`time_spent`</span> ist Sekunden.</span>
-<span id="cb33-287"><a href="#cb33-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-290"><a href="#cb33-290" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-291"><a href="#cb33-291" aria-hidden="true" tabindex="-1"></a>time_spent_by_month <span class="ot">&lt;-</span></span>
-<span id="cb33-292"><a href="#cb33-292" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-293"><a href="#cb33-293" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> <span class="fu">floor_date</span>(time_min, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb33-294"><a href="#cb33-294" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb33-295"><a href="#cb33-295" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_name =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-296"><a href="#cb33-296" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_num =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-297"><a href="#cb33-297" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(month_start)</span>
-<span id="cb33-298"><a href="#cb33-298" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb33-299"><a href="#cb33-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month_num, year) <span class="sc">|&gt;</span></span>
-<span id="cb33-300"><a href="#cb33-300" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb33-301"><a href="#cb33-301" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb33-302"><a href="#cb33-302" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-303"><a href="#cb33-303" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb33-304"><a href="#cb33-304" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, month_num)</span>
-<span id="cb33-305"><a href="#cb33-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-306"><a href="#cb33-306" aria-hidden="true" tabindex="-1"></a>time_spent_by_month</span>
-<span id="cb33-307"><a href="#cb33-307" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-308"><a href="#cb33-308" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-309"><a href="#cb33-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-310"><a href="#cb33-310" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time_spent_by_month}</span></span>
-<span id="cb33-311"><a href="#cb33-311" aria-hidden="true" tabindex="-1"></a>time_spent_by_month <span class="sc">|&gt;</span></span>
-<span id="cb33-312"><a href="#cb33-312" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb33-313"><a href="#cb33-313" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_avg =</span> <span class="fu">round</span>(time_spent_month_avg, <span class="dv">2</span>),</span>
-<span id="cb33-314"><a href="#cb33-314" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_sd =</span> <span class="fu">round</span>(time_spent_month_sd, <span class="dv">2</span>)</span>
-<span id="cb33-315"><a href="#cb33-315" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb33-316"><a href="#cb33-316" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtexttable</span>()</span>
-<span id="cb33-317"><a href="#cb33-317" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-318"><a href="#cb33-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-232"><a href="#cb33-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visualisierung der Verweildauer</span></span>
+<span id="cb33-233"><a href="#cb33-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-234"><a href="#cb33-234" aria-hidden="true" tabindex="-1"></a><span class="fu">### Binwidth=10 Minutes</span></span>
+<span id="cb33-235"><a href="#cb33-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-236"><a href="#cb33-236" aria-hidden="true" tabindex="-1"></a><span class="in">```{r plot-time-spent1}</span></span>
+<span id="cb33-237"><a href="#cb33-237" aria-hidden="true" tabindex="-1"></a>time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-238"><a href="#cb33-238" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_diff_minutes =</span> time_diff <span class="sc">/</span> <span class="dv">60</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-239"><a href="#cb33-239" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_diff_minutes)) <span class="sc">+</span> <span class="co"># minutes</span></span>
+<span id="cb33-240"><a href="#cb33-240" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb33-241"><a href="#cb33-241" aria-hidden="true" tabindex="-1"></a>  <span class="co">#scale_x_time() +</span></span>
+<span id="cb33-242"><a href="#cb33-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb33-243"><a href="#cb33-243" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"n"</span>, <span class="at">x =</span> <span class="st">"Verweildauer in HaNS pro Visit in d:h:m"</span>) <span class="sc">+</span></span>
+<span id="cb33-244"><a href="#cb33-244" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_time</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>()) <span class="sc">+</span></span>
+<span id="cb33-245"><a href="#cb33-245" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">median</span>(time_spent<span class="sc">$</span>time_diff) <span class="sc">/</span> <span class="dv">60</span>, <span class="at">color =</span> <span class="st">"blue"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb33-246"><a href="#cb33-246" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"label"</span>, <span class="at">x =</span> <span class="fu">median</span>(time_spent<span class="sc">$</span>time_diff) <span class="sc">/</span> <span class="dv">60</span>, </span>
+<span id="cb33-247"><a href="#cb33-247" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="st">"Median"</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span>
+<span id="cb33-248"><a href="#cb33-248" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-249"><a href="#cb33-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-250"><a href="#cb33-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-251"><a href="#cb33-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-252"><a href="#cb33-252" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bin width= 20 Minutes</span></span>
+<span id="cb33-253"><a href="#cb33-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-254"><a href="#cb33-254" aria-hidden="true" tabindex="-1"></a><span class="in">```{r plot-time-spent2}</span></span>
+<span id="cb33-255"><a href="#cb33-255" aria-hidden="true" tabindex="-1"></a>time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-256"><a href="#cb33-256" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_diff_minutes =</span> time_diff <span class="sc">/</span> <span class="dv">60</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-257"><a href="#cb33-257" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_diff_minutes)) <span class="sc">+</span> <span class="co"># minutes</span></span>
+<span id="cb33-258"><a href="#cb33-258" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">20</span>) <span class="sc">+</span></span>
+<span id="cb33-259"><a href="#cb33-259" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb33-260"><a href="#cb33-260" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb33-261"><a href="#cb33-261" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"n"</span>,</span>
+<span id="cb33-262"><a href="#cb33-262" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Verweildauer"</span>,</span>
+<span id="cb33-263"><a href="#cb33-263" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Verweildauer in HaNS pro Visit in d:h:m"</span></span>
+<span id="cb33-264"><a href="#cb33-264" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-265"><a href="#cb33-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_time</span>(<span class="at">breaks =</span> <span class="fu">pretty_breaks</span>()) <span class="sc">+</span></span>
+<span id="cb33-266"><a href="#cb33-266" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"label"</span>, <span class="at">x =</span> <span class="fu">median</span>(time_spent<span class="sc">$</span>time_diff) <span class="sc">/</span> <span class="dv">60</span>, </span>
+<span id="cb33-267"><a href="#cb33-267" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="st">"Median"</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span>
+<span id="cb33-268"><a href="#cb33-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-269"><a href="#cb33-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-270"><a href="#cb33-270" aria-hidden="true" tabindex="-1"></a><span class="fu">### Zeitdauer begrenzt auf 1-120 Min.</span></span>
+<span id="cb33-271"><a href="#cb33-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-272"><a href="#cb33-272" aria-hidden="true" tabindex="-1"></a><span class="in">```{r plot-time-spent3}</span></span>
+<span id="cb33-273"><a href="#cb33-273" aria-hidden="true" tabindex="-1"></a>time_spent2 <span class="ot">&lt;-</span></span>
+<span id="cb33-274"><a href="#cb33-274" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-275"><a href="#cb33-275" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_diff <span class="sc">&gt;</span> <span class="dv">1</span>, time_diff <span class="sc">&lt;</span> <span class="dv">120</span>)</span>
+<span id="cb33-276"><a href="#cb33-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-277"><a href="#cb33-277" aria-hidden="true" tabindex="-1"></a>time_spent2 <span class="sc">|&gt;</span></span>
+<span id="cb33-278"><a href="#cb33-278" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time_diff)) <span class="sc">+</span></span>
+<span id="cb33-279"><a href="#cb33-279" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb33-280"><a href="#cb33-280" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb33-281"><a href="#cb33-281" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb33-282"><a href="#cb33-282" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"n"</span>,</span>
+<span id="cb33-283"><a href="#cb33-283" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Verweildauer in HaNS pro Visit in Minuten"</span>,</span>
+<span id="cb33-284"><a href="#cb33-284" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Verweildauer begrenzt auf 1-120 Minuten"</span>,</span>
+<span id="cb33-285"><a href="#cb33-285" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"bindwidth = 10 Min."</span></span>
+<span id="cb33-286"><a href="#cb33-286" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-287"><a href="#cb33-287" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"label"</span>, <span class="at">x =</span> <span class="fu">median</span>(time_spent<span class="sc">$</span>time_diff) <span class="sc">/</span> <span class="dv">60</span>, </span>
+<span id="cb33-288"><a href="#cb33-288" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">label =</span> <span class="st">"Median"</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span>
+<span id="cb33-289"><a href="#cb33-289" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-290"><a href="#cb33-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-291"><a href="#cb33-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-292"><a href="#cb33-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-293"><a href="#cb33-293" aria-hidden="true" tabindex="-1"></a><span class="fu">### Veränderung der Verweildauer im Zeitverlauf</span></span>
+<span id="cb33-294"><a href="#cb33-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-295"><a href="#cb33-295" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Monat</span></span>
+<span id="cb33-296"><a href="#cb33-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-297"><a href="#cb33-297" aria-hidden="true" tabindex="-1"></a>Die Einheit von <span class="in">`time_spent`</span> ist Sekunden.</span>
+<span id="cb33-298"><a href="#cb33-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-301"><a href="#cb33-301" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-302"><a href="#cb33-302" aria-hidden="true" tabindex="-1"></a>time_spent_by_month <span class="ot">&lt;-</span></span>
+<span id="cb33-303"><a href="#cb33-303" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-304"><a href="#cb33-304" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> <span class="fu">floor_date</span>(time_min, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-305"><a href="#cb33-305" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-306"><a href="#cb33-306" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_name =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb33-307"><a href="#cb33-307" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_num =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb33-308"><a href="#cb33-308" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(month_start)</span>
+<span id="cb33-309"><a href="#cb33-309" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb33-310"><a href="#cb33-310" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month_num, year) <span class="sc">|&gt;</span></span>
+<span id="cb33-311"><a href="#cb33-311" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-312"><a href="#cb33-312" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-313"><a href="#cb33-313" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-314"><a href="#cb33-314" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb33-315"><a href="#cb33-315" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, month_num)</span>
+<span id="cb33-316"><a href="#cb33-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-317"><a href="#cb33-317" aria-hidden="true" tabindex="-1"></a>time_spent_by_month</span>
+<span id="cb33-318"><a href="#cb33-318" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb33-319"><a href="#cb33-319" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-320"><a href="#cb33-320" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-321"><a href="#cb33-321" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time_spent_by_month_name}</span></span>
-<span id="cb33-322"><a href="#cb33-322" aria-hidden="true" tabindex="-1"></a>time_spent_by_month_name <span class="ot">&lt;-</span></span>
-<span id="cb33-323"><a href="#cb33-323" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-324"><a href="#cb33-324" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time_min, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb33-325"><a href="#cb33-325" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb33-326"><a href="#cb33-326" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_name =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-327"><a href="#cb33-327" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_num =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-328"><a href="#cb33-328" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(month_start)</span>
-<span id="cb33-329"><a href="#cb33-329" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb33-330"><a href="#cb33-330" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month_start, year) <span class="sc">|&gt;</span></span>
-<span id="cb33-331"><a href="#cb33-331" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb33-332"><a href="#cb33-332" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb33-333"><a href="#cb33-333" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-334"><a href="#cb33-334" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-335"><a href="#cb33-335" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-336"><a href="#cb33-336" aria-hidden="true" tabindex="-1"></a>time_spent_by_month_name <span class="sc">|&gt;</span></span>
-<span id="cb33-337"><a href="#cb33-337" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month_start, <span class="at">y =</span> time_spent_month_avg)) <span class="sc">+</span></span>
-<span id="cb33-338"><a href="#cb33-338" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">group =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
-<span id="cb33-339"><a href="#cb33-339" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%H:%M:%S"</span>)) <span class="sc">+</span></span>
-<span id="cb33-340"><a href="#cb33-340" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Datum"</span>, <span class="at">y =</span> <span class="st">"Durchschnittliche Verweildauer pro Visit (in h:m:s)"</span>) <span class="sc">+</span></span>
-<span id="cb33-341"><a href="#cb33-341" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight March–July (approx 1 Mar to 31 Jul) ---</span></span>
-<span id="cb33-342"><a href="#cb33-342" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-343"><a href="#cb33-343" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-344"><a href="#cb33-344" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-03-01"</span>),</span>
-<span id="cb33-345"><a href="#cb33-345" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2023-07-31"</span>),</span>
-<span id="cb33-346"><a href="#cb33-346" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-347"><a href="#cb33-347" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-348"><a href="#cb33-348" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-349"><a href="#cb33-349" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
-<span id="cb33-350"><a href="#cb33-350" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-351"><a href="#cb33-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-352"><a href="#cb33-352" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-353"><a href="#cb33-353" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-354"><a href="#cb33-354" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-03-01"</span>),</span>
-<span id="cb33-355"><a href="#cb33-355" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-07-31"</span>),</span>
-<span id="cb33-356"><a href="#cb33-356" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-357"><a href="#cb33-357" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-358"><a href="#cb33-358" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-359"><a href="#cb33-359" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
-<span id="cb33-360"><a href="#cb33-360" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-361"><a href="#cb33-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-362"><a href="#cb33-362" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-363"><a href="#cb33-363" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2025-03-01"</span>),</span>
-<span id="cb33-364"><a href="#cb33-364" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-07-31"</span>),</span>
-<span id="cb33-365"><a href="#cb33-365" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-366"><a href="#cb33-366" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-367"><a href="#cb33-367" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-368"><a href="#cb33-368" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
-<span id="cb33-369"><a href="#cb33-369" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-370"><a href="#cb33-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-371"><a href="#cb33-371" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight October–February (semester break or 2nd term) ---</span></span>
+<span id="cb33-321"><a href="#cb33-321" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time_spent_by_month}</span></span>
+<span id="cb33-322"><a href="#cb33-322" aria-hidden="true" tabindex="-1"></a>time_spent_by_month <span class="sc">|&gt;</span></span>
+<span id="cb33-323"><a href="#cb33-323" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-324"><a href="#cb33-324" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_avg =</span> <span class="fu">round</span>(time_spent_month_avg, <span class="dv">2</span>),</span>
+<span id="cb33-325"><a href="#cb33-325" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_sd =</span> <span class="fu">round</span>(time_spent_month_sd, <span class="dv">2</span>)</span>
+<span id="cb33-326"><a href="#cb33-326" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb33-327"><a href="#cb33-327" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtexttable</span>()</span>
+<span id="cb33-328"><a href="#cb33-328" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-329"><a href="#cb33-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-330"><a href="#cb33-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-331"><a href="#cb33-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-332"><a href="#cb33-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time_spent_by_month_name}</span></span>
+<span id="cb33-333"><a href="#cb33-333" aria-hidden="true" tabindex="-1"></a>time_spent_by_month_name <span class="ot">&lt;-</span></span>
+<span id="cb33-334"><a href="#cb33-334" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-335"><a href="#cb33-335" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time_min, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-336"><a href="#cb33-336" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-337"><a href="#cb33-337" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_name =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb33-338"><a href="#cb33-338" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_num =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb33-339"><a href="#cb33-339" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(month_start)</span>
+<span id="cb33-340"><a href="#cb33-340" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb33-341"><a href="#cb33-341" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month_start, year) <span class="sc">|&gt;</span></span>
+<span id="cb33-342"><a href="#cb33-342" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-343"><a href="#cb33-343" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-344"><a href="#cb33-344" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_month_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-345"><a href="#cb33-345" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-346"><a href="#cb33-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-347"><a href="#cb33-347" aria-hidden="true" tabindex="-1"></a>time_spent_by_month_name <span class="sc">|&gt;</span></span>
+<span id="cb33-348"><a href="#cb33-348" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month_start, <span class="at">y =</span> time_spent_month_avg)) <span class="sc">+</span></span>
+<span id="cb33-349"><a href="#cb33-349" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">group =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
+<span id="cb33-350"><a href="#cb33-350" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%H:%M:%S"</span>)) <span class="sc">+</span></span>
+<span id="cb33-351"><a href="#cb33-351" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Datum"</span>, <span class="at">y =</span> <span class="st">"Durchschnittliche Verweildauer pro Visit (in h:m:s)"</span>) <span class="sc">+</span></span>
+<span id="cb33-352"><a href="#cb33-352" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight March–July (approx 1 Mar to 31 Jul) ---</span></span>
+<span id="cb33-353"><a href="#cb33-353" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-354"><a href="#cb33-354" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-355"><a href="#cb33-355" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-03-01"</span>),</span>
+<span id="cb33-356"><a href="#cb33-356" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2023-07-31"</span>),</span>
+<span id="cb33-357"><a href="#cb33-357" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-358"><a href="#cb33-358" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-359"><a href="#cb33-359" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-360"><a href="#cb33-360" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
+<span id="cb33-361"><a href="#cb33-361" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-362"><a href="#cb33-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-363"><a href="#cb33-363" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-364"><a href="#cb33-364" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-365"><a href="#cb33-365" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-03-01"</span>),</span>
+<span id="cb33-366"><a href="#cb33-366" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-07-31"</span>),</span>
+<span id="cb33-367"><a href="#cb33-367" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-368"><a href="#cb33-368" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-369"><a href="#cb33-369" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-370"><a href="#cb33-370" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
+<span id="cb33-371"><a href="#cb33-371" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb33-372"><a href="#cb33-372" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
 <span id="cb33-373"><a href="#cb33-373" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-374"><a href="#cb33-374" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-10-01"</span>),</span>
-<span id="cb33-375"><a href="#cb33-375" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-02-28"</span>),</span>
+<span id="cb33-374"><a href="#cb33-374" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2025-03-01"</span>),</span>
+<span id="cb33-375"><a href="#cb33-375" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-07-31"</span>),</span>
 <span id="cb33-376"><a href="#cb33-376" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
 <span id="cb33-377"><a href="#cb33-377" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
 <span id="cb33-378"><a href="#cb33-378" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-379"><a href="#cb33-379" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
+<span id="cb33-379"><a href="#cb33-379" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
 <span id="cb33-380"><a href="#cb33-380" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-381"><a href="#cb33-381" aria-hidden="true" tabindex="-1"></a>  <span class="co"># annotate("rect",</span></span>
-<span id="cb33-382"><a href="#cb33-382" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),</span></span>
-<span id="cb33-383"><a href="#cb33-383" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +</span></span>
-<span id="cb33-384"><a href="#cb33-384" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-385"><a href="#cb33-385" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-386"><a href="#cb33-386" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-10-01"</span>),</span>
-<span id="cb33-387"><a href="#cb33-387" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-02-28"</span>),</span>
-<span id="cb33-388"><a href="#cb33-388" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-389"><a href="#cb33-389" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-390"><a href="#cb33-390" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-391"><a href="#cb33-391" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
-<span id="cb33-392"><a href="#cb33-392" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-393"><a href="#cb33-393" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-394"><a href="#cb33-394" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb33-395"><a href="#cb33-395" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-396"><a href="#cb33-396" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-397"><a href="#cb33-397" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-398"><a href="#cb33-398" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Jahr</span></span>
-<span id="cb33-399"><a href="#cb33-399" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-402"><a href="#cb33-402" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-403"><a href="#cb33-403" aria-hidden="true" tabindex="-1"></a>time_spent_by_year <span class="ot">&lt;-</span></span>
-<span id="cb33-404"><a href="#cb33-404" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-405"><a href="#cb33-405" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time_min, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb33-406"><a href="#cb33-406" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb33-407"><a href="#cb33-407" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_name =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-408"><a href="#cb33-408" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_num =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb33-409"><a href="#cb33-409" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">year</span>(month_start)</span>
-<span id="cb33-410"><a href="#cb33-410" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb33-411"><a href="#cb33-411" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
-<span id="cb33-412"><a href="#cb33-412" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb33-413"><a href="#cb33-413" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb33-414"><a href="#cb33-414" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-415"><a href="#cb33-415" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-416"><a href="#cb33-416" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-417"><a href="#cb33-417" aria-hidden="true" tabindex="-1"></a>time_spent_by_year</span>
-<span id="cb33-418"><a href="#cb33-418" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-419"><a href="#cb33-419" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-420"><a href="#cb33-420" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-421"><a href="#cb33-421" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-424"><a href="#cb33-424" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-425"><a href="#cb33-425" aria-hidden="true" tabindex="-1"></a>time_spent_by_year <span class="ot">&lt;-</span></span>
-<span id="cb33-426"><a href="#cb33-426" aria-hidden="true" tabindex="-1"></a>  time_spent_by_year <span class="sc">|&gt;</span></span>
-<span id="cb33-427"><a href="#cb33-427" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(<span class="fu">paste0</span>(year, <span class="st">"-01-01"</span>))) <span class="co"># MAKE Date class</span></span>
-<span id="cb33-428"><a href="#cb33-428" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-429"><a href="#cb33-429" aria-hidden="true" tabindex="-1"></a>rect_data <span class="ot">&lt;-</span> <span class="fu">comp_semester_rects</span>(time_spent_by_year, <span class="at">col_date =</span> <span class="st">"year_date"</span>)</span>
+<span id="cb33-381"><a href="#cb33-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-382"><a href="#cb33-382" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight October–February (semester break or 2nd term) ---</span></span>
+<span id="cb33-383"><a href="#cb33-383" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-384"><a href="#cb33-384" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-385"><a href="#cb33-385" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-10-01"</span>),</span>
+<span id="cb33-386"><a href="#cb33-386" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-02-28"</span>),</span>
+<span id="cb33-387"><a href="#cb33-387" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-388"><a href="#cb33-388" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-389"><a href="#cb33-389" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-390"><a href="#cb33-390" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
+<span id="cb33-391"><a href="#cb33-391" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-392"><a href="#cb33-392" aria-hidden="true" tabindex="-1"></a>  <span class="co"># annotate("rect",</span></span>
+<span id="cb33-393"><a href="#cb33-393" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),</span></span>
+<span id="cb33-394"><a href="#cb33-394" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +</span></span>
+<span id="cb33-395"><a href="#cb33-395" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-396"><a href="#cb33-396" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-397"><a href="#cb33-397" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-10-01"</span>),</span>
+<span id="cb33-398"><a href="#cb33-398" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-02-28"</span>),</span>
+<span id="cb33-399"><a href="#cb33-399" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-400"><a href="#cb33-400" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-401"><a href="#cb33-401" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-402"><a href="#cb33-402" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
+<span id="cb33-403"><a href="#cb33-403" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-404"><a href="#cb33-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-405"><a href="#cb33-405" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb33-406"><a href="#cb33-406" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-407"><a href="#cb33-407" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-408"><a href="#cb33-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-409"><a href="#cb33-409" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Jahr</span></span>
+<span id="cb33-410"><a href="#cb33-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-413"><a href="#cb33-413" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-414"><a href="#cb33-414" aria-hidden="true" tabindex="-1"></a>time_spent_by_year <span class="ot">&lt;-</span></span>
+<span id="cb33-415"><a href="#cb33-415" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-416"><a href="#cb33-416" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time_min, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-417"><a href="#cb33-417" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-418"><a href="#cb33-418" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_name =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb33-419"><a href="#cb33-419" aria-hidden="true" tabindex="-1"></a>    <span class="at">month_num =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(month_start, <span class="at">label =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb33-420"><a href="#cb33-420" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">year</span>(month_start)</span>
+<span id="cb33-421"><a href="#cb33-421" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb33-422"><a href="#cb33-422" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
+<span id="cb33-423"><a href="#cb33-423" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-424"><a href="#cb33-424" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-425"><a href="#cb33-425" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-426"><a href="#cb33-426" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-427"><a href="#cb33-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-428"><a href="#cb33-428" aria-hidden="true" tabindex="-1"></a>time_spent_by_year</span>
+<span id="cb33-429"><a href="#cb33-429" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb33-430"><a href="#cb33-430" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-431"><a href="#cb33-431" aria-hidden="true" tabindex="-1"></a>time_spent_by_year <span class="sc">|&gt;</span></span>
-<span id="cb33-432"><a href="#cb33-432" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year_date, <span class="at">y =</span> time_spent_avg)) <span class="sc">+</span></span>
-<span id="cb33-433"><a href="#cb33-433" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">date_labels =</span> <span class="st">"%Y"</span>) <span class="sc">+</span></span>
-<span id="cb33-434"><a href="#cb33-434" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">group =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
-<span id="cb33-435"><a href="#cb33-435" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(</span>
-<span id="cb33-436"><a href="#cb33-436" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> rect_data <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">xmin =</span> <span class="fu">as.Date</span>(xmin), <span class="at">xmax =</span> <span class="fu">as.Date</span>(xmax)), <span class="co"># ensure Date</span></span>
-<span id="cb33-437"><a href="#cb33-437" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">xmin =</span> xmin, <span class="at">xmax =</span> xmax, <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax),</span>
-<span id="cb33-438"><a href="#cb33-438" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"grey"</span>,</span>
-<span id="cb33-439"><a href="#cb33-439" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-440"><a href="#cb33-440" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span></span>
-<span id="cb33-441"><a href="#cb33-441" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-442"><a href="#cb33-442" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb33-443"><a href="#cb33-443" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%H:%M"</span>)) <span class="sc">+</span></span>
-<span id="cb33-444"><a href="#cb33-444" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Jahr"</span>, <span class="at">y =</span> <span class="st">"Durchschnittliche Verweildauer pro Jahr (h:m)"</span>)</span>
-<span id="cb33-445"><a href="#cb33-445" aria-hidden="true" tabindex="-1"></a><span class="co"># ...existing code...</span></span>
-<span id="cb33-446"><a href="#cb33-446" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-447"><a href="#cb33-447" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-448"><a href="#cb33-448" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-449"><a href="#cb33-449" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-450"><a href="#cb33-450" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Woche</span></span>
-<span id="cb33-451"><a href="#cb33-451" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-452"><a href="#cb33-452" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-453"><a href="#cb33-453" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-454"><a href="#cb33-454" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-455"><a href="#cb33-455" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-456"><a href="#cb33-456" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time_spent_by_week_name}</span></span>
-<span id="cb33-457"><a href="#cb33-457" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-458"><a href="#cb33-458" aria-hidden="true" tabindex="-1"></a>time_spent_by_week_name <span class="ot">&lt;-</span></span>
-<span id="cb33-459"><a href="#cb33-459" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
-<span id="cb33-460"><a href="#cb33-460" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time_min, <span class="st">"week"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb33-461"><a href="#cb33-461" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_num =</span> lubridate<span class="sc">::</span><span class="fu">week</span>(week_start), <span class="at">year =</span> <span class="fu">year</span>(week_start)) <span class="sc">|&gt;</span></span>
-<span id="cb33-462"><a href="#cb33-462" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(week_start, year) <span class="sc">|&gt;</span></span>
-<span id="cb33-463"><a href="#cb33-463" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb33-464"><a href="#cb33-464" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_week_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb33-465"><a href="#cb33-465" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_week_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-466"><a href="#cb33-466" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb33-467"><a href="#cb33-467" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-468"><a href="#cb33-468" aria-hidden="true" tabindex="-1"></a>time_spent_by_week_name <span class="sc">|&gt;</span></span>
-<span id="cb33-469"><a href="#cb33-469" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> week_start, <span class="at">y =</span> time_spent_week_avg)) <span class="sc">+</span></span>
-<span id="cb33-470"><a href="#cb33-470" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%H:%M"</span>)) <span class="sc">+</span></span>
-<span id="cb33-471"><a href="#cb33-471" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Datum"</span>, <span class="at">y =</span> <span class="st">"Durchschnittliche Verweildauer pro Woche (h:m)"</span>) <span class="sc">+</span></span>
-<span id="cb33-472"><a href="#cb33-472" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-473"><a href="#cb33-473" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight March–July (approx 1 Mar to 31 Jul) ---</span></span>
-<span id="cb33-474"><a href="#cb33-474" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-475"><a href="#cb33-475" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-476"><a href="#cb33-476" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-03-01"</span>),</span>
-<span id="cb33-477"><a href="#cb33-477" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2023-07-31"</span>),</span>
-<span id="cb33-478"><a href="#cb33-478" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-479"><a href="#cb33-479" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-480"><a href="#cb33-480" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-481"><a href="#cb33-481" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
-<span id="cb33-482"><a href="#cb33-482" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-431"><a href="#cb33-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-432"><a href="#cb33-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-435"><a href="#cb33-435" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-436"><a href="#cb33-436" aria-hidden="true" tabindex="-1"></a>time_spent_by_year <span class="ot">&lt;-</span></span>
+<span id="cb33-437"><a href="#cb33-437" aria-hidden="true" tabindex="-1"></a>  time_spent_by_year <span class="sc">|&gt;</span></span>
+<span id="cb33-438"><a href="#cb33-438" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(<span class="fu">paste0</span>(year, <span class="st">"-01-01"</span>))) <span class="co"># MAKE Date class</span></span>
+<span id="cb33-439"><a href="#cb33-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-440"><a href="#cb33-440" aria-hidden="true" tabindex="-1"></a>rect_data <span class="ot">&lt;-</span> <span class="fu">comp_semester_rects</span>(time_spent_by_year, <span class="at">col_date =</span> <span class="st">"year_date"</span>)</span>
+<span id="cb33-441"><a href="#cb33-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-442"><a href="#cb33-442" aria-hidden="true" tabindex="-1"></a>time_spent_by_year <span class="sc">|&gt;</span></span>
+<span id="cb33-443"><a href="#cb33-443" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year_date, <span class="at">y =</span> time_spent_avg)) <span class="sc">+</span></span>
+<span id="cb33-444"><a href="#cb33-444" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">date_labels =</span> <span class="st">"%Y"</span>) <span class="sc">+</span></span>
+<span id="cb33-445"><a href="#cb33-445" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">group =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
+<span id="cb33-446"><a href="#cb33-446" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(</span>
+<span id="cb33-447"><a href="#cb33-447" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> rect_data <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">xmin =</span> <span class="fu">as.Date</span>(xmin), <span class="at">xmax =</span> <span class="fu">as.Date</span>(xmax)), <span class="co"># ensure Date</span></span>
+<span id="cb33-448"><a href="#cb33-448" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">xmin =</span> xmin, <span class="at">xmax =</span> xmax, <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax),</span>
+<span id="cb33-449"><a href="#cb33-449" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"grey"</span>,</span>
+<span id="cb33-450"><a href="#cb33-450" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-451"><a href="#cb33-451" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span></span>
+<span id="cb33-452"><a href="#cb33-452" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-453"><a href="#cb33-453" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb33-454"><a href="#cb33-454" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%H:%M"</span>)) <span class="sc">+</span></span>
+<span id="cb33-455"><a href="#cb33-455" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Jahr"</span>, <span class="at">y =</span> <span class="st">"Durchschnittliche Verweildauer pro Jahr (h:m)"</span>)</span>
+<span id="cb33-456"><a href="#cb33-456" aria-hidden="true" tabindex="-1"></a><span class="co"># ...existing code...</span></span>
+<span id="cb33-457"><a href="#cb33-457" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-458"><a href="#cb33-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-459"><a href="#cb33-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-460"><a href="#cb33-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-461"><a href="#cb33-461" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Woche</span></span>
+<span id="cb33-462"><a href="#cb33-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-463"><a href="#cb33-463" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-464"><a href="#cb33-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-465"><a href="#cb33-465" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-466"><a href="#cb33-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-467"><a href="#cb33-467" aria-hidden="true" tabindex="-1"></a><span class="in">```{r time_spent_by_week_name}</span></span>
+<span id="cb33-468"><a href="#cb33-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-469"><a href="#cb33-469" aria-hidden="true" tabindex="-1"></a>time_spent_by_week_name <span class="ot">&lt;-</span></span>
+<span id="cb33-470"><a href="#cb33-470" aria-hidden="true" tabindex="-1"></a>  time_spent <span class="sc">|&gt;</span></span>
+<span id="cb33-471"><a href="#cb33-471" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_start =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time_min, <span class="st">"week"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-472"><a href="#cb33-472" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_num =</span> lubridate<span class="sc">::</span><span class="fu">week</span>(week_start), <span class="at">year =</span> <span class="fu">year</span>(week_start)) <span class="sc">|&gt;</span></span>
+<span id="cb33-473"><a href="#cb33-473" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(week_start, year) <span class="sc">|&gt;</span></span>
+<span id="cb33-474"><a href="#cb33-474" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-475"><a href="#cb33-475" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_week_avg =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-476"><a href="#cb33-476" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_spent_week_sd =</span> <span class="fu">sd</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-477"><a href="#cb33-477" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-478"><a href="#cb33-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-479"><a href="#cb33-479" aria-hidden="true" tabindex="-1"></a>time_spent_by_week_name <span class="sc">|&gt;</span></span>
+<span id="cb33-480"><a href="#cb33-480" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> week_start, <span class="at">y =</span> time_spent_week_avg)) <span class="sc">+</span></span>
+<span id="cb33-481"><a href="#cb33-481" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%H:%M"</span>)) <span class="sc">+</span></span>
+<span id="cb33-482"><a href="#cb33-482" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Datum"</span>, <span class="at">y =</span> <span class="st">"Durchschnittliche Verweildauer pro Woche (h:m)"</span>) <span class="sc">+</span></span>
 <span id="cb33-483"><a href="#cb33-483" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-484"><a href="#cb33-484" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-485"><a href="#cb33-485" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-486"><a href="#cb33-486" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-03-01"</span>),</span>
-<span id="cb33-487"><a href="#cb33-487" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-07-31"</span>),</span>
-<span id="cb33-488"><a href="#cb33-488" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-489"><a href="#cb33-489" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-490"><a href="#cb33-490" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-491"><a href="#cb33-491" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
-<span id="cb33-492"><a href="#cb33-492" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-493"><a href="#cb33-493" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-494"><a href="#cb33-494" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-495"><a href="#cb33-495" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2025-03-01"</span>),</span>
-<span id="cb33-496"><a href="#cb33-496" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-07-31"</span>),</span>
-<span id="cb33-497"><a href="#cb33-497" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-498"><a href="#cb33-498" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-499"><a href="#cb33-499" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-500"><a href="#cb33-500" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
-<span id="cb33-501"><a href="#cb33-501" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-502"><a href="#cb33-502" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-503"><a href="#cb33-503" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight October–February (semester break or 2nd term) ---</span></span>
-<span id="cb33-504"><a href="#cb33-504" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
-<span id="cb33-505"><a href="#cb33-505" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-506"><a href="#cb33-506" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-10-01"</span>),</span>
-<span id="cb33-507"><a href="#cb33-507" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-02-28"</span>),</span>
-<span id="cb33-508"><a href="#cb33-508" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
-<span id="cb33-509"><a href="#cb33-509" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
-<span id="cb33-510"><a href="#cb33-510" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
-<span id="cb33-511"><a href="#cb33-511" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
-<span id="cb33-512"><a href="#cb33-512" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-513"><a href="#cb33-513" aria-hidden="true" tabindex="-1"></a>  <span class="co"># annotate("rect",</span></span>
-<span id="cb33-514"><a href="#cb33-514" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),</span></span>
-<span id="cb33-515"><a href="#cb33-515" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +</span></span>
+<span id="cb33-484"><a href="#cb33-484" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight March–July (approx 1 Mar to 31 Jul) ---</span></span>
+<span id="cb33-485"><a href="#cb33-485" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-486"><a href="#cb33-486" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-487"><a href="#cb33-487" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-03-01"</span>),</span>
+<span id="cb33-488"><a href="#cb33-488" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2023-07-31"</span>),</span>
+<span id="cb33-489"><a href="#cb33-489" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-490"><a href="#cb33-490" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-491"><a href="#cb33-491" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-492"><a href="#cb33-492" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
+<span id="cb33-493"><a href="#cb33-493" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-494"><a href="#cb33-494" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-495"><a href="#cb33-495" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-496"><a href="#cb33-496" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-497"><a href="#cb33-497" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-03-01"</span>),</span>
+<span id="cb33-498"><a href="#cb33-498" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-07-31"</span>),</span>
+<span id="cb33-499"><a href="#cb33-499" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-500"><a href="#cb33-500" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-501"><a href="#cb33-501" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-502"><a href="#cb33-502" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-503"><a href="#cb33-503" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
+<span id="cb33-504"><a href="#cb33-504" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-505"><a href="#cb33-505" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-506"><a href="#cb33-506" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-507"><a href="#cb33-507" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2025-03-01"</span>),</span>
+<span id="cb33-508"><a href="#cb33-508" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-07-31"</span>),</span>
+<span id="cb33-509"><a href="#cb33-509" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-510"><a href="#cb33-510" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-511"><a href="#cb33-511" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-512"><a href="#cb33-512" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"skyblue"</span></span>
+<span id="cb33-513"><a href="#cb33-513" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-514"><a href="#cb33-514" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-515"><a href="#cb33-515" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- Highlight October–February (semester break or 2nd term) ---</span></span>
 <span id="cb33-516"><a href="#cb33-516" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
 <span id="cb33-517"><a href="#cb33-517" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
-<span id="cb33-518"><a href="#cb33-518" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-10-01"</span>),</span>
-<span id="cb33-519"><a href="#cb33-519" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-02-28"</span>),</span>
+<span id="cb33-518"><a href="#cb33-518" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2023-10-01"</span>),</span>
+<span id="cb33-519"><a href="#cb33-519" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2024-02-28"</span>),</span>
 <span id="cb33-520"><a href="#cb33-520" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
 <span id="cb33-521"><a href="#cb33-521" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
 <span id="cb33-522"><a href="#cb33-522" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
 <span id="cb33-523"><a href="#cb33-523" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
 <span id="cb33-524"><a href="#cb33-524" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb33-525"><a href="#cb33-525" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">group =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
-<span id="cb33-526"><a href="#cb33-526" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb33-527"><a href="#cb33-527" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span>
-<span id="cb33-528"><a href="#cb33-528" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-529"><a href="#cb33-529" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-530"><a href="#cb33-530" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-531"><a href="#cb33-531" aria-hidden="true" tabindex="-1"></a><span class="fu">## Zusammenhang von Lehrveranstaltung und Verweildauer</span></span>
-<span id="cb33-532"><a href="#cb33-532" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-533"><a href="#cb33-533" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-534"><a href="#cb33-534" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-537"><a href="#cb33-537" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-538"><a href="#cb33-538" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary <span class="ot">&lt;-</span></span>
-<span id="cb33-539"><a href="#cb33-539" aria-hidden="true" tabindex="-1"></a>  time_spent_w_course_university <span class="sc">|&gt;</span></span>
-<span id="cb33-540"><a href="#cb33-540" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(floor_date_month) <span class="sc">|&gt;</span></span>
-<span id="cb33-541"><a href="#cb33-541" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb33-542"><a href="#cb33-542" aria-hidden="true" tabindex="-1"></a>    <span class="at">distinct_courses_n =</span> <span class="fu">n_distinct</span>(course),</span>
-<span id="cb33-543"><a href="#cb33-543" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_time_mean =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb33-544"><a href="#cb33-544" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
-<span id="cb33-545"><a href="#cb33-545" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-525"><a href="#cb33-525" aria-hidden="true" tabindex="-1"></a>  <span class="co"># annotate("rect",</span></span>
+<span id="cb33-526"><a href="#cb33-526" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          xmin = as.Date("2024-10-01"), xmax = as.Date("2024-02-28"),</span></span>
+<span id="cb33-527"><a href="#cb33-527" aria-hidden="true" tabindex="-1"></a>  <span class="co">#          ymin = -Inf, ymax = Inf, alpha = 0.2, fill = "orange") +</span></span>
+<span id="cb33-528"><a href="#cb33-528" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(</span>
+<span id="cb33-529"><a href="#cb33-529" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rect"</span>,</span>
+<span id="cb33-530"><a href="#cb33-530" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2024-10-01"</span>),</span>
+<span id="cb33-531"><a href="#cb33-531" aria-hidden="true" tabindex="-1"></a>    <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2025-02-28"</span>),</span>
+<span id="cb33-532"><a href="#cb33-532" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymin =</span> <span class="sc">-</span><span class="cn">Inf</span>,</span>
+<span id="cb33-533"><a href="#cb33-533" aria-hidden="true" tabindex="-1"></a>    <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb33-534"><a href="#cb33-534" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb33-535"><a href="#cb33-535" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span></span>
+<span id="cb33-536"><a href="#cb33-536" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb33-537"><a href="#cb33-537" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">group =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"grey60"</span>) <span class="sc">+</span></span>
+<span id="cb33-538"><a href="#cb33-538" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb33-539"><a href="#cb33-539" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span>
+<span id="cb33-540"><a href="#cb33-540" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-541"><a href="#cb33-541" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-542"><a href="#cb33-542" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-543"><a href="#cb33-543" aria-hidden="true" tabindex="-1"></a><span class="fu">## Zusammenhang von Lehrveranstaltung und Verweildauer</span></span>
+<span id="cb33-544"><a href="#cb33-544" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-545"><a href="#cb33-545" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-546"><a href="#cb33-546" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-547"><a href="#cb33-547" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary</span>
-<span id="cb33-548"><a href="#cb33-548" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-549"><a href="#cb33-549" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-550"><a href="#cb33-550" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-551"><a href="#cb33-551" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-554"><a href="#cb33-554" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-555"><a href="#cb33-555" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary <span class="sc">|&gt;</span></span>
-<span id="cb33-556"><a href="#cb33-556" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> distinct_courses_n, <span class="at">y =</span> diff_time_mean)) <span class="sc">+</span></span>
-<span id="cb33-557"><a href="#cb33-557" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb33-558"><a href="#cb33-558" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%M:%S"</span>)) <span class="sc">+</span></span>
-<span id="cb33-559"><a href="#cb33-559" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb33-560"><a href="#cb33-560" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Average visit duration (m:s)"</span>,</span>
-<span id="cb33-561"><a href="#cb33-561" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"No. of distinct courses per month"</span></span>
-<span id="cb33-562"><a href="#cb33-562" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-549"><a href="#cb33-549" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-550"><a href="#cb33-550" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary <span class="ot">&lt;-</span></span>
+<span id="cb33-551"><a href="#cb33-551" aria-hidden="true" tabindex="-1"></a>  time_spent_w_course_university <span class="sc">|&gt;</span></span>
+<span id="cb33-552"><a href="#cb33-552" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(floor_date_month) <span class="sc">|&gt;</span></span>
+<span id="cb33-553"><a href="#cb33-553" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-554"><a href="#cb33-554" aria-hidden="true" tabindex="-1"></a>    <span class="at">distinct_courses_n =</span> <span class="fu">n_distinct</span>(course),</span>
+<span id="cb33-555"><a href="#cb33-555" aria-hidden="true" tabindex="-1"></a>    <span class="at">diff_time_mean =</span> <span class="fu">mean</span>(time_diff, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-556"><a href="#cb33-556" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb33-557"><a href="#cb33-557" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-558"><a href="#cb33-558" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-559"><a href="#cb33-559" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary</span>
+<span id="cb33-560"><a href="#cb33-560" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-561"><a href="#cb33-561" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-562"><a href="#cb33-562" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-563"><a href="#cb33-563" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-564"><a href="#cb33-564" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb33-565"><a href="#cb33-565" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-566"><a href="#cb33-566" aria-hidden="true" tabindex="-1"></a><span class="fu">## Zusammenhang von Lehrveranstaltung und Anzahl Visits</span></span>
-<span id="cb33-567"><a href="#cb33-567" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-570"><a href="#cb33-570" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb33-571"><a href="#cb33-571" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary <span class="sc">|&gt;</span></span>
-<span id="cb33-572"><a href="#cb33-572" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> distinct_courses_n, <span class="at">y =</span> n)) <span class="sc">+</span></span>
-<span id="cb33-573"><a href="#cb33-573" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb33-574"><a href="#cb33-574" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"No. of visits per month"</span>, <span class="at">x =</span> <span class="st">"No. of distinct courses per month"</span>)</span>
-<span id="cb33-575"><a href="#cb33-575" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-566"><a href="#cb33-566" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-567"><a href="#cb33-567" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary <span class="sc">|&gt;</span></span>
+<span id="cb33-568"><a href="#cb33-568" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> distinct_courses_n, <span class="at">y =</span> diff_time_mean)) <span class="sc">+</span></span>
+<span id="cb33-569"><a href="#cb33-569" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb33-570"><a href="#cb33-570" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_time</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">time_format</span>(<span class="st">"%M:%S"</span>)) <span class="sc">+</span></span>
+<span id="cb33-571"><a href="#cb33-571" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb33-572"><a href="#cb33-572" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Average visit duration (m:s)"</span>,</span>
+<span id="cb33-573"><a href="#cb33-573" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"No. of distinct courses per month"</span></span>
+<span id="cb33-574"><a href="#cb33-574" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-575"><a href="#cb33-575" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-576"><a href="#cb33-576" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb33-577"><a href="#cb33-577" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-578"><a href="#cb33-578" aria-hidden="true" tabindex="-1"></a><span class="fu">## Zusammenhang von Lehrveranstaltung und Anzahl Visits</span></span>
+<span id="cb33-579"><a href="#cb33-579" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-582"><a href="#cb33-582" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb33-583"><a href="#cb33-583" aria-hidden="true" tabindex="-1"></a>time_spent_w_course_university_summary <span class="sc">|&gt;</span></span>
+<span id="cb33-584"><a href="#cb33-584" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> distinct_courses_n, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb33-585"><a href="#cb33-585" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb33-586"><a href="#cb33-586" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"No. of visits per month"</span>, <span class="at">x =</span> <span class="st">"No. of distinct courses per month"</span>)</span>
+<span id="cb33-587"><a href="#cb33-587" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="In die Zwischenablage kopieren" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
