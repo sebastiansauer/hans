@@ -27,13 +27,9 @@ tar_source()
 ## import data -------------------------------------------------------------
 list(
   tar_target(config_file, "config.yaml", format = "file"),
-
   tar_target(config, read_yaml(config_file), packages = "yaml"),
-
   tar_target(data_files_list, find_data_files(config), format = "file"),
-
   tar_target(data_files_dupes_excluded, exclude_dupes(data_files_list)),
-
   tar_target(
     data_imported,
     data_files_dupes_excluded |>
@@ -52,9 +48,7 @@ list(
     data_prepped |> mutate(across(everything(), as.factor)),
     packages = "collapse"
   ),
-
   tar_target(test_unique_idvisit, check_unique_ids(data_prepped)),
-
   tar_target(
     data_wide_slim,
     data_all_fct |>
@@ -66,7 +60,6 @@ list(
         )
       )
   ),
-
   tar_target(
     course_and_uni_per_visit,
     data_wide_slim |> extract_course_role_university_of_visit()
@@ -98,7 +91,6 @@ list(
     data_separated |>
       filter_column_type()
   ),
-
   tar_target(
     data_separated_filtered_date_uni_course,
     add_date_uni_course_to_long_data(
@@ -121,19 +113,22 @@ list(
       group_by(fingerprint) |>
       summarise(nr_max = max(nr))
   ),
-  tar_target(n_action_lt_500,
-  n_action |>
-  filter(nr_max != 499)),
-
-  tar_target(n_action_lt_500_fingerprint,
-  n_action_fingerprint |>
-  filter(nr_max != 499)),
+  tar_target(
+    n_action_lt_500,
+    n_action |>
+      filter(nr_max != 499)
+  ),
+  tar_target(
+    n_action_lt_500_fingerprint,
+    n_action_fingerprint |>
+      filter(nr_max != 499)
+  ),
 
 
   # count number of actions per visit and adds date of visit:
   tar_target(
     n_action_w_date,
-    data_separated_filtered |>  # one row is one visit
+    data_separated_filtered |> # one row is one visit
       count_action_w_date()
   ),
   tar_target(
@@ -143,7 +138,9 @@ list(
   ),
 
   # compute how much time was spent per visit:
-  tar_target(time_spent, data_separated_filtered |> diff_time()),
+  tar_target(
+    time_spent, 
+    data_separated_filtered |> diff_time()),
   tar_target(
     time_spent_fingerprint,
     data_separated_filtered |> diff_time(idvar = fingerprint)
@@ -169,7 +166,7 @@ list(
   ),
 
   # compute how much time was spent per visit:
-  # different computation to "timpe_spent", but same goal.
+  # different computation to "time_spent", but same goal.
   tar_target(
     time_duration,
     data_all_fct %>%
@@ -196,14 +193,14 @@ list(
   tar_target(n_action_type, count_user_action_type(data_separated_filtered)),
 
   # get timestamps for each idvisits:
-  tar_target(timestamps_added_to_idvisits,
+  tar_target(
+    timestamps_added_to_idvisits,
     data_separated_filtered |> idvar_timestamp()
   ),
   tar_target(
     timestamps_added_to_fingerprints,
     data_separated_filtered |> idvar_timestamp(idvar = fingerprint)
   ),
-
   tar_target(
     n_action_type_per_month,
     add_dates_to_n_action_type(data = n_action_type, data_time = time_spent_w_course_university),
@@ -241,7 +238,7 @@ list(
   # add date, course, university to LLM responses:
   tar_target(
     llm_response_text_date_course_uni,
-    time_spent_w_course_university |> 
+    time_spent_w_course_university |>
       mutate(idvisit = as.integer(idvisit)) |>
       left_join(llm_response_text, by = "idvisit") |>
       select(-any_of(c("type", "value"))),
@@ -284,28 +281,28 @@ list(
     packages = c("tokenizers", "stringr")
   ),
   tar_target(
-    prompt_length_date_uni_course, 
-    time_spent_w_course_university |> 
+    prompt_length_date_uni_course,
+    time_spent_w_course_university |>
       mutate(idvisit = as.integer(idvisit)) |>
       left_join(prompt_length, by = "idvisit") |>
       select(-any_of(c("type", "value"))),
     packages = c("dplyr", "lubridate")
   ),
-
   tar_target(
     prompts_texts_date_course_uni,
     data_separated_filtered |>
-      compute_prompt_length(no_prompt_text = FALSE) |> 
-      left_join(time_spent_w_course_university |> mutate(idvisit = as.integer(idvisit)), 
-        by = "idvisit"),        
+      compute_prompt_length(no_prompt_text = FALSE) |>
+      left_join(time_spent_w_course_university |> mutate(idvisit = as.integer(idvisit)),
+        by = "idvisit"
+      ),
     packages = c("tokenizers", "stringr")
   ),
-
   tar_target(
     n_interactions_w_llm_course_date_course_uni,
     count_llm_interactions_add_context(
       data_separated_filtered,
-      time_spent_w_course_university)
+      time_spent_w_course_university
+    )
   ),
 
 
@@ -318,8 +315,8 @@ list(
       compute_glotzdauer(),
     packages = c("data.table", "dplyr", "lubridate")
   ),
-
-  tar_target(glotzdauer_prepped,
+  tar_target(
+    glotzdauer_prepped,
     prep_glotzdauer(data_separated_distinct_slice)
   )
 

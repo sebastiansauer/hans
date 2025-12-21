@@ -47,7 +47,8 @@ Die Visit-Zeit wurde auf 600 Min. trunkiert/begrenzt.
 
 ```{r}
 time_spent |>
-  head(30)
+  head(10) |> 
+  gt::gt()
 ```
 
 
@@ -63,7 +64,8 @@ time_spent <-
 
 ```{r}
 time_spent_fingerprint |>
-  head(30)
+   head(10) |> 
+  gt::gt()
 ```
 
 
@@ -79,7 +81,8 @@ time_spent_fingerprint <-
 
 ```{r}
 time_spent_fingerprint |>
-  head(30)
+  head(10) |> 
+  gt::gt()
 ```
 
 
@@ -148,7 +151,8 @@ vgl. [Target `time_duration` in der Targets-Pipeline](https://github.com/sebasti
 
 ```{r}
 time_duration |>
-  head(30)
+  head(10) |> 
+  gt::gt()
 ```
 
 
@@ -186,6 +190,8 @@ time_spent |>
   mutate(time_diff_minutes = time_length(time_diff, unit = "minute")) |>
   summarise(
     mean_time_diff = round(mean(time_diff_minutes), 2),
+    median_time_diff =round(median(time_diff_minutes), 2),
+    iqr_time_diff = round(IQR(time_diff_minutes), 2)
     sd_time_diff = sd(time_diff_minutes),
     min_time_diff = min(time_diff_minutes), # shortest duration
     max_time_diff = max(time_diff_minutes) # longest
@@ -224,7 +230,8 @@ time_spent |>
   #scale_x_time() +
   theme_minimal() +
   labs(y = "n", x = "Verweildauer in HaNS pro Visit in d:h:m") +
-  scale_x_time(breaks = pretty_breaks())
+  scale_x_time(breaks = pretty_breaks()) +
+  geom_vline(xintercept = median(time_diff_minutes, na.rm = TRUE))
 ```
 
 

@@ -1,8 +1,7 @@
 count_user_action_type <- function(data) {
   data |>
     fsubset(type == "subtitle" | type == "timestamp") |>
-    ftransform(value = gsub('["\']', '', value)) |>
-
+    ftransform(value = gsub('["\']', "", value)) |>
     fmutate(
       category = case_when(
         str_detect(value, "https") ~ "visit_page",

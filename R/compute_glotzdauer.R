@@ -1,5 +1,17 @@
-compute_glotzdauer <- function(data_separated) {
-  d <- as.data.table(data_separated)
+compute_glotzdauer <- function(data = data_separated) {
+  #' Video watching duration per visitid
+  #' 
+  #' Computes the duration of video watching per visitid.
+  #' 
+  #' @param data The main data frame in long format.
+  #' 
+  #' @retuns Data frame with 4 columns: id, start, end, duration 
+  #' 
+  #' @examples 
+  #' video <- compute_glotzdaer(data_separated) 
+
+  
+  d <- as.data.table(data)
 
   # Filter relevant rows first
   d_events <- d[

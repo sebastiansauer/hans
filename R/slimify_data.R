@@ -14,7 +14,7 @@ slimify_nona_data <- function(data_long) {
       type = as.factor(type),
       value = as.factor(value)
     ) |>
-    #ungroup() |>
+    # ungroup() |>
     arrange(idvisit, nr)
 
   return(data_separated)
