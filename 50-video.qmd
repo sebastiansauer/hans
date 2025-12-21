@@ -13,6 +13,7 @@ library(scales)
 # library(ggfittext)
 library(easystats)
 # library(ggokabeito)
+library(knitr)
 ```
 
 ```{r source-common-start}
@@ -60,6 +61,24 @@ as_tibble(data_separated_distinct_slice) |>
   head(30)
 ```
 
+```{r}
+data_separated_distinct_slice_summary <-
+  data_separated_distinct_slice |>
+  mutate(time_diff = abs(time_diff)) |>
+  # without glotzdauer smaller than 10 minutes:
+  filter(time_diff < 60 * 10) |>
+  summarise(
+    time_diff_median = median(time_diff, na.rm = TRUE),
+    time_diff_median_hms = hms::as_hms(median(time_diff, na.rm = TRUE)),
+    time_diff_mean_hms = hms::as_hms(mean(time_diff, na.rm = TRUE)),
+    time_diff_mean = mean(time_diff, na.rm = TRUE),
+    time_diff_sd = sd(time_diff, na.rm = TRUE),
+    n = n()
+  )
+
+data_separated_distinct_slice_summary |> kable(digits = 2)
+```
+
 Für die folgende Darstellung wurden die *absoluten* Zeitwerte verwendet, d.h. ohne Vorzeichen.
 
 ```{r p-plotzdauer}
@@ -70,12 +89,20 @@ data_separated_distinct_slice |>
   filter(time_diff < 60 * 10) |>
   ggplot(aes(x = time_diff)) +
   geom_histogram() +
-  scale_x_time() +
+  scale_x_time(breaks = pretty_breaks()) +
   labs(
-    x = "Time interval [minutes]",
+    x = "Time interval [h:m:s]",
     caption = "Only time intervals less than 10 minutes. It is assumed that video time is positive only (no negative time intervals)."
   ) +
-  theme_minimal()
+  theme_minimal() +
+  geom_vline(xintercept = data_separated_distinct_slice_summary$time_diff_median, 
+  linetype = "dashed", color = "blue") +
+  annotate("label",
+    x = data_separated_distinct_slice_summary$time_diff_median_hms,
+    y = 0,
+    color = "blue",
+    label = data_separated_distinct_slice_summary$time_diff_median_hms, 
+  )
 ```
 
 
@@ -167,6 +194,11 @@ glotzdauer_prepped_tbl |>
   ) +
   geom_line() +
   theme_minimal() +
-  geom_smooth(method = "loess", se = FALSE, color = "blue") 
+  geom_smooth(method = "loess", se = FALSE, color = "blue") +
+  labs(
+    x = "Date",
+    y = "Average video watching time [s]",
+    caption = "Highlighted: Lecture periods (skyblue) and semester breaks (orange)."
+  )
 ```
 

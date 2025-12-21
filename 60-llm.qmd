@@ -92,7 +92,8 @@ llm_interactions_count <-
   rename(messages_to_llm_n = n)
 
 llm_interactions_count |>
-  describe_distribution(messages_to_llm_n, centrality = c("mean", "median"))
+  describe_distribution(messages_to_llm_n, centrality = c("mean", "median")) |>
+  print_md()
 
 ```
 
@@ -343,7 +344,8 @@ idvisit_has_llm |>
   labs(
     title = "Anteil der Besucher, die mit dem LLM interagieren (Prozent)",
     y = "Prozentualer Anteil der Besucher",
-    fill = "Interagiert mit LLM"
+    fill = "Interagiert mit LLM",
+    x = "Datum"
   ) +
   scale_x_date(breaks = pretty_breaks())
 ```
@@ -394,11 +396,12 @@ describe_distribution(
 ```{r}
 prompt_length_date_uni_course |>
   group_by(university) |>
-  describe_distribution(token_length)
+  describe_distribution(token_length) |>
+  print_md()
 ```
 
 ```{r prompt_length_date_uni_course-ggviolin}
-ggviolin(
+ggboxplot(
   prompt_length_date_uni_course,
   x = "university",
   y = "token_length",
@@ -408,8 +411,7 @@ ggviolin(
   labs(
     title = "Prompt length by university",
     x = "University",
-    y = "Prompt length (in tokens)",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Prompt length (in tokens)"
   ) +
   coord_flip()
 ```
@@ -427,7 +429,9 @@ prompt_length_date_uni_course |>
 ```
 
 ```{r prompt_length_date_uni_course-ggviolin-per-course}
-ggviolin(
+#| fig-asp: 1
+ 
+ggboxplot(
   prompt_length_date_uni_course,
   x = "course",
   y = "token_length",
@@ -437,8 +441,7 @@ ggviolin(
   labs(
     title = "Prompt length by course",
     x = "Course",
-    y = "Prompt length (in tokens)",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Prompt length (in tokens)"
   ) +
   coord_flip()
 ```
@@ -474,11 +477,11 @@ filtered_data |>
   theme_minimal() +
   labs(
     title = "Prompt length over time",
-    x = "Month",
+    x = "Date",
     y = "Prompt length (in tokens)",
     caption = "The dots represent the mean and the error bars the standard error of the mean."
   ) +
-  scale_x_date(limits = lim, labels = scales::label_date_short())
+  scale_x_date(limits = lim, labels = scales::label_date_short()) 
 
 ```
 
@@ -533,7 +536,8 @@ n_interactions_w_llm_course_date_course_uni |>
   summarise(n = n()) |>
   ggplot(aes(x = reorder(course, n), y = n)) +
   geom_col() +
-  coord_flip()
+  coord_flip() +
+  labs(x =  "Course")
 #facet_wrap(~ university, scales = "free_y")
 ```
 
@@ -556,17 +560,11 @@ n_interactions_w_llm_course_date_course_uni |>
     alpha = 0.2,
     inherit.aes = FALSE # Essential to use the rect_data columns
   ) +
-  geom_line()
-#todo
-
+  geom_line() +
+  labs(x = "Date", y = "Number of interactions with LLM") 
 ```
 
 ```{r n_interactions_w_llm_course_date_course_uni-plot_with_semesters_shaded}
-library(dplyr)
-library(lubridate)
-library(ggplot2)
-library(tibble) # Needed for the tibble function
-
 # --- 1. Prepare Data ---
 # Your original data processing for the plot
 plot_data <- n_interactions_w_llm_course_date_course_uni |>
@@ -632,9 +630,9 @@ plot_data |>
   theme_minimal() +
   labs(
     title = "Number of Interactions with LLM per Course Date per University",
-    x = "Month",
+    x = "Date",
     y = "Number of Interactions"
-  )
+  ) 
 ```
 
 ## Klick auf ein Wort im Transkript
@@ -694,7 +692,9 @@ click_transcript_word_per_month |>
     alpha = 0.2,
     inherit.aes = FALSE # Essential to use the rect_data columns
   ) +
-  geom_line()
+  geom_line() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue", alpha = 0.7) +
+  scale_x_date(labels = scales::label_date_short())
 ```
 
 #### fingerprint unique
@@ -729,7 +729,8 @@ click_transcript_word_per_month_fingerprint |>
     alpha = 0.2,
     inherit.aes = FALSE # Essential to use the rect_data columns
   ) +
-  geom_line()
+  geom_line() +
+  geom_smooth(method = "loess", se = FALSE, color = "blue", alpha = 0.7)
 ```
 
 ## KI-Aktionen
@@ -878,7 +879,8 @@ ai_clicks_data |>
   geom_line(group = 1) +
   geom_point() +
   theme_minimal() +
-  labs(title = "Number of AI transcript clicks per month", x = "date [months]")
+  labs(title = "Number of AI transcript clicks per month", x = "date [months]") +
+  geom_smooth(method = "loess", se = FALSE, color = "blue", alpha = 0.5)
 ```
 
 ```{r ai_transcript_clicks_per_month_count-plot_with_semesters_shaded}
@@ -938,7 +940,8 @@ ai_clicks_data |>
   geom_line(group = 1) +
   geom_point() +
   theme_minimal() +
-  labs(title = "Number of AI transcript clicks per month", x = "date [months]")
+  labs(title = "Number of AI transcript clicks per month", x = "date [months]") +
+  geom_smooth(method = "loess", se = FALSE, color = "blue", alpha = 0.5)
 ```
 
 ## Output des LLMs: `llm_response` - Tokens und Tokenlänge
@@ -972,7 +975,7 @@ llm_response_text_date_course_uni |>
 
 ```{r}
 llm_response_text_date_course_uni |>
-  ggviolin(
+  ggboxplot(
     x = "university",
     y = "tokens_n",
     add = "mean_se"
@@ -981,8 +984,7 @@ llm_response_text_date_course_uni |>
   labs(
     title = "Number of tokens in LLM responses by university",
     x = "University",
-    y = "Number of tokens",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Number of tokens"
   ) +
   coord_flip()
 ```
@@ -1000,7 +1002,7 @@ llm_response_text_date_course_uni |>
 
 ```{r}
 llm_response_text_date_course_uni |>
-  ggviolin(
+  ggboxplot(
     x = "course",
     y = "tokens_n",
     add = "mean_se"
@@ -1009,8 +1011,7 @@ llm_response_text_date_course_uni |>
   labs(
     title = "Number of tokens in LLM responses by course",
     x = "Course",
-    y = "Number of tokens",
-    caption = "The dots represent the mean and the error bars the standard error of the mean."
+    y = "Number of tokens"
   ) +
   coord_flip()
 ```
@@ -1252,7 +1253,6 @@ prior_existing_questions_summary |>
 prompt_length |>
   head()
 ```
-
 ```{r}
 prompt_length |>
   describe_distribution(token_length)
